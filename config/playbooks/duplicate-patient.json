@@ -1,0 +1,156 @@
+{
+  "playbook_id": "duplicate-patient",
+  "version": "1.0.0",
+  "name": "Duplicate Patient Detection",
+  "description": "Detects when a patient may already exist in the system and handles the branching logic for new vs. existing patients.",
+  "trigger_conditions": {
+    "triggered_by": "booking-conversion duplicate_detection",
+    "check_points": [
+      "after_name_collected",
+      "after_phone_confirmed",
+      "when_both_name_and_phone_available"
+    ]
+  },
+  "response_goals": [
+    "Accurately identify whether the patient is new or returning",
+    "Handle the conversation naturally without making it feel like interrogation",
+    "Route returning patients to the appropriate workflow",
+    "Protect patient privacy throughout the process"
+  ],
+  "detection_rules": {
+    "match_criteria": [
+      {
+        "field": "phone_number",
+        "match_type": "exact",
+        "confidence": "high"
+      },
+      {
+        "field": "first_name_last_name",
+        "match_type": "fuzzy",
+        "confidence": "medium",
+        "fuzzy_threshold": 0.85
+      },
+      {
+        "field": "date_of_birth",
+        "match_type": "exact",
+        "confidence": "high",
+        "note": "Only used if already collected, never requested for dedup purposes"
+      }
+    ],
+    "confidence_thresholds": {
+      "definite_match": "phone_exact AND name_fuzzy_above_0.9",
+      "probable_match": "phone_exact OR (name_exact AND any_other_field)",
+      "possible_match": "name_fuzzy_above_0.85 only",
+      "no_match": "below_all_thresholds"
+    }
+  },
+  "steps": [
+    {
+      "step_id": 1,
+      "name": "run_duplicate_check",
+      "description": "Query the patient database for potential matches.",
+      "required": true,
+      "guidelines": [
+        "Check happens in the background -- do not tell the patient you're checking for duplicates",
+        "Run check against active and inactive patient records",
+        "Log the match confidence for quality tracking"
+      ]
+    },
+    {
+      "step_id": 2,
+      "name": "handle_definite_match",
+      "description": "Patient is clearly a returning patient.",
+      "condition": "definite_match",
+      "guidelines": [
+        "Acknowledge them warmly: 'Welcome back!'",
+        "Reference their existing information without reading it all back",
+        "Ask if their information is still current",
+        "Skip redundant data collection steps",
+        "Route to returning patient booking flow"
+      ],
+      "response_template": "Welcome back, {first_name}! I see you've been with us before. Is your information still up to date, or has anything changed?"
+    },
+    {
+      "step_id": 3,
+      "name": "handle_probable_match",
+      "description": "Likely a returning patient but needs confirmation.",
+      "condition": "probable_match",
+      "guidelines": [
+        "Gently ask if they've visited before without assuming",
+        "Use a natural question: 'Have you been to one of our locations before?'",
+        "If yes, confirm identity with a soft verification question",
+        "If no, proceed as new patient",
+        "Never reveal specific account details until identity is confirmed"
+      ],
+      "response_template": "Have you visited one of our offices before? I just want to make sure I have the right information for you."
+    },
+    {
+      "step_id": 4,
+      "name": "handle_possible_match",
+      "description": "Might be a match but not enough data to be sure.",
+      "condition": "possible_match",
+      "guidelines": [
+        "Ask casually if they're a new or returning patient",
+        "Don't mention that you found a possible match",
+        "If they say new, proceed as new patient",
+        "If they say returning, do additional verification"
+      ]
+    },
+    {
+      "step_id": 5,
+      "name": "handle_no_match",
+      "description": "Patient is new. Proceed with standard booking flow.",
+      "condition": "no_match",
+      "guidelines": [
+        "Continue with booking-conversion as normal",
+        "Welcome them as a new patient warmly",
+        "No additional steps needed"
+      ]
+    },
+    {
+      "step_id": 6,
+      "name": "identity_verification_for_returning",
+      "description": "Soft verification for probable returning patients.",
+      "condition": "probable_match AND patient_says_returning",
+      "guidelines": [
+        "Ask one simple verification question",
+        "Acceptable: date of birth, last visit date range, location visited",
+        "Never ask for SSN, full address, or other sensitive data via chat",
+        "If verification fails, treat as new patient and note for staff review",
+        "Maximum 2 verification attempts before treating as new"
+      ]
+    }
+  ],
+  "privacy_rules": {
+    "never_reveal": [
+      "That a matching record was found until identity is confirmed",
+      "Other patient details from the matching record",
+      "How many matches were found",
+      "The matching criteria used"
+    ],
+    "always_protect": [
+      "Patient health information",
+      "Previous visit details",
+      "Billing or insurance history",
+      "Other patients with similar names"
+    ]
+  },
+  "returning_patient_shortcuts": {
+    "skip_if_on_file": [
+      "phone_number_collection",
+      "insurance_provider_basic",
+      "location_preference_if_single_location"
+    ],
+    "always_reconfirm": [
+      "insurance_still_current",
+      "preferred_location",
+      "contact_number_still_correct"
+    ]
+  },
+  "tone_settings": {
+    "warmth": "high",
+    "naturalness": "high",
+    "intrusiveness": "minimal",
+    "efficiency": "moderate"
+  }
+}

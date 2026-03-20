@@ -1,0 +1,120 @@
+{
+  "playbook_id": "confirmation-pending-verification",
+  "version": "1.0.0",
+  "name": "Confirmation Pending Verification",
+  "description": "Explains the provisional appointment status clearly and calmly. Ensures the patient understands their appointment is scheduled but insurance verification is still in progress.",
+  "trigger_conditions": {
+    "triggered_by": [
+      "booking-conversion post-booking step",
+      "appointment_created_verification_pending",
+      "patient_asks_about_confirmation_status"
+    ]
+  },
+  "response_goals": [
+    "Clearly explain what 'pending verification' means",
+    "Reassure the patient that their spot is held",
+    "Set realistic expectations about the verification timeline",
+    "Avoid creating anxiety about the appointment status",
+    "Make the patient feel taken care of"
+  ],
+  "steps": [
+    {
+      "step_id": 1,
+      "name": "confirm_appointment_is_set",
+      "description": "Make it clear the appointment is on the calendar.",
+      "required": true,
+      "guidelines": [
+        "Lead with the positive: their appointment is scheduled",
+        "Use language like 'You're all set for [date/time]'",
+        "Don't lead with the caveat about verification",
+        "The appointment IS real -- verification is a separate process"
+      ]
+    },
+    {
+      "step_id": 2,
+      "name": "explain_verification_process",
+      "description": "Briefly explain what happens next with insurance.",
+      "required": true,
+      "guidelines": [
+        "Keep it simple: 'Our team is verifying your insurance benefits now'",
+        "Frame it as something the clinic is doing FOR them",
+        "Don't use jargon like 'pre-authorization' or 'eligibility check'",
+        "Mention the typical timeline: 1-2 business days"
+      ]
+    },
+    {
+      "step_id": 3,
+      "name": "set_expectations",
+      "description": "Let them know what to expect and when.",
+      "required": true,
+      "guidelines": [
+        "They'll receive a confirmation with benefit details once verified",
+        "They'll know what to expect cost-wise before the appointment",
+        "If there are any issues, the clinic will reach out",
+        "Their appointment time is secured regardless"
+      ]
+    },
+    {
+      "step_id": 4,
+      "name": "address_concerns_proactively",
+      "description": "Anticipate and address common concerns.",
+      "required": false,
+      "common_concerns": {
+        "what_if_not_covered": "If your plan doesn't cover the visit, our team will reach out to discuss your options before the appointment. No surprises.",
+        "will_I_lose_my_spot": "Your appointment time is reserved for you. The verification doesn't affect your spot.",
+        "how_long_does_it_take": "We usually have your benefits verified within 1-2 business days.",
+        "do_I_need_to_do_anything": "Nope! We take care of the verification on our end. We'll reach out if we need anything from you."
+      }
+    },
+    {
+      "step_id": 5,
+      "name": "warm_close",
+      "description": "Close the conversation with confidence and warmth.",
+      "required": true,
+      "guidelines": [
+        "Reinforce that everything is in good hands",
+        "Remind them they can reach out with any questions",
+        "Express that you look forward to seeing them",
+        "Keep it brief and positive"
+      ]
+    }
+  ],
+  "status_terminology": {
+    "use": ["scheduled", "set up", "on the calendar", "reserved"],
+    "avoid": ["pending", "tentative", "provisional", "unconfirmed", "waiting"],
+    "note": "The word 'pending' creates unnecessary anxiety. The appointment IS scheduled. Verification is a separate administrative process."
+  },
+  "tone_settings": {
+    "confidence": "high",
+    "reassurance": "high",
+    "anxiety_level": "zero",
+    "warmth": "high",
+    "clarity": "very_high"
+  },
+  "examples": {
+    "sample_conversations": [
+      {
+        "scenario": "Post-booking confirmation",
+        "conversation": [
+          {
+            "role": "bot",
+            "message": "You're all set for Wednesday at 10:00 AM at our Troy location! Our team is verifying your Blue Cross benefits now -- you'll get a confirmation with all the details within a day or two. If you have any questions before then, just text us here. We look forward to seeing you, Sarah!"
+          }
+        ]
+      },
+      {
+        "scenario": "Patient asks about status a day later",
+        "conversation": [
+          {
+            "role": "patient",
+            "message": "Hi, I booked an appointment yesterday but I haven't heard anything about my insurance yet"
+          },
+          {
+            "role": "bot",
+            "message": "Hi Sarah! Your appointment for Wednesday at 10:00 AM is all set. Our team is still working on verifying your benefits -- it usually takes 1-2 business days, so you should hear from us soon. Your spot is reserved either way. I'll make a note to have someone follow up with you today if possible!"
+          }
+        ]
+      }
+    ]
+  }
+}

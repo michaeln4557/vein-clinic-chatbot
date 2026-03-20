@@ -1,0 +1,99 @@
+{
+  "template_id": "confirmation-sms",
+  "version": "1.0.0",
+  "name": "Booking Confirmation SMS Templates",
+  "description": "Templates for confirming booked appointments via SMS. Includes initial confirmation, day-before reminder, and day-of reminder.",
+  "channel": "sms",
+  "templates": {
+    "initial_confirmation": {
+      "description": "Sent immediately after the appointment is booked and insurance verification is noted.",
+      "variants": [
+        {
+          "id": "conf-init-001",
+          "variant_name": "standard",
+          "text": "Hi {FirstName}! Your appointment at {ClinicName} - {LocationName} is set for {Date} at {Time}. Our team is verifying your insurance benefits and will follow up with details. Questions? Just reply here!",
+          "active": true
+        },
+        {
+          "id": "conf-init-002",
+          "variant_name": "warm",
+          "text": "You're all set, {FirstName}! {Date} at {Time} at our {LocationName} office. We'll verify your insurance and send you all the details soon. Text us anytime if you have questions!",
+          "active": true
+        }
+      ]
+    },
+    "verification_complete": {
+      "description": "Sent after insurance benefits have been verified.",
+      "variants": [
+        {
+          "id": "conf-ver-001",
+          "variant_name": "standard",
+          "text": "Hi {FirstName}! Good news -- your insurance benefits have been verified for your {Date} appointment. Our team will share the details with you. If you have any questions, just reply here!",
+          "active": true
+        }
+      ]
+    },
+    "day_before_reminder": {
+      "description": "Sent the day before the appointment as a reminder.",
+      "timing": "day_before_at_10am_local",
+      "variants": [
+        {
+          "id": "conf-rem-001",
+          "variant_name": "standard",
+          "text": "Hi {FirstName}! Just a friendly reminder about your appointment tomorrow at {Time} at {ClinicName} - {LocationName} ({Address}). Please wear comfortable, loose-fitting clothing. See you then!",
+          "active": true
+        },
+        {
+          "id": "conf-rem-002",
+          "variant_name": "with_confirm_request",
+          "text": "Hi {FirstName}! Your appointment at {ClinicName} - {LocationName} is tomorrow at {Time}. Can you confirm you'll be there? Just reply YES. If you need to reschedule, let us know!",
+          "active": true
+        }
+      ]
+    },
+    "day_of_reminder": {
+      "description": "Sent the morning of the appointment.",
+      "timing": "day_of_at_8am_local",
+      "variants": [
+        {
+          "id": "conf-day-001",
+          "variant_name": "standard",
+          "text": "Good morning, {FirstName}! We look forward to seeing you today at {Time} at our {LocationName} office. The address is {Address}. See you soon!",
+          "active": true
+        }
+      ]
+    },
+    "reschedule_confirmation": {
+      "description": "Sent when an appointment is rescheduled.",
+      "variants": [
+        {
+          "id": "conf-resch-001",
+          "variant_name": "standard",
+          "text": "Hi {FirstName}! Your appointment has been rescheduled to {NewDate} at {NewTime} at {ClinicName} - {LocationName}. We'll send you a reminder beforehand. Text us if you need anything!",
+          "active": true
+        }
+      ]
+    },
+    "cancellation_confirmation": {
+      "description": "Sent when an appointment is cancelled.",
+      "variants": [
+        {
+          "id": "conf-cancel-001",
+          "variant_name": "standard",
+          "text": "Hi {FirstName}, your appointment on {Date} has been cancelled. If you'd like to reschedule, just text us here anytime. We're happy to help!",
+          "active": true
+        }
+      ]
+    }
+  },
+  "variable_definitions": {
+    "FirstName": "Patient's first name",
+    "ClinicName": "Full clinic brand name",
+    "LocationName": "Specific location name (e.g., 'Troy', 'Downtown Detroit')",
+    "Date": "Appointment date in friendly format (e.g., 'Wednesday, March 25')",
+    "Time": "Appointment time (e.g., '10:00 AM')",
+    "Address": "Full street address of the location",
+    "NewDate": "Rescheduled date in friendly format",
+    "NewTime": "Rescheduled time"
+  }
+}

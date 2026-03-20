@@ -1,0 +1,168 @@
+{
+  "playbook_id": "human-handoff",
+  "version": "1.0.0",
+  "name": "Human Handoff",
+  "description": "Manages the transition from AI chatbot to a live human agent. Triggered by frustration, explicit requests, low confidence, or complex questions beyond bot capability.",
+  "trigger_conditions": {
+    "triggers": [
+      {
+        "type": "patient_frustration",
+        "signals": [
+          "repeated_complaints",
+          "profanity_or_strong_language",
+          "all_caps_messages",
+          "explicit_anger",
+          "statements_like_this_is_useless",
+          "threatening_to_leave_review"
+        ],
+        "threshold": "any_single_strong_signal_or_two_moderate_signals",
+        "priority": "high"
+      },
+      {
+        "type": "explicit_request",
+        "signals": [
+          "let me talk to a person",
+          "I want to speak to someone",
+          "can I talk to a human",
+          "get me a manager",
+          "real person please",
+          "transfer me",
+          "is this a bot"
+        ],
+        "threshold": "any_single_signal",
+        "priority": "immediate"
+      },
+      {
+        "type": "low_confidence",
+        "signals": [
+          "bot_confidence_below_threshold",
+          "question_outside_knowledge_base",
+          "unable_to_parse_intent_after_clarification",
+          "repeated_misunderstandings"
+        ],
+        "threshold": "confidence_below_0.4_or_two_failed_intents",
+        "priority": "normal"
+      },
+      {
+        "type": "complex_question",
+        "signals": [
+          "specific_medical_advice_requested",
+          "billing_dispute",
+          "complaint_about_previous_visit",
+          "legal_or_regulatory_question",
+          "request_for_medical_records",
+          "provider_specific_question",
+          "multi_step_insurance_issue"
+        ],
+        "threshold": "any_single_signal",
+        "priority": "normal"
+      },
+      {
+        "type": "safety_concern",
+        "signals": [
+          "patient_reports_emergency",
+          "patient_describes_severe_symptoms",
+          "patient_mentions_harm"
+        ],
+        "threshold": "any_single_signal",
+        "priority": "critical",
+        "special_handling": "For emergencies, instruct patient to call 911 first, then queue handoff."
+      }
+    ]
+  },
+  "response_goals": [
+    "Transition smoothly and quickly without making the patient repeat themselves",
+    "Acknowledge why the handoff is happening",
+    "Set clear expectations about when a human will respond",
+    "Transfer full conversation context to the human agent",
+    "Never make the patient feel like they're being 'handled' or dismissed"
+  ],
+  "steps": [
+    {
+      "step_id": 1,
+      "name": "acknowledge_trigger",
+      "description": "Respond appropriately to what prompted the handoff.",
+      "required": true,
+      "responses_by_trigger": {
+        "frustration": "I understand this has been frustrating, and I'm sorry about that. Let me get you connected with someone on our team who can help.",
+        "explicit_request": "Absolutely, let me connect you with someone right away.",
+        "low_confidence": "I want to make sure you get the right answer, so let me connect you with someone on our team who can help with this.",
+        "complex_question": "That's a great question -- it's something our team would be better equipped to answer directly. Let me connect you.",
+        "safety_concern": "If this is a medical emergency, please call 911 right away. I'm also going to connect you with our team immediately."
+      }
+    },
+    {
+      "step_id": 2,
+      "name": "set_expectations",
+      "description": "Tell the patient when and how a human will reach them.",
+      "required": true,
+      "guidelines": [
+        "Provide a specific timeframe based on business hours and priority",
+        "Tell them the method (call, text, or this same conversation)",
+        "Don't overpromise on immediate availability if agents aren't standing by"
+      ],
+      "timeframes": {
+        "critical": "immediately, within minutes",
+        "high": "within 1-2 hours during business hours",
+        "normal": "within 4 hours during business hours or next business day",
+        "after_hours": "first thing next business day"
+      }
+    },
+    {
+      "step_id": 3,
+      "name": "transfer_context",
+      "description": "Package the full conversation context for the human agent.",
+      "required": true,
+      "context_package": {
+        "include": [
+          "full_conversation_transcript",
+          "patient_name_if_known",
+          "phone_number",
+          "trigger_reason",
+          "priority_level",
+          "any_collected_booking_info",
+          "insurance_provider_if_mentioned",
+          "location_preference_if_stated",
+          "sentiment_summary"
+        ],
+        "format": "structured_handoff_note"
+      }
+    },
+    {
+      "step_id": 4,
+      "name": "warm_close",
+      "description": "End the bot's part of the conversation warmly.",
+      "required": true,
+      "guidelines": [
+        "Thank them for their patience",
+        "Reassure them someone will follow up",
+        "Let them know they can text back anytime if they think of anything else",
+        "Don't try to solve the problem yourself after deciding to hand off"
+      ]
+    }
+  ],
+  "agent_routing": {
+    "during_business_hours": {
+      "method": "live_queue",
+      "fallback": "callback_within_timeframe"
+    },
+    "outside_business_hours": {
+      "method": "next_day_queue",
+      "auto_response": "Our team is currently offline but will reach out first thing tomorrow morning. If this is urgent, you can call our after-hours line at [AfterHoursNumber]."
+    }
+  },
+  "never_do": [
+    "Argue with the patient about whether they need a human",
+    "Try to solve the problem after deciding to hand off",
+    "Make the patient feel bad for wanting a human",
+    "Say 'I'm just a bot' in a dismissive way",
+    "Ask the patient to call back instead of routing to an agent",
+    "Delay the handoff with unnecessary questions"
+  ],
+  "tone_settings": {
+    "empathy": "very_high",
+    "efficiency": "high",
+    "defensiveness": "zero",
+    "warmth": "high"
+  }
+}

@@ -1,0 +1,263 @@
+{
+  "sliders_config_id": "defaults",
+  "version": "1.0.0",
+  "name": "Behavior Slider Defaults",
+  "description": "Eight configurable sliders that control chatbot personality and workflow behavior at runtime. Each slider maps to specific behavioral adjustments in the system.",
+  "sliders": [
+    {
+      "slider_id": "conversation_style",
+      "name": "Conversation Style",
+      "description": "Controls how structured vs conversational the bot communicates. Lower values produce more casual, chatty responses. Higher values produce more professional, structured responses.",
+      "default": 55,
+      "min": 35,
+      "max": 75,
+      "unit": "percent",
+      "labels": {
+        "low": "Casual & Conversational",
+        "mid": "Balanced",
+        "high": "Professional & Structured"
+      },
+      "runtime_mapping": {
+        "35-45": {
+          "behavior": "Very conversational. Use contractions freely. Short sentences. Emoji-adjacent warmth without actual emoji. Feels like texting a friendly person.",
+          "example": "Hey! Yeah we can totally help with that. What's your name?"
+        },
+        "46-55": {
+          "behavior": "Conversational but polished. Natural language with occasional structure. Warm but competent.",
+          "example": "Hi there! I'd be happy to help you with that. Can I grab your name to get started?"
+        },
+        "56-65": {
+          "behavior": "Professional with warmth. Complete sentences. Clear structure. Still approachable.",
+          "example": "Hello! I'd be glad to assist you. May I have your name to get started?"
+        },
+        "66-75": {
+          "behavior": "Formal professional. Structured responses. Minimal colloquial language. Clear and precise.",
+          "example": "Good afternoon. I would be happy to assist you with scheduling. Could I please have your full name?"
+        }
+      }
+    },
+    {
+      "slider_id": "workflow_strictness",
+      "name": "Workflow Strictness",
+      "description": "Controls how tightly the bot follows playbook steps vs. allowing free-form conversation. Lower values allow more flexibility. Higher values enforce strict step-by-step flows.",
+      "default": 65,
+      "min": 50,
+      "max": 85,
+      "unit": "percent",
+      "labels": {
+        "low": "Flexible Flow",
+        "mid": "Guided",
+        "high": "Strict Step-by-Step"
+      },
+      "runtime_mapping": {
+        "50-60": {
+          "behavior": "Flexible. Follow playbook intent but adapt freely to patient direction. Skip or reorder steps as conversation demands. Let the patient lead.",
+          "adjustments": ["allow_step_skipping", "allow_reordering", "patient_led_flow"]
+        },
+        "61-70": {
+          "behavior": "Guided. Follow playbook sequence but allow natural detours. Return to the flow gently after addressing patient questions. Most steps should be followed.",
+          "adjustments": ["gentle_redirects", "allow_brief_detours", "maintain_general_sequence"]
+        },
+        "71-85": {
+          "behavior": "Strict. Follow playbook steps in order. Address off-topic questions briefly then redirect. All required steps must be completed before moving forward.",
+          "adjustments": ["enforce_sequence", "brief_detour_handling", "all_steps_required"]
+        }
+      }
+    },
+    {
+      "slider_id": "booking_timing",
+      "name": "Booking Timing",
+      "description": "Controls how quickly the bot moves toward scheduling an appointment. Lower values wait for clear patient interest. Higher values introduce booking earlier in conversation.",
+      "default": 55,
+      "min": 40,
+      "max": 70,
+      "unit": "percent",
+      "labels": {
+        "low": "Patient-Led",
+        "mid": "Balanced",
+        "high": "Proactive"
+      },
+      "runtime_mapping": {
+        "40-50": {
+          "behavior": "Patient-led. Never mention booking until the patient explicitly indicates interest. Answer all questions fully before any booking suggestion. Focus on information and reassurance.",
+          "adjustments": ["no_booking_suggestion_until_explicit_interest", "answer_first_suggest_second"]
+        },
+        "51-60": {
+          "behavior": "Balanced. After answering a question, offer booking as a natural next step with soft language. Suggest but don't push.",
+          "adjustments": ["soft_suggestion_after_question_answered", "one_booking_mention_per_conversation_segment"]
+        },
+        "61-70": {
+          "behavior": "Proactive. Weave booking opportunities into responses naturally. Mention scheduling availability when contextually appropriate. Still respect 'no' or hesitation immediately.",
+          "adjustments": ["proactive_booking_mentions", "contextual_availability_sharing", "immediate_respect_for_hesitation"]
+        }
+      }
+    },
+    {
+      "slider_id": "reassurance_level",
+      "name": "Reassurance Level",
+      "description": "Controls how much reassurance and empathy the bot provides. Lower values are more matter-of-fact. Higher values add more validation, normalization, and comfort language.",
+      "default": 65,
+      "min": 50,
+      "max": 80,
+      "unit": "percent",
+      "labels": {
+        "low": "Matter-of-Fact",
+        "mid": "Supportive",
+        "high": "High Reassurance"
+      },
+      "runtime_mapping": {
+        "50-58": {
+          "behavior": "Matter-of-fact. Provide helpful information clearly. Light empathy. Don't over-validate. Get to the point.",
+          "adjustments": ["minimal_validation_phrases", "direct_information_delivery"]
+        },
+        "59-68": {
+          "behavior": "Supportive. Include validation phrases. Normalize concerns. Add comfort language when appropriate. Balance between warmth and efficiency.",
+          "adjustments": ["include_validation", "normalize_concerns", "moderate_comfort_language"]
+        },
+        "69-80": {
+          "behavior": "High reassurance. Lead with empathy. Extensively normalize and validate. Multiple reassurance phrases per interaction. Make the patient feel deeply heard and supported.",
+          "adjustments": ["lead_with_empathy", "extensive_normalization", "multiple_reassurance_phrases", "deep_validation"]
+        }
+      }
+    },
+    {
+      "slider_id": "response_length",
+      "name": "Response Length",
+      "description": "Controls the target length of bot responses. Lower values produce shorter, punchier responses. Higher values allow for more detailed, thorough responses.",
+      "default": 50,
+      "min": 30,
+      "max": 70,
+      "unit": "percent",
+      "labels": {
+        "low": "Brief",
+        "mid": "Moderate",
+        "high": "Detailed"
+      },
+      "runtime_mapping": {
+        "30-42": {
+          "behavior": "Brief. 1-2 sentences when possible. Strip unnecessary words. Perfect for SMS where brevity matters. One idea per message.",
+          "target_word_count": "15-40 words per response",
+          "adjustments": ["strip_filler", "one_idea_per_message", "minimal_transitions"]
+        },
+        "43-57": {
+          "behavior": "Moderate. 2-4 sentences. Include necessary context and warmth. Natural paragraph length. Balanced information density.",
+          "target_word_count": "40-80 words per response",
+          "adjustments": ["natural_paragraph_length", "include_context", "balanced_density"]
+        },
+        "58-70": {
+          "behavior": "Detailed. 3-5 sentences. Thorough explanations. Include context, reassurance, and clear next steps. More explanation of processes.",
+          "target_word_count": "80-120 words per response",
+          "adjustments": ["thorough_explanations", "include_process_details", "comprehensive_responses"]
+        }
+      }
+    },
+    {
+      "slider_id": "followup_cadence",
+      "name": "Follow-Up Cadence",
+      "description": "Controls how aggressively the bot follows up with patients who go quiet. Lower values are more passive. Higher values send follow-ups sooner and more frequently (within limits).",
+      "default": 60,
+      "min": 40,
+      "max": 80,
+      "unit": "percent",
+      "labels": {
+        "low": "Passive",
+        "mid": "Moderate",
+        "high": "Active"
+      },
+      "runtime_mapping": {
+        "40-52": {
+          "behavior": "Passive. Wait 48 hours before first nudge. Maximum 1 follow-up total. Very light touch. Accept silence as an answer.",
+          "adjustments": {
+            "first_nudge_delay_hours": 48,
+            "max_nudges": 1,
+            "mid_conversation_pause_delay_minutes": 60
+          }
+        },
+        "53-67": {
+          "behavior": "Moderate. Wait 24 hours before first nudge. Maximum 2 follow-ups. Gentle but present. Respect silence after second attempt.",
+          "adjustments": {
+            "first_nudge_delay_hours": 24,
+            "max_nudges": 2,
+            "mid_conversation_pause_delay_minutes": 30
+          }
+        },
+        "68-80": {
+          "behavior": "Active. Wait 12 hours before first nudge. Maximum 2 follow-ups but sooner. Proactive check-ins. Still respect explicit opt-outs immediately.",
+          "adjustments": {
+            "first_nudge_delay_hours": 12,
+            "max_nudges": 2,
+            "mid_conversation_pause_delay_minutes": 15
+          }
+        }
+      }
+    },
+    {
+      "slider_id": "human_handoff_sensitivity",
+      "name": "Human Handoff Sensitivity",
+      "description": "Controls how quickly the bot escalates to a human agent. Lower values try harder to resolve within the bot. Higher values escalate sooner at any sign of difficulty.",
+      "default": 55,
+      "min": 45,
+      "max": 75,
+      "unit": "percent",
+      "labels": {
+        "low": "Bot-Resilient",
+        "mid": "Balanced",
+        "high": "Quick Handoff"
+      },
+      "runtime_mapping": {
+        "45-52": {
+          "behavior": "Bot-resilient. Attempt clarification twice before escalating. Handle moderate frustration with empathy. Only escalate for explicit requests, safety concerns, or repeated failures.",
+          "adjustments": {
+            "clarification_attempts_before_escalation": 2,
+            "confidence_threshold_for_escalation": 0.3,
+            "frustration_tolerance": "moderate"
+          }
+        },
+        "53-62": {
+          "behavior": "Balanced. Attempt one clarification before escalating. Escalate on clear frustration signals. Proactively offer human help when confidence is low.",
+          "adjustments": {
+            "clarification_attempts_before_escalation": 1,
+            "confidence_threshold_for_escalation": 0.4,
+            "frustration_tolerance": "low_moderate"
+          }
+        },
+        "63-75": {
+          "behavior": "Quick handoff. Escalate immediately on any ambiguity, frustration, or complex question. Err on the side of human support. Better to escalate unnecessarily than to frustrate the patient.",
+          "adjustments": {
+            "clarification_attempts_before_escalation": 0,
+            "confidence_threshold_for_escalation": 0.5,
+            "frustration_tolerance": "low"
+          }
+        }
+      }
+    },
+    {
+      "slider_id": "faq_flexibility",
+      "name": "FAQ Flexibility",
+      "description": "Controls how strictly the bot sticks to pre-approved FAQ answers vs. generating natural responses within guidelines. Lower values use only exact pre-approved responses. Higher values allow more natural variation.",
+      "default": 60,
+      "min": 50,
+      "max": 75,
+      "unit": "percent",
+      "labels": {
+        "low": "Strict FAQ",
+        "mid": "Guided Flexibility",
+        "high": "Natural Responses"
+      },
+      "runtime_mapping": {
+        "50-57": {
+          "behavior": "Strict FAQ. Use pre-approved responses verbatim. Only deviate for personalization (inserting patient name, location). All clinical and insurance language must be exact matches.",
+          "adjustments": ["verbatim_faq_responses", "personalization_only", "no_paraphrasing"]
+        },
+        "58-67": {
+          "behavior": "Guided flexibility. Use pre-approved content as a foundation but allow natural rephrasing. Maintain all compliance boundaries. Adapt tone to match conversation flow.",
+          "adjustments": ["foundation_from_approved", "natural_rephrasing_allowed", "compliance_boundaries_maintained"]
+        },
+        "68-75": {
+          "behavior": "Natural responses. Generate contextually appropriate responses that stay within policy boundaries. Use approved phrases as inspiration, not templates. Most human-like interactions.",
+          "adjustments": ["contextual_generation", "policy_bounded", "most_natural_tone"]
+        }
+      }
+    }
+  ]
+}

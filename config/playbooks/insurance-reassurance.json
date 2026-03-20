@@ -1,0 +1,186 @@
+{
+  "playbook_id": "insurance-reassurance",
+  "version": "1.0.0",
+  "name": "Insurance Reassurance",
+  "description": "Handles insurance-related questions with compliant, reassuring language. Never implies coverage certainty. Guides patient toward verification without assumptions.",
+  "trigger_conditions": {
+    "intent_detected": [
+      "insurance_question",
+      "coverage_inquiry",
+      "cost_concern",
+      "payment_question",
+      "plan_verification_request"
+    ],
+    "keywords": [
+      "insurance", "coverage", "covered", "pay", "cost",
+      "copay", "deductible", "out of pocket", "Blue Cross",
+      "Aetna", "United", "Cigna", "Medicare", "Medicaid",
+      "plan", "benefits", "accept", "take"
+    ]
+  },
+  "response_goals": [
+    "Acknowledge the patient's concern genuinely",
+    "Explain the verification process clearly",
+    "State that verification happens before any commitment",
+    "Avoid making any assumptions about their specific coverage",
+    "Offer the next step softly without pressure"
+  ],
+  "steps": [
+    {
+      "step_id": 1,
+      "name": "acknowledge_concern",
+      "description": "Validate the patient's question about insurance. Show empathy for the concern without dismissing it.",
+      "required": true,
+      "guidelines": [
+        "Treat insurance questions as completely reasonable",
+        "Don't rush past the concern to get to booking",
+        "Use phrases like 'Great question' or 'That's really important to know beforehand'",
+        "Never make the patient feel they should already know the answer"
+      ]
+    },
+    {
+      "step_id": 2,
+      "name": "explain_process",
+      "description": "Explain how insurance verification works at the clinic in simple, clear terms.",
+      "required": true,
+      "guidelines": [
+        "Explain that the clinic works with most major insurance plans",
+        "Describe verification as something the clinic does on their behalf",
+        "Emphasize there is no cost or obligation for verification",
+        "Keep the explanation brief and jargon-free"
+      ]
+    },
+    {
+      "step_id": 3,
+      "name": "state_verification_before_confirmation",
+      "description": "Make it clear that benefits are verified before any appointment is confirmed or any charges occur.",
+      "required": true,
+      "guidelines": [
+        "Use language like 'before anything is confirmed'",
+        "Reassure them they will know what to expect beforehand",
+        "Never promise a specific outcome of verification",
+        "Frame it as protection for the patient"
+      ]
+    },
+    {
+      "step_id": 4,
+      "name": "avoid_assumptions",
+      "description": "Do not guess or imply what their specific plan will or won't cover.",
+      "required": true,
+      "guidelines": [
+        "Never say 'you're covered' or 'that should be covered'",
+        "Never name a specific dollar amount for copay or cost",
+        "Never say a procedure is 'usually covered' by a specific plan",
+        "If they ask about a specific plan, say you work with it often but verification is needed for their specific benefits"
+      ]
+    },
+    {
+      "step_id": 5,
+      "name": "offer_next_step_softly",
+      "description": "Suggest the next step without pressure. Let them decide when they're ready.",
+      "required": true,
+      "guidelines": [
+        "Frame it as 'Would you like us to look into that for you?'",
+        "Don't assume they want to proceed",
+        "Make it clear they can ask more questions first",
+        "Keep the door open for them to come back later"
+      ]
+    }
+  ],
+  "preferred_response_pattern": {
+    "description": "The recommended structure for insurance reassurance responses.",
+    "template": "We work with most major insurance plans, and [PlanName] is one we see often. Every plan is a little different, so the best way to know what yours covers is for our team to verify your specific benefits. There's no cost or obligation for that, and you'll know what to expect before anything is confirmed. Would you like us to look into it for you?",
+    "notes": [
+      "Adapt naturally to conversation flow -- do not read this verbatim every time",
+      "Include the plan name only if the patient mentioned one",
+      "All five steps should be present but can be woven together naturally"
+    ]
+  },
+  "allowed_language": [
+    "We work with most major insurance plans.",
+    "[PlanName] is one we see quite often.",
+    "Every plan is a little different.",
+    "The best way to know is for us to verify your specific benefits.",
+    "There's no cost or obligation for the verification.",
+    "You'll know what to expect before anything is confirmed.",
+    "Would you like us to look into that for you?",
+    "I'd be happy to have our team check on that.",
+    "That's a great question to get answered upfront.",
+    "We want to make sure you know exactly what to expect."
+  ],
+  "prohibited_language": [
+    "You're covered.",
+    "That's covered under your plan.",
+    "It's free.",
+    "There's no cost to you.",
+    "Your insurance will pay for it.",
+    "Don't worry about the cost.",
+    "It's complimentary.",
+    "Guaranteed coverage.",
+    "Most people don't pay anything.",
+    "Insurance always covers this.",
+    "Your copay will be...",
+    "Your deductible is..."
+  ],
+  "tone_settings": {
+    "warmth": "high",
+    "confidence": "moderate",
+    "reassurance": "high",
+    "pressure": "zero",
+    "specificity_about_coverage": "zero"
+  },
+  "policy_reference": "insurance-communication",
+  "escalation_rules": {
+    "escalate_if": [
+      "Patient asks for a specific dollar amount and won't accept general answer",
+      "Patient claims another staff member told them specific coverage details",
+      "Patient is upset about a previous billing experience",
+      "Patient asks about financial hardship or payment plans",
+      "Patient has a plan the clinic does not work with"
+    ],
+    "escalation_target": "human-handoff"
+  },
+  "examples": {
+    "sample_conversations": [
+      {
+        "scenario": "Patient asks if their plan is accepted",
+        "conversation": [
+          {
+            "role": "patient",
+            "message": "Do you take Aetna?"
+          },
+          {
+            "role": "bot",
+            "message": "Great question! We work with most major insurance plans, and Aetna is one we see quite often. Every plan is a little different though, so the best way to know exactly what yours covers is for our team to verify your specific benefits. There's no cost or obligation for that, and you'll know what to expect before anything is confirmed. Would you like us to look into it for you?"
+          }
+        ]
+      },
+      {
+        "scenario": "Patient asks about cost directly",
+        "conversation": [
+          {
+            "role": "patient",
+            "message": "How much does this cost? Will my insurance cover it?"
+          },
+          {
+            "role": "bot",
+            "message": "That's really important to know upfront, and I'm glad you're asking. The cost depends on your specific insurance plan and benefits, which vary quite a bit from person to person. What we can do is verify your benefits ahead of time so you know exactly what to expect -- there's no cost or obligation for that step. Want me to get that started for you?"
+          }
+        ]
+      },
+      {
+        "scenario": "Patient pushes for a specific answer",
+        "conversation": [
+          {
+            "role": "patient",
+            "message": "But usually is it covered? Like what do most people pay?"
+          },
+          {
+            "role": "bot",
+            "message": "I totally understand wanting a ballpark. The tricky part is that it really does depend on each person's specific plan -- even within the same insurance company, benefits can vary a lot. I wouldn't want to give you a number that turns out to be wrong. That's exactly why our team verifies everything upfront, so there are no surprises. It only takes a day or two and you'll have a clear picture. Would you like to go that route?"
+          }
+        ]
+      }
+    ]
+  }
+}

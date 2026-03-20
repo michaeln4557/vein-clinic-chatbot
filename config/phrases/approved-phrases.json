@@ -1,0 +1,263 @@
+{
+  "phrase_library_id": "approved-phrases",
+  "version": "1.1.0",
+  "name": "Approved Phrase Library",
+  "description": "Pre-approved phrases organized by category for use across all chatbot interactions. These phrases have been vetted for compliance, tone, and accuracy.",
+  "categories": {
+    "insurance_reassurance": [
+      {
+        "id": "ins-001",
+        "category": "insurance_reassurance",
+        "text": "That's a very common question. We'll verify your insurance and confirm everything with you before the appointment is finalized, so you'll have the information you need ahead of time.",
+        "context": "Primary reassurance pattern from brief. Use when patient first asks about insurance or cost.",
+        "active": true
+      },
+      {
+        "id": "ins-002",
+        "category": "insurance_reassurance",
+        "text": "We work with most major insurance plans, and {PlanName} is one we see quite often.",
+        "context": "Use when patient names their insurance provider. Acknowledges familiarity without promising coverage.",
+        "active": true
+      },
+      {
+        "id": "ins-003",
+        "category": "insurance_reassurance",
+        "text": "Every plan is a little different, so the best way to know what yours covers is for our team to verify your specific benefits.",
+        "context": "Explains why we can't give a definitive answer. Positions verification as helpful, not burdensome.",
+        "active": true
+      },
+      {
+        "id": "ins-004",
+        "category": "insurance_reassurance",
+        "text": "There's no cost or obligation for the verification step, and you'll know what to expect before anything is confirmed.",
+        "context": "Removes risk from the patient's perspective. Only approved context for 'no cost' language.",
+        "active": true
+      },
+      {
+        "id": "ins-005",
+        "category": "insurance_reassurance",
+        "text": "Would you like us to look into it for you?",
+        "context": "Soft close after insurance reassurance. Invites action without pressure.",
+        "active": true
+      },
+      {
+        "id": "ins-006",
+        "category": "insurance_reassurance",
+        "text": "The cost depends on your specific insurance plan and benefits, and our team can walk you through the details once we verify everything.",
+        "context": "Use when patient asks directly about cost. Redirects to verification without guessing.",
+        "active": true
+      },
+      {
+        "id": "ins-007",
+        "category": "insurance_reassurance",
+        "text": "We verify your benefits ahead of time so you know exactly what to expect — no surprises.",
+        "context": "Emphasizes transparency and patient control. Good for patients who seem anxious about cost.",
+        "active": true
+      },
+      {
+        "id": "ins-008",
+        "category": "insurance_reassurance",
+        "text": "I wouldn't want to give you a number that turns out to be wrong, so let our team verify the details for you. That way you'll have accurate information.",
+        "context": "Use when patient presses for specific dollar amounts. Honest deflection with patient-centered reasoning.",
+        "active": true
+      },
+      {
+        "id": "ins-009",
+        "category": "insurance_reassurance",
+        "text": "Even within the same insurance company, benefits can vary quite a bit from person to person. That's exactly why our team verifies everything upfront.",
+        "context": "Explains plan variability. Helpful for patients who say 'my friend has the same plan and said...'.",
+        "active": true
+      },
+      {
+        "id": "ins-010",
+        "category": "insurance_reassurance",
+        "text": "Our team handles the insurance side for you — you won't need to make any calls yourself.",
+        "context": "Reduces perceived effort for the patient. Positions the clinic as doing the work.",
+        "active": true
+      }
+    ],
+    "booking_invitation": [
+      {
+        "id": "book-001",
+        "category": "booking_invitation",
+        "text": "Would you like to go ahead and schedule a consultation?",
+        "context": "Standard soft booking invitation. Use after answering the patient's questions.",
+        "active": true
+      },
+      {
+        "id": "book-002",
+        "category": "booking_invitation",
+        "text": "I can get you scheduled right here if you'd like — it only takes a minute.",
+        "context": "Emphasizes ease. Good for patients who seem ready but hesitant about the process.",
+        "active": true
+      },
+      {
+        "id": "book-003",
+        "category": "booking_invitation",
+        "text": "Want me to help you find a time that works? No obligation at all.",
+        "context": "Low-pressure invitation. Good for patients who seem on the fence.",
+        "active": true
+      },
+      {
+        "id": "book-004",
+        "category": "booking_invitation",
+        "text": "If you'd like, I can set up a consultation for you. Our team will verify your insurance beforehand so you'll know what to expect.",
+        "context": "Combines booking with insurance reassurance. Good transition from insurance discussion.",
+        "active": true
+      },
+      {
+        "id": "book-005",
+        "category": "booking_invitation",
+        "text": "The next step would be a consultation with one of our doctors. Would you like me to find a time that works for you?",
+        "context": "Frames booking as a natural next step. Good for patients who have been asking clinical questions.",
+        "active": true
+      },
+      {
+        "id": "book-006",
+        "category": "booking_invitation",
+        "text": "Whenever you're ready, I can help you set up an appointment. No rush at all.",
+        "context": "Very low pressure. Use when patient seems interested but not quite ready to commit.",
+        "active": true
+      }
+    ],
+    "greeting": [
+      {
+        "id": "greet-001",
+        "category": "greeting",
+        "text": "Hi! This is {ClinicName}. How can I help you today?",
+        "context": "Standard warm greeting for inbound conversations.",
+        "active": true
+      },
+      {
+        "id": "greet-002",
+        "category": "greeting",
+        "text": "Hello! Thanks for reaching out to {ClinicName}. What can I help you with?",
+        "context": "Slightly more formal greeting. Good for web chat channel.",
+        "active": true
+      },
+      {
+        "id": "greet-003",
+        "category": "greeting",
+        "text": "Hi there! This is {ClinicName}. We're happy to help — what's on your mind?",
+        "context": "Warm and inviting. Good for creating an open, conversational tone.",
+        "active": true
+      },
+      {
+        "id": "greet-004",
+        "category": "greeting",
+        "text": "Hey! This is {ClinicName}. How can I help you today?",
+        "context": "Casual and friendly. Best for SMS channel.",
+        "active": true
+      },
+      {
+        "id": "greet-005",
+        "category": "greeting",
+        "text": "Welcome back, {FirstName}! How can I help you today?",
+        "context": "Returning patient greeting. Use when patient is recognized from previous interaction.",
+        "active": true
+      },
+      {
+        "id": "greet-006",
+        "category": "greeting",
+        "text": "Hi {FirstName}, good to hear from you again! What can I do for you?",
+        "context": "Returning patient greeting, warmer variant.",
+        "active": true
+      }
+    ],
+    "closing": [
+      {
+        "id": "close-001",
+        "category": "closing",
+        "text": "We look forward to seeing you, {FirstName}!",
+        "context": "Post-booking closing. Warm and personal.",
+        "active": true
+      },
+      {
+        "id": "close-002",
+        "category": "closing",
+        "text": "Thanks for reaching out! We're here anytime you need us.",
+        "context": "General closing when no booking was made. Leaves the door open.",
+        "active": true
+      },
+      {
+        "id": "close-003",
+        "category": "closing",
+        "text": "Have a great day! Don't hesitate to reach out if anything comes up.",
+        "context": "Warm, general-purpose closing.",
+        "active": true
+      },
+      {
+        "id": "close-004",
+        "category": "closing",
+        "text": "Thanks for chatting with us! We're just a text away if you need anything.",
+        "context": "SMS-appropriate closing. Reminds patient of the text channel.",
+        "active": true
+      },
+      {
+        "id": "close-005",
+        "category": "closing",
+        "text": "Take your time, and don't hesitate to reach out when you're ready. We're here for you.",
+        "context": "Closing when patient needs time to decide. No pressure.",
+        "active": true
+      },
+      {
+        "id": "close-006",
+        "category": "closing",
+        "text": "Someone from our team will be in touch soon. Thanks for your patience!",
+        "context": "Closing after escalation to human. Sets expectation for follow-up.",
+        "active": true
+      }
+    ],
+    "empathy": [
+      {
+        "id": "emp-001",
+        "category": "empathy",
+        "text": "That's a great question — a lot of people ask about that.",
+        "context": "Normalizes the patient's concern. Good opener for FAQ or insurance questions.",
+        "active": true
+      },
+      {
+        "id": "emp-002",
+        "category": "empathy",
+        "text": "That's completely understandable. It's important to have all the information before making a decision.",
+        "context": "Validates hesitation. Use when patient expresses uncertainty.",
+        "active": true
+      },
+      {
+        "id": "emp-003",
+        "category": "empathy",
+        "text": "I hear you — that can feel overwhelming. Let me help simplify things.",
+        "context": "Acknowledges complexity. Good when patient seems confused by process or insurance.",
+        "active": true
+      },
+      {
+        "id": "emp-004",
+        "category": "empathy",
+        "text": "I completely understand. No rush at all — we're here whenever you're ready.",
+        "context": "Validates the need for time. Zero-pressure acknowledgment.",
+        "active": true
+      },
+      {
+        "id": "emp-005",
+        "category": "empathy",
+        "text": "A lot of people feel the same way, and that's totally okay.",
+        "context": "Normalizes feelings of nervousness or hesitation about treatment.",
+        "active": true
+      },
+      {
+        "id": "emp-006",
+        "category": "empathy",
+        "text": "I'm sorry to hear that. Let's see what we can do to help.",
+        "context": "Use when patient describes discomfort or frustration. Empathetic and action-oriented.",
+        "active": true
+      },
+      {
+        "id": "emp-007",
+        "category": "empathy",
+        "text": "That makes total sense. I'm happy to walk you through it.",
+        "context": "Validates the question and offers guidance. Good for process-related questions.",
+        "active": true
+      }
+    ]
+  }
+}

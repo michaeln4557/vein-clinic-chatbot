@@ -1,0 +1,121 @@
+{
+  "playbook_id": "low-confidence",
+  "version": "1.0.0",
+  "name": "Low Confidence Fallback",
+  "description": "Handles situations where the bot is uncertain about the patient's intent, the correct response, or the appropriate action. Prioritizes honesty and human support over guessing.",
+  "trigger_conditions": {
+    "confidence_threshold_below": 0.4,
+    "additional_triggers": [
+      "intent_classification_failed",
+      "multiple_possible_intents_with_similar_scores",
+      "patient_message_is_ambiguous",
+      "topic_outside_knowledge_base",
+      "two_consecutive_misunderstandings",
+      "patient_indicates_bot_misunderstood"
+    ]
+  },
+  "response_goals": [
+    "Acknowledge uncertainty honestly without losing patient trust",
+    "Never guess or fabricate an answer",
+    "Offer a clear path to human help",
+    "Attempt one clarification before escalating",
+    "Maintain a professional and helpful tone"
+  ],
+  "steps": [
+    {
+      "step_id": 1,
+      "name": "assess_situation",
+      "description": "Determine whether clarification might help or if immediate escalation is needed.",
+      "decision_logic": {
+        "try_clarification_if": [
+          "Message is ambiguous but within general domain",
+          "Confidence is between 0.25 and 0.4",
+          "This is the first unclear message in the conversation",
+          "Patient seems patient and engaged"
+        ],
+        "escalate_immediately_if": [
+          "Confidence is below 0.25",
+          "This is the second or third unclear exchange",
+          "Patient has expressed frustration",
+          "Topic appears medical or clinical",
+          "Patient asked to speak with someone"
+        ]
+      }
+    },
+    {
+      "step_id": 2,
+      "name": "attempt_clarification",
+      "description": "Ask a simple, specific clarification question.",
+      "condition": "clarification_appropriate",
+      "max_attempts": 1,
+      "guidelines": [
+        "Ask one specific question, not multiple",
+        "Don't make the patient feel like they said something wrong",
+        "Offer options if possible: 'Were you asking about X or Y?'",
+        "Keep it brief and natural",
+        "Never say 'I didn't understand' -- reframe positively"
+      ],
+      "example_clarifications": [
+        "Just to make sure I point you in the right direction -- are you looking to schedule an appointment, or did you have a question about something?",
+        "I want to help! Could you tell me a bit more about what you're looking for?",
+        "I have a couple of ways I might be able to help -- were you asking about [option A] or [option B]?"
+      ]
+    },
+    {
+      "step_id": 3,
+      "name": "acknowledge_and_offer_human",
+      "description": "If clarification didn't help or isn't appropriate, honestly acknowledge and offer human support.",
+      "condition": "clarification_failed OR immediate_escalation",
+      "required": true,
+      "guidelines": [
+        "Be honest without being self-deprecating",
+        "Don't say 'I'm just a bot' -- focus on getting them help",
+        "Offer human connection as a positive next step, not a failure",
+        "Provide a clear path to human help"
+      ],
+      "response_templates": [
+        "I want to make sure you get the right answer on this one. Let me connect you with someone on our team who can help.",
+        "That's a great question -- I think one of our team members would be better equipped to help with that. Can I have someone reach out to you?",
+        "I appreciate your patience. I want to make sure this gets handled properly, so let me get one of our team members involved."
+      ]
+    },
+    {
+      "step_id": 4,
+      "name": "route_to_human",
+      "description": "Hand off to a human agent with full context.",
+      "routing": "human-handoff",
+      "context_to_pass": [
+        "full_conversation_history",
+        "intent_classification_attempts",
+        "confidence_scores",
+        "patient_sentiment",
+        "any_information_collected_so_far"
+      ]
+    }
+  ],
+  "absolutely_never": [
+    "Fabricate an answer when unsure",
+    "Guess at medical information",
+    "Make up insurance or cost details",
+    "Pretend to understand when confused",
+    "Repeat the same response hoping it works the second time",
+    "Blame the patient for being unclear",
+    "Say 'I don't know' and leave it there without offering help"
+  ],
+  "tone_settings": {
+    "honesty": "maximum",
+    "warmth": "high",
+    "confidence": "moderate",
+    "defensiveness": "zero",
+    "helpfulness": "high"
+  },
+  "metrics": {
+    "track": [
+      "low_confidence_trigger_rate",
+      "clarification_success_rate",
+      "escalation_rate_from_low_confidence",
+      "patient_satisfaction_after_escalation",
+      "common_unrecognized_intents"
+    ]
+  }
+}

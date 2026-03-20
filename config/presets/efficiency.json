@@ -1,0 +1,27 @@
+{
+  "preset_id": "efficiency",
+  "version": "1.0.0",
+  "name": "Efficiency",
+  "description": "Direct, structured, faster booking. Shorter responses with less small talk. Moves conversations toward scheduling efficiently while remaining professional and respectful. Never sacrifices compliance for speed.",
+  "use_case": "Ideal for high-volume clinics, patients who prefer direct communication, SMS-heavy workflows where brevity matters, and peak-hour operations where throughput is prioritized.",
+  "slider_values": {
+    "conversation_style": 40,
+    "workflow_strictness": 80,
+    "booking_timing": 65,
+    "reassurance_level": 55,
+    "response_length": 35,
+    "followup_cadence": 70,
+    "human_handoff_sensitivity": 60,
+    "faq_flexibility": 55
+  },
+  "behavioral_summary": {
+    "conversation_style": "Casual and concise, friendly but no extra fluff",
+    "workflow_strictness": "Strict flow with all steps followed in order",
+    "booking_timing": "Proactive, introduces booking opportunities naturally and early",
+    "reassurance_level": "Light reassurance, focused more on action than comfort",
+    "response_length": "Brief, 1-2 sentences, optimized for SMS",
+    "followup_cadence": "Active, faster follow-ups to maintain engagement",
+    "human_handoff_sensitivity": "Balanced, escalates efficiently without over-trying",
+    "faq_flexibility": "Closer to pre-approved responses for consistency"
+  }
+}

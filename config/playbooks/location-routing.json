@@ -1,0 +1,108 @@
+{
+  "playbook_id": "location-routing",
+  "version": "1.0.0",
+  "name": "Location Routing",
+  "description": "Determines the best clinic location for a patient based on ZIP code, preference, or proximity. Always respects patient choice.",
+  "trigger_conditions": {
+    "triggered_by": [
+      "booking-conversion step 3",
+      "direct location inquiry",
+      "patient provides ZIP code or city"
+    ]
+  },
+  "response_goals": [
+    "Suggest the most convenient location for the patient",
+    "Present options without overwhelming",
+    "Always let the patient choose",
+    "Handle cases where no location is nearby"
+  ],
+  "steps": [
+    {
+      "step_id": 1,
+      "name": "determine_location_input",
+      "description": "Identify what location information the patient has provided.",
+      "input_types": [
+        {
+          "type": "zip_code",
+          "action": "lookup_nearest_locations"
+        },
+        {
+          "type": "city_name",
+          "action": "match_city_to_locations"
+        },
+        {
+          "type": "specific_location_name",
+          "action": "confirm_location_exists"
+        },
+        {
+          "type": "no_preference",
+          "action": "ask_for_zip_or_city"
+        }
+      ]
+    },
+    {
+      "step_id": 2,
+      "name": "zip_based_suggestion",
+      "description": "Use the patient's ZIP code to find the nearest clinic location(s).",
+      "guidelines": [
+        "Calculate distance to all active locations",
+        "Present the closest location first",
+        "If multiple locations are within 15 miles, offer top 2-3",
+        "Include a brief identifier for each (neighborhood, cross street, or landmark)",
+        "Show approximate distance if helpful"
+      ],
+      "max_suggestions": 3,
+      "distance_threshold_miles": 30
+    },
+    {
+      "step_id": 3,
+      "name": "patient_choice",
+      "description": "Let the patient select their preferred location.",
+      "guidelines": [
+        "Never assign a location without asking",
+        "If they don't have a preference among options, suggest the closest",
+        "If they name a location not in the list, check if it exists",
+        "Respect their choice even if another location is closer"
+      ]
+    },
+    {
+      "step_id": 4,
+      "name": "fallback_no_nearby_locations",
+      "description": "Handle cases where no clinic location is within a reasonable distance.",
+      "guidelines": [
+        "Be honest that there isn't a location very close",
+        "Present the nearest option with actual distance",
+        "Offer virtual/telehealth consultation if available",
+        "Don't apologize excessively -- just be helpful",
+        "If the nearest location is more than 50 miles away, suggest they may want to consider the drive vs. telehealth"
+      ],
+      "fallback_message_template": "The closest location to you would be our {location_name} office, which is about {distance} miles away. Would that work for you, or would you prefer to start with a virtual consultation?"
+    },
+    {
+      "step_id": 5,
+      "name": "confirm_and_continue",
+      "description": "Confirm the selected location and continue with the booking flow.",
+      "guidelines": [
+        "Repeat the location name and any helpful details (address, neighborhood)",
+        "Transition smoothly to the next booking step",
+        "If the patient changes their mind later, allow re-routing without friction"
+      ]
+    }
+  ],
+  "location_display_format": {
+    "include": ["location_name", "city", "state", "approximate_distance"],
+    "exclude_from_chat": ["full_address", "internal_id", "fax_number"],
+    "provide_full_address": "only_after_booking_confirmed"
+  },
+  "multi_location_rules": {
+    "if_same_distance": "present_both_and_ask_preference",
+    "if_one_clearly_closer": "suggest_it_but_still_ask",
+    "if_patient_names_location": "confirm_and_use_it",
+    "if_location_is_full": "route to scheduling-unavailable"
+  },
+  "tone_settings": {
+    "helpfulness": "high",
+    "pressure": "zero",
+    "clarity": "high"
+  }
+}

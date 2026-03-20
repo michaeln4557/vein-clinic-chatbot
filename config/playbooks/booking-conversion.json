@@ -1,0 +1,246 @@
+{
+  "playbook_id": "booking-conversion",
+  "version": "1.0.0",
+  "name": "Booking Conversion",
+  "description": "Full appointment booking flow. Collects required information progressively through natural conversation. Prioritizes ease and low friction.",
+  "trigger_conditions": {
+    "intent_detected": [
+      "wants_appointment",
+      "ready_to_book",
+      "schedule_request",
+      "availability_inquiry"
+    ],
+    "can_also_be_triggered_by": [
+      "routing from missed-call-recovery",
+      "routing from insurance-reassurance",
+      "routing from patient-hesitation",
+      "direct patient request"
+    ]
+  },
+  "response_goals": [
+    "Collect all required booking information",
+    "Keep the flow conversational and natural",
+    "Progressively gather details without overwhelming the patient",
+    "Make each step feel easy and low-commitment",
+    "Confirm everything before finalizing"
+  ],
+  "required_fields": {
+    "collection_order": [
+      "first_name",
+      "last_name",
+      "phone_number",
+      "location_preference",
+      "insurance_provider",
+      "preferred_date_time"
+    ],
+    "deferred_fields": [
+      "date_of_birth",
+      "insurance_member_id",
+      "insurance_group_number",
+      "referring_physician",
+      "reason_for_visit_detail"
+    ],
+    "notes": "Deferred fields are collected during intake or pre-appointment, not during initial booking. Do NOT ask for DOB early in the conversation -- it creates unnecessary friction."
+  },
+  "steps": [
+    {
+      "step_id": 1,
+      "name": "collect_name",
+      "description": "Get the patient's first and last name.",
+      "required": true,
+      "guidelines": [
+        "Ask casually: 'Can I grab your name to get started?'",
+        "If they give only a first name, gently ask for last name",
+        "Confirm spelling if the name is unusual",
+        "Use their name naturally in subsequent messages"
+      ],
+      "validation": {
+        "min_length": 2,
+        "format": "alphabetic_with_spaces_hyphens"
+      }
+    },
+    {
+      "step_id": 2,
+      "name": "confirm_phone",
+      "description": "Confirm or collect the patient's phone number.",
+      "required": true,
+      "guidelines": [
+        "If texting, confirm: 'Is this the best number to reach you?'",
+        "If calling, they likely called from it -- confirm",
+        "Accept various formats without correcting them",
+        "Store in standardized format internally"
+      ],
+      "validation": {
+        "format": "us_phone_10_digit",
+        "allow_formatting_variations": true
+      }
+    },
+    {
+      "step_id": 3,
+      "name": "location_preference",
+      "description": "Determine which clinic location the patient prefers.",
+      "required": true,
+      "guidelines": [
+        "If ZIP code is known, suggest nearest location",
+        "If multiple locations are close, offer top 2-3 options",
+        "Let the patient choose -- don't assign a location",
+        "If only one location is nearby, confirm it works for them"
+      ],
+      "routing": "location-routing"
+    },
+    {
+      "step_id": 4,
+      "name": "insurance_information",
+      "description": "Collect basic insurance information.",
+      "required": true,
+      "guidelines": [
+        "Ask for insurance provider name first",
+        "Do NOT ask for member ID or group number at this stage",
+        "If they don't have insurance, note it and continue",
+        "If they have questions about coverage, route to insurance-reassurance",
+        "Never comment on whether their plan is 'good' or covers the procedure"
+      ],
+      "routing_if_questions": "insurance-reassurance"
+    },
+    {
+      "step_id": 5,
+      "name": "preferred_date_time",
+      "description": "Find a date and time that works for the patient.",
+      "required": true,
+      "guidelines": [
+        "Ask for their general preference first: 'Do you prefer mornings or afternoons?'",
+        "Offer 2-3 specific options based on availability",
+        "If preferred time isn't available, use scheduling-unavailable playbook",
+        "Be flexible and accommodating",
+        "Don't overwhelm with too many options at once"
+      ],
+      "routing_if_unavailable": "scheduling-unavailable"
+    },
+    {
+      "step_id": 6,
+      "name": "confirm_booking_details",
+      "description": "Read back all collected information and confirm.",
+      "required": true,
+      "guidelines": [
+        "Summarize: name, location, date/time, insurance noted",
+        "Ask for confirmation: 'Does everything look right?'",
+        "Make it easy to correct any detail",
+        "Do NOT use the word 'confirmed' -- use 'scheduled' or 'set up'",
+        "Explain that insurance will be verified before the appointment"
+      ]
+    },
+    {
+      "step_id": 7,
+      "name": "post_booking",
+      "description": "After booking is complete, set expectations for next steps.",
+      "required": true,
+      "guidelines": [
+        "Let them know what to expect next (verification, confirmation)",
+        "Mention they'll receive a confirmation text/email",
+        "Offer to answer any other questions",
+        "End warmly"
+      ],
+      "triggers_playbook": "confirmation-pending-verification"
+    }
+  ],
+  "progressive_collection_rules": {
+    "max_fields_per_message": 2,
+    "never_ask_all_at_once": true,
+    "allow_out_of_order_collection": true,
+    "skip_if_already_known": true,
+    "natural_conversation_flow": "Always weave questions into natural responses rather than presenting a form-like sequence."
+  },
+  "do_not_block_on": [
+    "date_of_birth",
+    "insurance_member_id",
+    "insurance_group_number",
+    "social_security_number",
+    "detailed_medical_history",
+    "referring_physician"
+  ],
+  "tone_settings": {
+    "warmth": "high",
+    "efficiency": "moderate",
+    "pressure": "zero",
+    "helpfulness": "high",
+    "formality": "conversational_professional"
+  },
+  "duplicate_detection": {
+    "check_before_creating": true,
+    "match_fields": ["phone_number", "first_name", "last_name"],
+    "routing_if_duplicate": "duplicate-patient"
+  },
+  "examples": {
+    "sample_conversations": [
+      {
+        "scenario": "Smooth booking flow",
+        "conversation": [
+          {
+            "role": "patient",
+            "message": "I'd like to schedule an appointment"
+          },
+          {
+            "role": "bot",
+            "message": "I'd be happy to help with that! Can I grab your name to get started?"
+          },
+          {
+            "role": "patient",
+            "message": "Sarah Johnson"
+          },
+          {
+            "role": "bot",
+            "message": "Great, Sarah! Is this the best number to reach you at?"
+          },
+          {
+            "role": "patient",
+            "message": "Yes it is"
+          },
+          {
+            "role": "bot",
+            "message": "Perfect. Do you have a preferred location, or would you like me to find the one closest to you?"
+          },
+          {
+            "role": "patient",
+            "message": "I'm in the Troy area"
+          },
+          {
+            "role": "bot",
+            "message": "Our Troy location on Big Beaver Rd would be great for you. And do you happen to know your insurance provider?"
+          },
+          {
+            "role": "patient",
+            "message": "Blue Cross Blue Shield"
+          },
+          {
+            "role": "bot",
+            "message": "Got it, thanks. Do you prefer mornings or afternoons? And is there a particular day that works best?"
+          },
+          {
+            "role": "patient",
+            "message": "Mornings are better, maybe Tuesday or Wednesday"
+          },
+          {
+            "role": "bot",
+            "message": "We have Tuesday at 9:30 AM or Wednesday at 10:00 AM available at Troy. Which works better for you?"
+          },
+          {
+            "role": "patient",
+            "message": "Wednesday at 10 is perfect"
+          },
+          {
+            "role": "bot",
+            "message": "Wonderful! Let me make sure I have everything right:\n\nSarah Johnson\nTroy location\nWednesday at 10:00 AM\nInsurance: Blue Cross Blue Shield\n\nDoes that all look good?"
+          },
+          {
+            "role": "patient",
+            "message": "Yes!"
+          },
+          {
+            "role": "bot",
+            "message": "You're all set, Sarah! Our team will verify your insurance benefits and you'll get a confirmation with all the details. If you have any questions before then, just text us here anytime. We look forward to seeing you!"
+          }
+        ]
+      }
+    ]
+  }
+}

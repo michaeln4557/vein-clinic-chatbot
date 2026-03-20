@@ -1,0 +1,42 @@
+{
+  "name": "vein-clinic-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Enterprise Vein Clinic Conversational AI Platform",
+  "workspaces": [
+    "packages/shared",
+    "packages/backend",
+    "packages/admin-ui",
+    "packages/chat-widget"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:admin\" \"npm run dev:widget\"",
+    "dev:backend": "npm -w @vein-clinic/backend run dev",
+    "dev:admin": "npm -w @vein-clinic/admin-ui run dev",
+    "dev:widget": "npm -w @vein-clinic/chat-widget run dev",
+    "build": "npm run build:shared && concurrently \"npm run build:backend\" \"npm run build:admin\" \"npm run build:widget\"",
+    "build:shared": "npm -w @vein-clinic/shared run build",
+    "build:backend": "npm -w @vein-clinic/backend run build",
+    "build:admin": "npm -w @vein-clinic/admin-ui run build",
+    "build:widget": "npm -w @vein-clinic/chat-widget run build",
+    "test": "npm -w @vein-clinic/backend run test",
+    "test:unit": "npm -w @vein-clinic/backend run test:unit",
+    "test:integration": "npm -w @vein-clinic/backend run test:integration",
+    "test:safety": "npm -w @vein-clinic/backend run test:safety",
+    "lint": "eslint packages/*/src --ext .ts,.tsx",
+    "db:migrate": "npm -w @vein-clinic/backend run db:migrate",
+    "db:seed": "npm -w @vein-clinic/backend run db:seed",
+    "db:studio": "npm -w @vein-clinic/backend run db:studio"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "typescript": "^5.4.0",
+    "prettier": "^3.2.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

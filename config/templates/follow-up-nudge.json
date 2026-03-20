@@ -1,0 +1,109 @@
+{
+  "template_id": "follow-up-nudge",
+  "version": "1.0.0",
+  "name": "Follow-Up Nudge Templates",
+  "description": "Templates for gentle follow-up messages when a patient pauses or stops responding during a conversation.",
+  "channel": "sms",
+  "timing_rules": {
+    "tier_1_delay_minutes": 30,
+    "tier_2_delay_minutes": 120,
+    "tier_3_delay_minutes": 1440,
+    "max_nudges": 3,
+    "do_not_send_after_hours": true,
+    "quiet_hours": { "before": "08:00", "after": "21:00" },
+    "respect_opt_out": true,
+    "do_not_nudge_if": [
+      "patient_explicitly_said_not_interested",
+      "patient_asked_to_stop",
+      "patient_booked_appointment",
+      "patient_was_handed_off_to_human",
+      "patient_opted_out"
+    ]
+  },
+  "first_nudge_variants": [
+    {
+      "id": "fn-first-001",
+      "variant_name": "gentle_checkin",
+      "text": "Just checking in -- we're still here if you need anything. No rush at all. Just reply anytime!",
+      "tone": "warm_low_pressure"
+    },
+    {
+      "id": "fn-first-002",
+      "variant_name": "open_ended",
+      "text": "Hi {FirstName}! Just wanted to make sure you got our message. Happy to help if you have any questions. No pressure!",
+      "tone": "friendly_casual"
+    },
+    {
+      "id": "fn-first-003",
+      "variant_name": "offer_help",
+      "text": "Hi! We're still here if you'd like help scheduling or have any questions. Just reply whenever you're ready.",
+      "tone": "helpful_patient"
+    }
+  ],
+  "second_nudge_variants": [
+    {
+      "id": "fn-second-001",
+      "variant_name": "final_gentle",
+      "text": "Hi {FirstName}! Just one more check-in from {ClinicName}. We're here whenever you're ready -- no expiration on that. Have a great day!",
+      "tone": "warm_closing"
+    },
+    {
+      "id": "fn-second-002",
+      "variant_name": "door_open",
+      "text": "Hey! Just a quick note from {ClinicName} -- whenever you're ready to chat, we're just a text away. No rush!",
+      "tone": "casual_supportive"
+    }
+  ],
+  "mid_conversation_pause_variants": {
+    "description": "For when a patient pauses mid-conversation (e.g., during booking flow).",
+    "delay_before_send_minutes": 30,
+    "variants": [
+      {
+        "id": "fn-mid-001",
+        "text": "Still here if you'd like to continue! No rush at all.",
+        "tone": "patient"
+      },
+      {
+        "id": "fn-mid-002",
+        "text": "Take your time! I'll be here whenever you're ready to pick back up.",
+        "tone": "supportive"
+      },
+      {
+        "id": "fn-mid-003",
+        "text": "Just wanted to let you know I'm still here. If you need to come back to this later, just reply anytime.",
+        "tone": "accommodating"
+      }
+    ]
+  },
+  "after_insurance_question_variants": {
+    "description": "For when a patient asked about insurance and then went quiet.",
+    "delay_before_send_hours": 24,
+    "variants": [
+      {
+        "id": "fn-ins-001",
+        "text": "Hi {FirstName}! Just following up -- would you like us to go ahead and check on your insurance benefits? It's quick and no obligation.",
+        "tone": "helpful"
+      },
+      {
+        "id": "fn-ins-002",
+        "text": "Hey! If you're still thinking about the insurance question, we're happy to verify your benefits whenever you're ready. Just say the word!",
+        "tone": "casual_supportive"
+      }
+    ]
+  },
+  "tone_guidelines": {
+    "never": [
+      "Sound pushy or sales-oriented",
+      "Create urgency or imply they're missing out",
+      "Make the patient feel guilty for not responding",
+      "Send more than 2 follow-ups total",
+      "Use language like 'we haven't heard from you'"
+    ],
+    "always": [
+      "Sound genuinely helpful and patient",
+      "Make it clear there's no pressure",
+      "Keep messages short",
+      "Leave the door open without demanding a response"
+    ]
+  }
+}

@@ -1,0 +1,243 @@
+{
+  "playbook_id": "missed-call-recovery",
+  "version": "1.0.0",
+  "name": "Missed Call Recovery",
+  "description": "Handles outreach to patients who called but were not answered. Aims to re-engage warmly without pressure.",
+  "trigger_conditions": {
+    "event_type": "missed_call_detected",
+    "channel": "sms",
+    "delay_before_trigger_seconds": 120,
+    "max_attempts": 3,
+    "cooldown_between_attempts_hours": 24,
+    "exclude_if": [
+      "patient_already_booked",
+      "patient_opted_out_sms",
+      "call_returned_within_window"
+    ]
+  },
+  "response_goals": [
+    "Acknowledge the missed call promptly and warmly",
+    "Apologize without over-apologizing",
+    "Offer immediate text-based assistance",
+    "Offer a callback at the patient's convenience",
+    "Make the next step as easy as possible",
+    "Convert to a booked appointment if appropriate"
+  ],
+  "steps": [
+    {
+      "step_id": 1,
+      "name": "apologize_and_acknowledge",
+      "description": "Send initial SMS acknowledging the missed call with a brief, warm apology.",
+      "required": true,
+      "timing": "immediate",
+      "guidelines": [
+        "Keep it brief and genuine",
+        "Do not over-apologize or grovel",
+        "Use the clinic name for recognition",
+        "One short sentence of apology is sufficient"
+      ]
+    },
+    {
+      "step_id": 2,
+      "name": "offer_text_help",
+      "description": "Offer to help right now via text message so the patient doesn't have to call back.",
+      "required": true,
+      "timing": "within_same_message",
+      "guidelines": [
+        "Frame text help as the easiest option",
+        "Make it clear they can reply right here",
+        "Don't list every service; keep it open-ended"
+      ]
+    },
+    {
+      "step_id": 3,
+      "name": "offer_callback",
+      "description": "Offer a callback as an alternative if the patient prefers speaking with someone.",
+      "required": true,
+      "timing": "within_same_message",
+      "guidelines": [
+        "Let the patient choose the time",
+        "Don't force them into a narrow window",
+        "Keep it casual and low-pressure"
+      ]
+    },
+    {
+      "step_id": 4,
+      "name": "make_next_step_easy",
+      "description": "End with a clear, simple next action the patient can take.",
+      "required": true,
+      "timing": "within_same_message",
+      "guidelines": [
+        "One clear call to action",
+        "Make replying feel effortless",
+        "Avoid multiple competing options in the closing"
+      ]
+    },
+    {
+      "step_id": 5,
+      "name": "handle_response",
+      "description": "When the patient replies, route to the appropriate playbook based on their intent.",
+      "required": true,
+      "timing": "on_patient_reply",
+      "routing": {
+        "wants_appointment": "booking-conversion",
+        "has_insurance_question": "insurance-reassurance",
+        "wants_callback": "callback-request",
+        "has_general_question": "faq",
+        "expresses_hesitation": "patient-hesitation",
+        "no_response_after_24h": "follow_up_nudge"
+      }
+    }
+  ],
+  "allowed_language": [
+    "Hi, this is [ClinicName].",
+    "Sorry we missed your call!",
+    "We'd love to help you.",
+    "I can help you right here by text if that's easier.",
+    "Would you like us to call you back at a time that works for you?",
+    "Just reply here anytime.",
+    "We're here whenever you're ready.",
+    "No rush at all.",
+    "What can I help you with?",
+    "Happy to answer any questions you have."
+  ],
+  "prohibited_language": [
+    "We noticed you called and didn't leave a message",
+    "You missed our call",
+    "Call us back immediately",
+    "Limited availability",
+    "Don't miss out",
+    "Act now",
+    "Special offer",
+    "Free consultation",
+    "This is urgent",
+    "We've been trying to reach you"
+  ],
+  "tone_settings": {
+    "warmth": "high",
+    "urgency": "none",
+    "formality": "conversational_professional",
+    "pressure": "zero",
+    "empathy": "high",
+    "brevity": "concise"
+  },
+  "booking_timing": {
+    "when_to_introduce": "only_after_patient_expresses_interest",
+    "how_to_introduce": "soft_suggestion",
+    "never_before": "patient_has_responded_to_initial_message",
+    "guidelines": [
+      "Do not mention booking in the first outreach message",
+      "Wait for the patient to indicate they want an appointment",
+      "If they ask a question, answer it fully before suggesting booking",
+      "Frame booking as a helpful next step, not a sales close"
+    ]
+  },
+  "escalation_rules": {
+    "escalate_to_human_if": [
+      "Patient expresses frustration about not being answered",
+      "Patient mentions an urgent medical concern",
+      "Patient requests to speak with a specific person",
+      "Three or more messages without resolution",
+      "Patient uses language indicating distress or anger"
+    ],
+    "escalation_method": "human-handoff",
+    "escalation_priority": {
+      "medical_concern": "high",
+      "frustration": "medium",
+      "general_request": "normal"
+    }
+  },
+  "examples": {
+    "sample_conversations": [
+      {
+        "scenario": "Patient called about scheduling, no voicemail left",
+        "conversation": [
+          {
+            "role": "bot",
+            "message": "Hi! This is Metro Vein Clinic. Sorry we missed your call -- I can help you right here by text, or we can set up a time to call you back. Whatever's easiest!"
+          },
+          {
+            "role": "patient",
+            "message": "Oh hi, yeah I was calling to see about making an appointment"
+          },
+          {
+            "role": "bot",
+            "message": "I'd be happy to help with that! We have a few locations in the area. Do you have a preference, or would you like me to find the closest one to you?"
+          },
+          {
+            "role": "patient",
+            "message": "Whatever is closest to 48226"
+          },
+          {
+            "role": "bot",
+            "message": "Our Downtown Detroit location would be closest to you. They have openings this week. Can I grab your name to get started?"
+          }
+        ]
+      },
+      {
+        "scenario": "Patient called with insurance question",
+        "conversation": [
+          {
+            "role": "bot",
+            "message": "Hi! This is Metro Vein Clinic. Sorry we missed your call -- I can help you right here by text, or we can set up a time to call you back. Whatever's easiest!"
+          },
+          {
+            "role": "patient",
+            "message": "I wanted to know if you take Blue Cross"
+          },
+          {
+            "role": "bot",
+            "message": "Great question! We work with most major insurance plans, and Blue Cross is one we see quite often. The best way to know exactly what your plan covers is for our team to verify your specific benefits -- and there's no cost or obligation for that. Would you like us to look into it for you?"
+          }
+        ]
+      },
+      {
+        "scenario": "Patient doesn't respond to initial message",
+        "conversation": [
+          {
+            "role": "bot",
+            "message": "Hi! This is Metro Vein Clinic. Sorry we missed your call -- I can help you right here by text, or we can set up a time to call you back. Whatever's easiest!"
+          },
+          {
+            "role": "system_note",
+            "message": "No response after 24 hours. Send follow-up nudge per follow-up-nudge template."
+          },
+          {
+            "role": "bot",
+            "message": "Just checking in -- we're still here if you need anything. No rush at all. Just reply anytime."
+          }
+        ]
+      },
+      {
+        "scenario": "Patient is frustrated about missed call",
+        "conversation": [
+          {
+            "role": "bot",
+            "message": "Hi! This is Metro Vein Clinic. Sorry we missed your call -- I can help you right here by text, or we can set up a time to call you back. Whatever's easiest!"
+          },
+          {
+            "role": "patient",
+            "message": "Yeah I called THREE times and nobody answered. This is ridiculous."
+          },
+          {
+            "role": "bot",
+            "message": "I completely understand your frustration, and I'm really sorry about that. That's not the experience we want for you. Let me connect you with someone on our team right away -- would you prefer a call back in the next few minutes, or is there a better time?"
+          },
+          {
+            "role": "system_note",
+            "message": "Escalate to human-handoff playbook with priority: medium (frustration)."
+          }
+        ]
+      }
+    ]
+  },
+  "metrics": {
+    "track": [
+      "response_rate",
+      "time_to_first_reply",
+      "conversion_to_booking",
+      "escalation_rate",
+      "patient_satisfaction_signals"
+    ]
+  }
+}

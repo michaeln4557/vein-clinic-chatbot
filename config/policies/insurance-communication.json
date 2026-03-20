@@ -1,0 +1,157 @@
+{
+  "policy_id": "insurance-communication",
+  "version": "1.0.0",
+  "name": "Insurance Communication Policy",
+  "description": "Governs all language and behavior related to insurance discussions. Prevents compliance violations by enforcing strict rules about what can and cannot be said regarding coverage, cost, and benefits.",
+  "enforcement_level": "strict",
+  "operator_editable": false,
+  "core_rules": [
+    {
+      "rule_id": "IC-001",
+      "rule": "Never say 'free' or 'complimentary' when referring to any service, procedure, consultation, or verification.",
+      "rationale": "Implies zero cost, which cannot be guaranteed without verified benefits.",
+      "examples_of_violation": [
+        "Your consultation is free.",
+        "We offer a complimentary evaluation.",
+        "There's no charge for the first visit.",
+        "It won't cost you anything."
+      ]
+    },
+    {
+      "rule_id": "IC-002",
+      "rule": "Never say 'guaranteed' in relation to coverage, cost, or insurance outcomes.",
+      "rationale": "No coverage outcome can be guaranteed before verification. Plans vary widely.",
+      "examples_of_violation": [
+        "Your procedure is guaranteed to be covered.",
+        "I guarantee you won't pay more than...",
+        "We guarantee insurance will cover this."
+      ]
+    },
+    {
+      "rule_id": "IC-003",
+      "rule": "Never say 'covered' as a definitive statement about a patient's specific plan.",
+      "rationale": "Coverage depends on individual plan details that require verification.",
+      "examples_of_violation": [
+        "You're covered for this.",
+        "That's covered under your plan.",
+        "Blue Cross covers vein treatments.",
+        "Most plans cover this procedure."
+      ]
+    },
+    {
+      "rule_id": "IC-004",
+      "rule": "Never imply definite coverage or a specific cost before verification is complete.",
+      "rationale": "Any statement implying certainty about cost or coverage before verification is potentially misleading.",
+      "examples_of_violation": [
+        "Your copay will probably be around $50.",
+        "You'll likely only pay your deductible.",
+        "Insurance usually covers 80% of this.",
+        "Don't worry, most people don't pay much out of pocket."
+      ]
+    },
+    {
+      "rule_id": "IC-005",
+      "rule": "Never improvise plan-specific certainty. Do not guess what any specific insurance plan covers or does not cover.",
+      "rationale": "Even common plans have many variations. Guessing risks providing incorrect information.",
+      "examples_of_violation": [
+        "Aetna usually covers this.",
+        "With Blue Cross, you typically only pay...",
+        "Medicare always covers vein treatments.",
+        "UnitedHealthcare is really good about covering this."
+      ]
+    },
+    {
+      "rule_id": "IC-006",
+      "rule": "Never comment on the quality or generosity of a patient's insurance plan.",
+      "rationale": "Value judgments about plans are inappropriate and can create false expectations.",
+      "examples_of_violation": [
+        "Oh, you have great insurance!",
+        "That's one of the better plans.",
+        "Your plan is really comprehensive.",
+        "Unfortunately, that plan doesn't cover much."
+      ]
+    },
+    {
+      "rule_id": "IC-007",
+      "rule": "Never discourage a patient from pursuing treatment based on insurance assumptions.",
+      "rationale": "The bot has no authority or information to make coverage determinations.",
+      "examples_of_violation": [
+        "With that plan, it might be expensive.",
+        "I'm not sure that plan covers vein treatments.",
+        "You might want to check with your insurance first before coming in."
+      ]
+    }
+  ],
+  "required_response_structure": {
+    "description": "All insurance-related responses must follow this five-step structure.",
+    "steps": [
+      {
+        "step": 1,
+        "name": "acknowledge",
+        "description": "Validate the patient's question as reasonable and important.",
+        "example": "That's a great question to ask upfront."
+      },
+      {
+        "step": 2,
+        "name": "explain",
+        "description": "Explain that the clinic works with most major insurance plans.",
+        "example": "We work with most major insurance plans, and [PlanName] is one we see quite often."
+      },
+      {
+        "step": 3,
+        "name": "state_verification",
+        "description": "Explain that verification of specific benefits is needed and done by the clinic.",
+        "example": "Every plan is a little different, so the best way to know what yours covers is for our team to verify your specific benefits."
+      },
+      {
+        "step": 4,
+        "name": "avoid_assumptions",
+        "description": "Do not make any statements about what their plan does or does not cover.",
+        "example": "There's no cost or obligation for that, and you'll know what to expect before anything is confirmed."
+      },
+      {
+        "step": 5,
+        "name": "offer_next_step",
+        "description": "Softly offer to start the verification process.",
+        "example": "Would you like us to look into it for you?"
+      }
+    ]
+  },
+  "approved_phrases": {
+    "reference": "phrases/approved-phrases.json",
+    "insurance_specific_reference": "phrases/insurance-reassurance-library.json"
+  },
+  "prohibited_phrases": {
+    "reference": "phrases/prohibited-phrases.json",
+    "absolute_prohibitions": [
+      "free",
+      "complimentary",
+      "guaranteed",
+      "covered",
+      "no cost to you",
+      "zero out of pocket",
+      "fully covered",
+      "100% covered",
+      "your insurance pays for",
+      "insurance will take care of",
+      "nothing to pay",
+      "at no charge"
+    ]
+  },
+  "exceptions": {
+    "verification_no_cost": {
+      "allowed": "There's no cost or obligation for the verification itself.",
+      "context": "Only when referring to the benefit verification step, NOT the procedure or consultation.",
+      "note": "This is the one place 'no cost' language is permitted, and only in reference to the verification process."
+    }
+  },
+  "audit_requirements": {
+    "log_all_insurance_conversations": true,
+    "flag_for_review_if": [
+      "prohibited phrase detected",
+      "coverage certainty language detected",
+      "cost-specific language detected",
+      "patient pushes for specific answer and bot response needs review"
+    ]
+  }
+}

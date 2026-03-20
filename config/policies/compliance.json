@@ -1,0 +1,180 @@
+{
+  "policy_id": "compliance",
+  "version": "1.0.0",
+  "name": "General Compliance Policy",
+  "description": "General compliance rules covering data handling, HIPAA considerations, communication standards, and regulatory requirements for the chatbot system.",
+  "enforcement_level": "strict",
+  "operator_editable": false,
+  "hipaa_considerations": {
+    "description": "While the chatbot is not a covered entity's EHR, it handles PHI-adjacent data and must follow safe data handling practices.",
+    "rules": [
+      {
+        "rule_id": "COMP-HIPAA-001",
+        "rule": "Never request or store Social Security Numbers via any channel.",
+        "enforcement": "absolute"
+      },
+      {
+        "rule_id": "COMP-HIPAA-002",
+        "rule": "Minimize collection of Protected Health Information (PHI) to only what is necessary for scheduling and insurance verification.",
+        "enforcement": "strict"
+      },
+      {
+        "rule_id": "COMP-HIPAA-003",
+        "rule": "Never share one patient's information with another patient or unauthorized party.",
+        "enforcement": "absolute"
+      },
+      {
+        "rule_id": "COMP-HIPAA-004",
+        "rule": "All patient data must be transmitted over encrypted channels.",
+        "enforcement": "absolute"
+      },
+      {
+        "rule_id": "COMP-HIPAA-005",
+        "rule": "Patient insurance card images must be stored in secure, access-controlled storage, not in chat logs.",
+        "enforcement": "absolute"
+      },
+      {
+        "rule_id": "COMP-HIPAA-006",
+        "rule": "Conversation transcripts containing PHI must be stored in HIPAA-compliant storage with appropriate access controls.",
+        "enforcement": "strict"
+      },
+      {
+        "rule_id": "COMP-HIPAA-007",
+        "rule": "Patient data must be redacted from any analytics, reporting, or debugging logs.",
+        "enforcement": "strict"
+      },
+      {
+        "rule_id": "COMP-HIPAA-008",
+        "rule": "Retain patient conversation data only as long as required by policy and applicable regulations. Implement automated data retention and purging.",
+        "enforcement": "strict",
+        "default_retention_days": 365
+      }
+    ]
+  },
+  "data_handling": {
+    "collection_rules": [
+      {
+        "rule_id": "COMP-DATA-001",
+        "rule": "Only collect information necessary for the current interaction's purpose.",
+        "examples": [
+          "For booking: name, phone, location preference, insurance provider, date/time",
+          "For insurance verification: insurance card images or provider/member ID/group number",
+          "For callback: name, phone, preferred time"
+        ]
+      },
+      {
+        "rule_id": "COMP-DATA-002",
+        "rule": "Never collect sensitive health details beyond what is needed for scheduling.",
+        "prohibited_collections": [
+          "Detailed symptom descriptions (note: 'vein concerns' is acceptable, detailed symptom lists are not)",
+          "Medication lists",
+          "Complete medical history",
+          "Mental health information",
+          "Substance use information"
+        ]
+      },
+      {
+        "rule_id": "COMP-DATA-003",
+        "rule": "Provide clear data use disclosure when collecting information.",
+        "guideline": "The patient should understand why information is being collected. This does not require a formal legal disclaimer in every message, but the purpose should be clear."
+      }
+    ],
+    "storage_rules": [
+      {
+        "rule_id": "COMP-DATA-004",
+        "rule": "All patient data at rest must be encrypted.",
+        "standard": "AES-256 or equivalent"
+      },
+      {
+        "rule_id": "COMP-DATA-005",
+        "rule": "Access to patient data must be role-based and logged.",
+        "enforcement": "strict"
+      },
+      {
+        "rule_id": "COMP-DATA-006",
+        "rule": "Patient data must not be used for training AI models without explicit consent and proper de-identification.",
+        "enforcement": "absolute"
+      }
+    ]
+  },
+  "communication_standards": {
+    "sms_compliance": [
+      {
+        "rule_id": "COMP-SMS-001",
+        "rule": "Patient must have opted in to receive SMS messages before any outbound messaging.",
+        "enforcement": "absolute"
+      },
+      {
+        "rule_id": "COMP-SMS-002",
+        "rule": "Every SMS conversation must include opt-out instructions on first message or at reasonable intervals.",
+        "standard_text": "Reply STOP to opt out at any time."
+      },
+      {
+        "rule_id": "COMP-SMS-003",
+        "rule": "Honor opt-out requests immediately. STOP, CANCEL, UNSUBSCRIBE, and QUIT must all be recognized.",
+        "enforcement": "absolute"
+      },
+      {
+        "rule_id": "COMP-SMS-004",
+        "rule": "Do not send SMS outside of reasonable hours (8 AM - 9 PM local time) unless responding to a patient-initiated conversation.",
+        "enforcement": "strict"
+      },
+      {
+        "rule_id": "COMP-SMS-005",
+        "rule": "Include clinic identification in first message of each conversation.",
+        "enforcement": "strict"
+      }
+    ],
+    "advertising_compliance": [
+      {
+        "rule_id": "COMP-AD-001",
+        "rule": "Do not make comparative claims about the clinic vs. competitors.",
+        "enforcement": "strict"
+      },
+      {
+        "rule_id": "COMP-AD-002",
+        "rule": "Do not use testimonials or patient reviews in chatbot responses.",
+        "enforcement": "strict"
+      },
+      {
+        "rule_id": "COMP-AD-003",
+        "rule": "Do not make claims about treatment outcomes that are not approved by the clinic's compliance team.",
+        "enforcement": "strict"
+      },
+      {
+        "rule_id": "COMP-AD-004",
+        "rule": "Never use urgency, scarcity, or fear-based tactics to encourage booking.",
+        "enforcement": "absolute"
+      }
+    ]
+  },
+  "bot_disclosure": {
+    "rule_id": "COMP-BOT-001",
+    "rule": "If a patient asks whether they are speaking with a person or a bot, answer honestly.",
+    "response": "I'm an AI assistant for [ClinicName]. I can help with scheduling, answer general questions, and connect you with our team. Would you like to speak with someone on our staff?",
+    "enforcement": "absolute"
+  },
+  "incident_response": {
+    "data_breach_protocol": {
+      "immediate_actions": [
+        "Disable affected communication channels",
+        "Notify security team immediately",
+        "Preserve all logs for investigation",
+        "Do not attempt to remediate without security team guidance"
+      ],
+      "notification_requirements": "Per HIPAA breach notification rules if applicable"
+    },
+    "complaint_handling": {
+      "patient_complaints": "Route to human-handoff immediately with high priority",
+      "regulatory_inquiries": "Escalate to compliance officer immediately"
+    }
+  },
+  "audit_trail": {
+    "log_all_conversations": true,
+    "log_all_data_access": true,
+    "log_all_escalations": true,
+    "log_all_opt_outs": true,
+    "retention_period_days": 365,
+    "review_frequency": "monthly"
+  }
+}

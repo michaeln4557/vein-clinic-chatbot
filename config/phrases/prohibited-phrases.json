@@ -1,0 +1,459 @@
+{
+  "phrase_library_id": "prohibited-phrases",
+  "version": "1.1.0",
+  "name": "Prohibited Phrase Library",
+  "description": "Phrases that must never be used by the chatbot under any circumstances. Organized by violation category with severity levels for enforcement.",
+  "enforcement": "absolute",
+  "categories": {
+    "insurance": [
+      {
+        "id": "prohib-ins-001",
+        "category": "insurance",
+        "text": "free",
+        "reason": "Implies zero cost without verified benefits. Cannot guarantee any service is free.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-002",
+        "category": "insurance",
+        "text": "complimentary",
+        "reason": "Synonym for 'free' — implies no charge without verification.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-003",
+        "category": "insurance",
+        "text": "guaranteed",
+        "reason": "Cannot guarantee insurance coverage, cost, or outcomes.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-004",
+        "category": "insurance",
+        "text": "covered",
+        "reason": "Definitive coverage statements require verification. Cannot state that any plan covers any service.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-005",
+        "category": "insurance",
+        "text": "no cost",
+        "reason": "Implies zero patient responsibility. Exception: 'no cost or obligation for the verification' only.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-006",
+        "category": "insurance",
+        "text": "no charge",
+        "reason": "Implies zero cost for services or procedures.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-007",
+        "category": "insurance",
+        "text": "fully covered",
+        "reason": "Cannot confirm full coverage without verification.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-008",
+        "category": "insurance",
+        "text": "your plan covers",
+        "reason": "Cannot state what any specific plan covers before verification.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-009",
+        "category": "insurance",
+        "text": "your insurance covers",
+        "reason": "Cannot confirm what insurance covers without verification.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-010",
+        "category": "insurance",
+        "text": "don't worry about cost",
+        "reason": "Dismisses legitimate financial concern and implies zero or low cost.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-011",
+        "category": "insurance",
+        "text": "won't cost you anything",
+        "reason": "Explicit zero-cost promise without verification.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-012",
+        "category": "insurance",
+        "text": "zero out of pocket",
+        "reason": "Cannot guarantee out-of-pocket costs.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-013",
+        "category": "insurance",
+        "text": "100% covered",
+        "reason": "Specific coverage percentages cannot be stated.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-014",
+        "category": "insurance",
+        "text": "insurance will take care of",
+        "reason": "Implies definite coverage and zero patient responsibility.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-015",
+        "category": "insurance",
+        "text": "your copay will be",
+        "reason": "Cannot specify copay amounts without verification.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-016",
+        "category": "insurance",
+        "text": "your deductible is",
+        "reason": "Cannot specify deductible amounts without verification.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-017",
+        "category": "insurance",
+        "text": "most people don't pay anything",
+        "reason": "Misleading generalization about cost.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-018",
+        "category": "insurance",
+        "text": "insurance always covers this",
+        "reason": "False absolute statement about coverage.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-019",
+        "category": "insurance",
+        "text": "usually covered",
+        "reason": "Implies likely coverage without verification.",
+        "severity": "warn",
+        "active": true
+      },
+      {
+        "id": "prohib-ins-020",
+        "category": "insurance",
+        "text": "nothing to pay",
+        "reason": "Implies zero patient cost.",
+        "severity": "block",
+        "active": true
+      }
+    ],
+    "clinical": [
+      {
+        "id": "prohib-clin-001",
+        "category": "clinical",
+        "text": "you have [condition]",
+        "reason": "Constitutes a diagnosis. Only licensed physicians may diagnose.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-clin-002",
+        "category": "clinical",
+        "text": "sounds like you have",
+        "reason": "Implied diagnosis based on symptom description.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-clin-003",
+        "category": "clinical",
+        "text": "I think you have",
+        "reason": "Implied diagnosis. Bot has no clinical authority.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-clin-004",
+        "category": "clinical",
+        "text": "you need treatment",
+        "reason": "Treatment necessity is a clinical determination made by physicians.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-clin-005",
+        "category": "clinical",
+        "text": "I recommend",
+        "reason": "Bot cannot make medical recommendations.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-clin-006",
+        "category": "clinical",
+        "text": "diagnosis is",
+        "reason": "Bot cannot provide or confirm diagnoses.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-clin-007",
+        "category": "clinical",
+        "text": "you should take",
+        "reason": "Medication advice is unsafe and outside bot scope.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-clin-008",
+        "category": "clinical",
+        "text": "it's probably nothing",
+        "reason": "Minimizes potentially serious conditions.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-clin-009",
+        "category": "clinical",
+        "text": "there's nothing to worry about",
+        "reason": "Minimizes symptoms and could delay necessary care.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-clin-010",
+        "category": "clinical",
+        "text": "you don't need to see a doctor",
+        "reason": "Could prevent necessary medical care.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-clin-011",
+        "category": "clinical",
+        "text": "guaranteed results",
+        "reason": "No medical outcomes can be guaranteed.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-clin-012",
+        "category": "clinical",
+        "text": "no side effects",
+        "reason": "All medical treatments carry some risk.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-clin-013",
+        "category": "clinical",
+        "text": "completely safe",
+        "reason": "No procedure is risk-free.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-clin-014",
+        "category": "clinical",
+        "text": "permanent results",
+        "reason": "Overstates treatment outcomes without clinical context.",
+        "severity": "warn",
+        "active": true
+      }
+    ],
+    "sales_pressure": [
+      {
+        "id": "prohib-sales-001",
+        "category": "sales_pressure",
+        "text": "act now",
+        "reason": "Creates false urgency. Violates zero-pressure communication policy.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-sales-002",
+        "category": "sales_pressure",
+        "text": "limited time",
+        "reason": "Creates false urgency and scarcity.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-sales-003",
+        "category": "sales_pressure",
+        "text": "don't miss out",
+        "reason": "Fear-of-missing-out tactic.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-sales-004",
+        "category": "sales_pressure",
+        "text": "hurry",
+        "reason": "Urgency pressure incompatible with patient-centered care.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-sales-005",
+        "category": "sales_pressure",
+        "text": "last chance",
+        "reason": "False scarcity tactic.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-sales-006",
+        "category": "sales_pressure",
+        "text": "special offer",
+        "reason": "Sales promotion language inappropriate for healthcare.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-sales-007",
+        "category": "sales_pressure",
+        "text": "discount",
+        "reason": "Promotional language that may create compliance issues.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-sales-008",
+        "category": "sales_pressure",
+        "text": "deal",
+        "reason": "Sales language inappropriate for medical services.",
+        "severity": "warn",
+        "active": true
+      },
+      {
+        "id": "prohib-sales-009",
+        "category": "sales_pressure",
+        "text": "limited availability",
+        "reason": "Creates false scarcity pressure.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-sales-010",
+        "category": "sales_pressure",
+        "text": "spots are filling up",
+        "reason": "Scarcity pressure tactic.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-sales-011",
+        "category": "sales_pressure",
+        "text": "before it's too late",
+        "reason": "Fear-based pressure.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-sales-012",
+        "category": "sales_pressure",
+        "text": "your condition will get worse",
+        "reason": "Medical fear tactic combined with sales pressure. Also a clinical claim.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-sales-013",
+        "category": "sales_pressure",
+        "text": "you'll regret waiting",
+        "reason": "Guilt-based pressure.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-sales-014",
+        "category": "sales_pressure",
+        "text": "exclusive",
+        "reason": "Sales language inappropriate for healthcare.",
+        "severity": "warn",
+        "active": true
+      }
+    ],
+    "dismissive": [
+      {
+        "id": "prohib-dism-001",
+        "category": "dismissive",
+        "text": "I'm just a bot",
+        "reason": "Self-deprecating and unhelpful. Undermines patient trust.",
+        "severity": "warn",
+        "active": true
+      },
+      {
+        "id": "prohib-dism-002",
+        "category": "dismissive",
+        "text": "I can't help with that",
+        "reason": "Dead-end response. Must always offer an alternative or escalation.",
+        "severity": "warn",
+        "active": true
+      },
+      {
+        "id": "prohib-dism-003",
+        "category": "dismissive",
+        "text": "that's not my department",
+        "reason": "Dismissive and corporate-sounding.",
+        "severity": "warn",
+        "active": true
+      },
+      {
+        "id": "prohib-dism-004",
+        "category": "dismissive",
+        "text": "we've been trying to reach you",
+        "reason": "Guilt-inducing and feels invasive, especially in missed-call contexts.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-dism-005",
+        "category": "dismissive",
+        "text": "as I already mentioned",
+        "reason": "Condescending. If repeating information, just repeat it naturally.",
+        "severity": "warn",
+        "active": true
+      },
+      {
+        "id": "prohib-dism-006",
+        "category": "dismissive",
+        "text": "obviously",
+        "reason": "Condescending. Nothing is 'obvious' to someone asking a question.",
+        "severity": "warn",
+        "active": true
+      }
+    ]
+  },
+  "detection_rules": {
+    "case_sensitive": false,
+    "match_type": "substring_and_semantic",
+    "semantic_matching": "Also detect paraphrases and synonyms of prohibited concepts",
+    "action_on_detection": {
+      "block": "Prevent message from being sent. Substitute with approved alternative.",
+      "warn": "Flag for review but allow with approved alternative suggestion."
+    },
+    "log_violations": true
+  }
+}

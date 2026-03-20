@@ -1,0 +1,166 @@
+{
+  "playbook_id": "faq",
+  "version": "1.0.0",
+  "name": "Frequently Asked Questions",
+  "description": "Handles common questions about vein treatments, what to expect, preparation, and general clinic information. Provides helpful information while staying within clinical safety boundaries.",
+  "trigger_conditions": {
+    "intent_detected": [
+      "general_question",
+      "treatment_inquiry",
+      "preparation_question",
+      "what_to_expect",
+      "recovery_question"
+    ]
+  },
+  "response_goals": [
+    "Provide accurate, helpful general information",
+    "Stay within approved clinical messaging boundaries",
+    "Never diagnose or provide specific medical advice",
+    "Route complex medical questions to clinical staff",
+    "Use every FAQ interaction as a soft opportunity to offer next steps"
+  ],
+  "faq_categories": {
+    "about_vein_conditions": {
+      "questions": [
+        {
+          "q": "What are varicose veins?",
+          "approved_response": "Varicose veins are enlarged, twisted veins that often appear on the legs. They happen when the valves in your veins don't work properly, causing blood to pool. They're very common and can cause symptoms like aching, heaviness, or swelling. A consultation with one of our doctors can help determine the best approach for your situation.",
+          "tags": ["condition", "general"]
+        },
+        {
+          "q": "What are spider veins?",
+          "approved_response": "Spider veins are small, thin veins that appear close to the skin's surface. They're usually red, blue, or purple and can look like a web pattern. While they're often cosmetic, sometimes they can be related to underlying vein issues. Our doctors can take a look and let you know what they're seeing.",
+          "tags": ["condition", "general"]
+        },
+        {
+          "q": "Are varicose veins dangerous?",
+          "approved_response": "In most cases, varicose veins aren't dangerous, but they can cause discomfort and sometimes lead to other concerns if left untreated over time. It's always a good idea to have a doctor take a look so you know where you stand. Would you like to set up a consultation?",
+          "tags": ["condition", "concern"]
+        },
+        {
+          "q": "What causes varicose veins?",
+          "approved_response": "Varicose veins can be caused by a number of factors including genetics, age, prolonged standing or sitting, pregnancy, and other factors. They're really common -- millions of people deal with them. A consultation can help you understand your specific situation.",
+          "tags": ["condition", "causes"]
+        }
+      ]
+    },
+    "about_treatments": {
+      "questions": [
+        {
+          "q": "What treatments do you offer?",
+          "approved_response": "We offer several minimally invasive treatment options for vein conditions. The specific treatment recommended depends on your individual situation, which is determined during a consultation with one of our doctors. Most of our treatments are done right in the office and patients typically get back to their normal activities quickly.",
+          "tags": ["treatment", "general"]
+        },
+        {
+          "q": "Does the treatment hurt?",
+          "approved_response": "Most patients tell us the treatments are much more comfortable than they expected. Our doctors use local anesthesia to keep you comfortable during the procedure. Many patients describe feeling just a small pinch. Everyone's experience is a little different, but comfort is a top priority for us.",
+          "tags": ["treatment", "comfort"]
+        },
+        {
+          "q": "How long does treatment take?",
+          "approved_response": "Most of our in-office treatments take about 30-60 minutes, depending on the type and extent of treatment. Your doctor will give you a more specific timeline during your consultation based on your individual needs.",
+          "tags": ["treatment", "logistics"]
+        },
+        {
+          "q": "How many treatments will I need?",
+          "approved_response": "The number of treatments varies from person to person depending on the condition being treated. Some patients only need one session, while others may need a few. Your doctor will develop a personalized treatment plan during your consultation.",
+          "tags": ["treatment", "planning"]
+        }
+      ]
+    },
+    "preparation_and_recovery": {
+      "questions": [
+        {
+          "q": "How do I prepare for my appointment?",
+          "approved_response": "For your first consultation, just wear comfortable, loose-fitting clothing -- shorts or something that makes it easy to see your legs. There's usually no special preparation needed for the initial visit. If a procedure is scheduled, our team will give you specific preparation instructions beforehand.",
+          "tags": ["preparation", "first_visit"]
+        },
+        {
+          "q": "What is the recovery like?",
+          "approved_response": "Recovery from most minimally invasive vein treatments is generally quick. Many patients return to normal activities the same day or the next day. Your doctor will give you specific recovery instructions based on your treatment. Walking is usually encouraged, and you may wear compression stockings for a period of time.",
+          "tags": ["recovery", "logistics"]
+        },
+        {
+          "q": "Can I go back to work after treatment?",
+          "approved_response": "Many patients are able to return to work the same day or the next day after most of our treatments. Your doctor will advise you based on the specific procedure and your job requirements. It's always best to discuss your schedule with your doctor so you can plan ahead.",
+          "tags": ["recovery", "work"]
+        },
+        {
+          "q": "Are there any activity restrictions?",
+          "approved_response": "Your doctor will provide specific guidelines for your situation, but generally patients are encouraged to walk and stay active after treatment. Some patients are asked to avoid strenuous exercise or heavy lifting for a short period. You'll get detailed instructions before and after your procedure.",
+          "tags": ["recovery", "activity"]
+        }
+      ]
+    },
+    "about_the_clinic": {
+      "questions": [
+        {
+          "q": "Where are you located?",
+          "approved_response": "We have several locations to make it convenient for you. I can help you find the one closest to you -- what's your ZIP code or what area are you in?",
+          "tags": ["clinic", "location"],
+          "routes_to": "location-routing"
+        },
+        {
+          "q": "What are your hours?",
+          "approved_response": "Our hours vary by location. Which location are you interested in? I can look up their specific hours for you.",
+          "tags": ["clinic", "hours"]
+        },
+        {
+          "q": "Do I need a referral?",
+          "approved_response": "Most patients don't need a referral to schedule a consultation with us. However, some insurance plans do require one, so we'll check on that when we verify your benefits. Either way, we can get you started and figure out the details.",
+          "tags": ["clinic", "referral"]
+        }
+      ]
+    },
+    "insurance_and_cost": {
+      "questions": [
+        {
+          "q": "Do you accept my insurance?",
+          "routes_to": "insurance-reassurance",
+          "tags": ["insurance"]
+        },
+        {
+          "q": "How much does treatment cost?",
+          "approved_response": "The cost of treatment depends on your specific procedure and insurance coverage. We verify your benefits before any treatment so you know what to expect. Our team can walk you through the financial details once your benefits are confirmed. Would you like us to get started on verifying your coverage?",
+          "tags": ["cost", "insurance"],
+          "routes_to_if_followup": "insurance-reassurance"
+        },
+        {
+          "q": "Is vein treatment covered by insurance?",
+          "approved_response": "Many vein treatments are covered by insurance when they're deemed medically necessary. Coverage varies by plan, so the best way to know is for us to verify your specific benefits. There's no cost or obligation for that step. Want us to look into it?",
+          "tags": ["insurance", "coverage"],
+          "routes_to_if_followup": "insurance-reassurance"
+        }
+      ]
+    }
+  },
+  "response_guidelines": {
+    "always": [
+      "Use patient-friendly language, no medical jargon",
+      "Keep responses conversational but informative",
+      "End with a soft next-step offer when appropriate",
+      "Stay within approved messaging boundaries",
+      "Refer to 'our doctors' or 'your doctor' for medical specifics"
+    ],
+    "never": [
+      "Diagnose or suggest a diagnosis",
+      "Recommend a specific treatment for a specific condition",
+      "Provide specific medical advice",
+      "Guarantee outcomes or results",
+      "Quote specific costs or copay amounts",
+      "Make claims about treatment effectiveness with percentages"
+    ]
+  },
+  "unknown_question_handling": {
+    "if_medical": "route to human-handoff",
+    "if_general": "route to low-confidence playbook",
+    "response": "That's a great question. I want to make sure you get the most accurate answer, so let me connect you with someone on our team who can help with that."
+  },
+  "tone_settings": {
+    "helpfulness": "very_high",
+    "warmth": "high",
+    "authority": "moderate",
+    "pressure": "zero",
+    "clinical_specificity": "low_general_only"
+  }
+}

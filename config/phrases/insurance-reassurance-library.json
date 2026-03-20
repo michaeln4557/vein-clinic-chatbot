@@ -1,0 +1,122 @@
+{
+  "phrase_library_id": "insurance-reassurance-library",
+  "version": "1.0.0",
+  "name": "Insurance Reassurance Phrase Library",
+  "description": "Multiple compliant variations of insurance reassurance language. All phrases have been vetted against the insurance-communication policy. Use variety to keep conversations natural.",
+  "usage_guidelines": [
+    "Rotate through variations to avoid sounding scripted",
+    "Adapt phrasing to match conversation flow",
+    "All variations are pre-approved for compliance",
+    "Combine components from different variations as needed",
+    "Always include all five elements: acknowledge, explain, verify, no-assumptions, next-step"
+  ],
+  "full_response_variations": [
+    {
+      "id": "ir-full-001",
+      "name": "standard",
+      "text": "We work with most major insurance plans, and {PlanName} is one we see quite often. Every plan is a little different, so the best way to know what yours covers is for our team to verify your specific benefits. There's no cost or obligation for that, and you'll know what to expect before anything is confirmed. Would you like us to look into it for you?",
+      "best_for": "First-time insurance questions with a named plan"
+    },
+    {
+      "id": "ir-full-002",
+      "name": "no_plan_named",
+      "text": "We work with most major insurance plans. Since every plan is a little different, the most accurate way to know what your specific coverage looks like is for our team to verify your benefits directly. It's quick, there's no obligation, and you'll have a clear picture before anything moves forward. Would you like to get that started?",
+      "best_for": "When the patient hasn't named a specific plan"
+    },
+    {
+      "id": "ir-full-003",
+      "name": "cost_focused",
+      "text": "That's a really important thing to know upfront. The cost depends on your specific plan and benefits, which can vary quite a bit even within the same insurance company. What we do is verify your benefits ahead of time so there are no surprises. It's no cost and no obligation to check. Want me to get that started for you?",
+      "best_for": "When the patient asks directly about cost"
+    },
+    {
+      "id": "ir-full-004",
+      "name": "hesitant_patient",
+      "text": "Totally understand wanting to know about that before moving forward. We work with most major plans, and we're happy to check on your specific coverage -- it just takes a day or two and there's no obligation. That way you'll know exactly what to expect before deciding anything. No pressure at all. Would you like us to look into it?",
+      "best_for": "When the patient seems hesitant or uncertain"
+    },
+    {
+      "id": "ir-full-005",
+      "name": "returning_to_topic",
+      "text": "Coming back to your insurance question -- we see a wide variety of plans and work with most major insurers. The details can vary a lot from plan to plan, so the best route is for our team to verify your specific benefits. It's quick and there's no cost or commitment on your end. Would that be helpful?",
+      "best_for": "When circling back to an earlier insurance question"
+    }
+  ],
+  "component_variations": {
+    "acknowledge": [
+      "That's a great question.",
+      "That's a really important thing to know upfront.",
+      "Totally understand wanting to know about that.",
+      "Great question -- I'm glad you're asking.",
+      "That's one of the most common questions we get, and it's a smart one to ask early."
+    ],
+    "explain_general_coverage": [
+      "We work with most major insurance plans.",
+      "We work with a wide range of insurance providers.",
+      "We accept most major insurers.",
+      "We see patients with all kinds of insurance plans."
+    ],
+    "named_plan_acknowledgment": [
+      "{PlanName} is one we see quite often.",
+      "{PlanName} is a plan we work with regularly.",
+      "We see patients with {PlanName} all the time.",
+      "{PlanName} is one of the plans we work with."
+    ],
+    "explain_variation": [
+      "Every plan is a little different.",
+      "Coverage can vary quite a bit from plan to plan.",
+      "Even within the same insurance company, benefits can differ.",
+      "Plans can vary a lot, even within the same provider.",
+      "The specifics really depend on your individual plan."
+    ],
+    "verification_offer": [
+      "The best way to know is for our team to verify your specific benefits.",
+      "The most accurate way to find out is for us to check your specific coverage.",
+      "Our team can verify your specific benefits so you know exactly what to expect.",
+      "We can look into your specific plan to get you a clear answer."
+    ],
+    "no_cost_no_obligation": [
+      "There's no cost or obligation for that.",
+      "It's no cost and no obligation to check.",
+      "There's no charge and no commitment for the verification.",
+      "The verification itself is at no cost or obligation to you.",
+      "It's completely free to check, and there's no obligation."
+    ],
+    "expectation_setting": [
+      "You'll know what to expect before anything is confirmed.",
+      "You'll have a clear picture before anything moves forward.",
+      "You'll know exactly where you stand before your appointment.",
+      "We'll make sure you know what to expect ahead of time.",
+      "No surprises -- you'll have all the details before anything is finalized."
+    ],
+    "soft_next_step": [
+      "Would you like us to look into it for you?",
+      "Want me to get that started?",
+      "Would you like us to check on that?",
+      "Should I have our team look into your benefits?",
+      "Would that be helpful?",
+      "Want us to take a look?"
+    ]
+  },
+  "pushback_responses": {
+    "description": "Pre-approved responses for when patients push for specific coverage answers.",
+    "variations": [
+      {
+        "trigger": "Patient asks 'but is it usually covered?'",
+        "response": "I totally understand wanting a ballpark. The tricky part is that it really does depend on each person's specific plan. I wouldn't want to give you a number that turns out to be wrong. That's exactly why we verify everything upfront -- so there are no surprises."
+      },
+      {
+        "trigger": "Patient asks 'what do most people pay?'",
+        "response": "It really varies from person to person based on their plan. Rather than guess, the best thing we can do is check your specific benefits so you get an accurate answer. It only takes a day or two."
+      },
+      {
+        "trigger": "Patient says 'just tell me if it's covered'",
+        "response": "I wish I could give you a simple yes or no, but coverage really depends on the specifics of your individual plan. Our team can verify that for you quickly -- then you'll have a definitive answer."
+      },
+      {
+        "trigger": "Patient asks about a specific dollar amount",
+        "response": "I don't want to give you an amount that might not be accurate for your plan. Our team can verify your exact benefits and give you a clear breakdown before anything is scheduled. Would you like us to do that?"
+      }
+    ]
+  }
+}

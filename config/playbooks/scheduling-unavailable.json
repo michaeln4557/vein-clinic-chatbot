@@ -1,0 +1,130 @@
+{
+  "playbook_id": "scheduling-unavailable",
+  "version": "1.0.0",
+  "name": "Scheduling Unavailable",
+  "description": "Handles situations where the patient's preferred date, time, or location is not available. Offers alternatives without losing the booking.",
+  "trigger_conditions": {
+    "triggered_by": [
+      "booking-conversion step 5",
+      "no_availability_at_preferred_time",
+      "location_fully_booked",
+      "provider_unavailable"
+    ]
+  },
+  "response_goals": [
+    "Acknowledge the patient's preference",
+    "Offer the closest available alternatives",
+    "Keep the patient engaged and moving toward a booking",
+    "Never make the patient feel like they can't be accommodated"
+  ],
+  "steps": [
+    {
+      "step_id": 1,
+      "name": "acknowledge_preference",
+      "description": "Validate what the patient wanted before presenting alternatives.",
+      "guidelines": [
+        "Don't just say 'that's not available' -- acknowledge their preference first",
+        "Use language like 'I see that time is already taken' or 'that slot just filled up'",
+        "Never blame the patient for not booking sooner"
+      ]
+    },
+    {
+      "step_id": 2,
+      "name": "offer_same_location_alternatives",
+      "description": "Present alternative times at the same location first.",
+      "guidelines": [
+        "Offer 2-3 alternative times that are close to the original preference",
+        "Same day alternatives take priority over same time on different days",
+        "If they wanted morning, offer other mornings first",
+        "Present options clearly and concisely"
+      ],
+      "max_alternatives": 3
+    },
+    {
+      "step_id": 3,
+      "name": "offer_nearby_location",
+      "description": "If no good alternatives exist at the preferred location, suggest a nearby location.",
+      "guidelines": [
+        "Only suggest nearby locations if same-location alternatives don't work",
+        "Mention the distance or travel time difference",
+        "Frame it as an option, not a redirect",
+        "Maximum of 2 alternative locations"
+      ]
+    },
+    {
+      "step_id": 4,
+      "name": "offer_different_day_time",
+      "description": "Broaden the search to other days or times if needed.",
+      "guidelines": [
+        "Ask if there's flexibility in their schedule",
+        "Offer the next available slot as a concrete option",
+        "If the wait is more than 2 weeks, mention it transparently",
+        "Offer to put them on a waitlist if applicable"
+      ]
+    },
+    {
+      "step_id": 5,
+      "name": "waitlist_option",
+      "description": "Offer to add the patient to a waitlist for their preferred time.",
+      "guidelines": [
+        "Explain how the waitlist works simply",
+        "Set realistic expectations about likelihood",
+        "Still encourage booking an alternative in the meantime",
+        "Don't make waitlist sound like a consolation prize"
+      ]
+    },
+    {
+      "step_id": 6,
+      "name": "callback_fallback",
+      "description": "If nothing works, offer to have someone call with more options.",
+      "routing": "callback-request",
+      "guidelines": [
+        "Use this as a last resort, not a first option",
+        "Frame it positively: 'Our scheduling team can look at a few more options for you'",
+        "Don't let the patient leave without a next step"
+      ]
+    }
+  ],
+  "alternative_presentation_rules": {
+    "always_offer_concrete_options": true,
+    "never_say_just_check_back": true,
+    "group_by_proximity_to_preference": true,
+    "format": "brief_and_scannable"
+  },
+  "tone_settings": {
+    "helpfulness": "very_high",
+    "urgency": "none",
+    "optimism": "moderate",
+    "pressure": "zero"
+  },
+  "examples": {
+    "sample_conversations": [
+      {
+        "scenario": "Preferred time unavailable, same-day alternative exists",
+        "conversation": [
+          {
+            "role": "patient",
+            "message": "Can I come in Tuesday at 9 AM?"
+          },
+          {
+            "role": "bot",
+            "message": "Tuesday at 9 is already taken, but I do have 10:30 AM or 1:00 PM available that same day. Would either of those work for you?"
+          }
+        ]
+      },
+      {
+        "scenario": "No availability that week",
+        "conversation": [
+          {
+            "role": "patient",
+            "message": "I need something this week"
+          },
+          {
+            "role": "bot",
+            "message": "This week is pretty full at our Troy location, but our Southfield office -- about 15 minutes away -- has openings Wednesday and Thursday morning. Would you like to take a look at those, or would you prefer to wait for Troy? The next opening there is Monday the 12th."
+          }
+        ]
+      }
+    ]
+  }
+}

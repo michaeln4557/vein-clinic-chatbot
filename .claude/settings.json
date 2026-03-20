@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":\"MANDATORY: You MUST route this request through the /team-lead agent. Read .claude/skills/team-lead/SKILL.md and dispatch the appropriate specialist agent(s). Do NOT work on this request directly — always go through team-lead first.\"}}'",
+            "statusMessage": "Routing through Team Lead..."
+          }
+        ]
+      }
+    ]
+  }
+}

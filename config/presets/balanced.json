@@ -1,0 +1,27 @@
+{
+  "preset_id": "balanced",
+  "version": "1.0.0",
+  "name": "Balanced",
+  "description": "Default configuration. Balances warmth with efficiency, patient-led with guided conversation, and reassurance with forward movement. Works well for most clinics and patient populations.",
+  "use_case": "General-purpose preset suitable for most vein clinics. Good starting point before customization. Works well across all channels (SMS, web chat, etc.).",
+  "slider_values": {
+    "conversation_style": 55,
+    "workflow_strictness": 65,
+    "booking_timing": 55,
+    "reassurance_level": 65,
+    "response_length": 50,
+    "followup_cadence": 60,
+    "human_handoff_sensitivity": 55,
+    "faq_flexibility": 60
+  },
+  "behavioral_summary": {
+    "conversation_style": "Professional with warmth, conversational but polished",
+    "workflow_strictness": "Guided flow with room for natural detours",
+    "booking_timing": "Balanced, suggests booking naturally after answering questions",
+    "reassurance_level": "Supportive with validation and normalized concerns",
+    "response_length": "Moderate length, 2-4 sentences",
+    "followup_cadence": "Standard 24-hour first nudge, max 2 follow-ups",
+    "human_handoff_sensitivity": "Balanced, one clarification attempt before escalation",
+    "faq_flexibility": "Guided flexibility with natural rephrasing"
+  }
+}

@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+*.log
+coverage/
+.nyc_output/
+.DS_Store
+Thumbs.db
+*.tsbuildinfo
+packages/backend/prisma/*.db
+packages/backend/prisma/migrations/

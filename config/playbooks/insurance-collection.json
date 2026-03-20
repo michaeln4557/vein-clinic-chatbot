@@ -1,0 +1,165 @@
+{
+  "playbook_id": "insurance-collection",
+  "version": "1.0.0",
+  "name": "Insurance Collection",
+  "description": "Guides the collection of insurance information including card images, manual entry fallback, and front/back image capture.",
+  "trigger_conditions": {
+    "triggered_by": [
+      "booking-conversion post-booking",
+      "insurance_verification_initiated",
+      "patient_offers_insurance_info",
+      "pre_appointment_intake"
+    ]
+  },
+  "response_goals": [
+    "Collect complete insurance information for verification",
+    "Make the process as easy as possible for the patient",
+    "Offer card photo upload as the primary method",
+    "Provide manual entry as a fallback",
+    "Ensure both front and back of card are captured"
+  ],
+  "steps": [
+    {
+      "step_id": 1,
+      "name": "introduce_collection",
+      "description": "Explain why insurance info is being collected and set expectations.",
+      "required": true,
+      "guidelines": [
+        "Frame it as being for the patient's benefit: 'so we can check your benefits'",
+        "Keep it brief and casual",
+        "Don't make it feel like a requirement to proceed",
+        "Mention it takes just a minute"
+      ]
+    },
+    {
+      "step_id": 2,
+      "name": "offer_card_upload",
+      "description": "Present card photo upload as the easiest option.",
+      "required": true,
+      "guidelines": [
+        "Make it sound easy: 'The quickest way is to snap a photo of your insurance card'",
+        "Specify front and back are needed",
+        "Explain they can take the photos right from their phone",
+        "Provide clear upload instructions for the platform"
+      ],
+      "upload_requirements": {
+        "images_needed": ["front_of_card", "back_of_card"],
+        "accepted_formats": ["jpg", "jpeg", "png", "heic", "pdf"],
+        "max_file_size_mb": 10,
+        "minimum_resolution": "legible text"
+      }
+    },
+    {
+      "step_id": 3,
+      "name": "handle_upload_success",
+      "description": "Confirm receipt of card images.",
+      "condition": "images_uploaded_successfully",
+      "guidelines": [
+        "Confirm receipt: 'Got it, thanks!'",
+        "Let them know the team will take it from here",
+        "Set expectation for verification timeline",
+        "Don't try to OCR or interpret the card in real-time"
+      ]
+    },
+    {
+      "step_id": 4,
+      "name": "handle_partial_upload",
+      "description": "Only one side of the card was uploaded.",
+      "condition": "only_one_image_received",
+      "guidelines": [
+        "Gently ask for the other side: 'Could you also send the [front/back]? We need both sides for verification.'",
+        "Be specific about which side is missing",
+        "Don't make them feel like they did something wrong"
+      ]
+    },
+    {
+      "step_id": 5,
+      "name": "manual_fallback",
+      "description": "Collect insurance info manually if the patient can't or won't upload photos.",
+      "condition": "patient_declines_upload OR upload_fails",
+      "required_fields": [
+        {
+          "field": "insurance_provider",
+          "example": "Blue Cross Blue Shield",
+          "required": true
+        },
+        {
+          "field": "member_id",
+          "example": "ABC123456789",
+          "required": true
+        },
+        {
+          "field": "group_number",
+          "example": "GRP-5678",
+          "required": true
+        },
+        {
+          "field": "subscriber_name",
+          "example": "The name on the card if different from patient",
+          "required": true
+        },
+        {
+          "field": "subscriber_dob",
+          "example": "Date of birth of the person the plan is under",
+          "required": true
+        },
+        {
+          "field": "relationship_to_subscriber",
+          "example": "Self, Spouse, Child, Other",
+          "required": true
+        }
+      ],
+      "collection_guidelines": [
+        "Collect one or two fields at a time, not all at once",
+        "Use natural language: 'What's the name of your insurance company?'",
+        "If they don't have the card handy, offer to continue later",
+        "Accept partial information and note what's missing for follow-up"
+      ]
+    },
+    {
+      "step_id": 6,
+      "name": "handle_no_insurance",
+      "description": "Patient does not have insurance or is self-pay.",
+      "condition": "patient_reports_no_insurance",
+      "guidelines": [
+        "Don't make them feel bad or uncomfortable",
+        "Note as self-pay in the system",
+        "Do NOT quote procedure costs -- route to staff for cost discussion",
+        "Continue with booking as normal",
+        "Mention that a team member can discuss payment options if they're interested"
+      ]
+    },
+    {
+      "step_id": 7,
+      "name": "confirm_and_close",
+      "description": "Confirm all insurance info is received and set expectations.",
+      "required": true,
+      "guidelines": [
+        "Summarize what was received (not the details, just that it was received)",
+        "Set verification timeline expectation: 'Our team will verify your benefits, usually within 1-2 business days'",
+        "Reassure: 'You'll know what to expect before your appointment'",
+        "Thank them for taking the time"
+      ]
+    }
+  ],
+  "privacy_and_security": {
+    "data_handling": [
+      "Insurance images are transmitted over encrypted channels only",
+      "Manual entry data is stored in the secure patient record",
+      "Do not store card images in chat logs",
+      "Redact member IDs in conversation transcripts"
+    ],
+    "never_do": [
+      "Ask for SSN via text",
+      "Share insurance details back in the chat after collection",
+      "Store card images in unsecured locations",
+      "Comment on the type or quality of their insurance plan"
+    ]
+  },
+  "tone_settings": {
+    "helpfulness": "high",
+    "patience": "high",
+    "pressure": "zero",
+    "efficiency": "moderate"
+  }
+}

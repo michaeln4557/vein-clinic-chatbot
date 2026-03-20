@@ -1,0 +1,789 @@
+// ─────────────────────────────────────────────────────────────
+// Vein Clinic Chatbot – Prisma Schema
+// PostgreSQL provider
+// ─────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ENUMS
+// ═══════════════════════════════════════════════════════════════
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  BOOKING_STARTED
+  BOOKED_PROVISIONAL
+  BOOKED_CONFIRMED
+  LOST
+  DUPLICATE
+}
+
+enum BookingStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  PROVISIONAL
+  CONFIRMED
+  CANCELLED
+  RESCHEDULED
+  FAILED
+}
+
+enum Channel {
+  SMS
+  WEB_CHAT
+}
+
+enum ConversationStatus {
+  ACTIVE
+  PAUSED
+  ENDED
+  ESCALATED
+}
+
+enum MessageRole {
+  PATIENT
+  BOT
+  AGENT
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  CONFIRMED
+  CORRECTED
+  REJECTED
+}
+
+enum PlaybookStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ApprovalState {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PublishState {
+  UNPUBLISHED
+  PUBLISHED
+  ROLLED_BACK
+}
+
+enum PolicySeverity {
+  BLOCK
+  WARN
+  LOG
+}
+
+enum SchedulingStatus {
+  REQUESTED
+  PROVISIONAL
+  CONFIRMED
+  CANCELLED
+  RESCHEDULED
+}
+
+enum InsuranceVerificationStatus {
+  PENDING
+  VERIFIED
+  DENIED
+  NEEDS_REVIEW
+}
+
+enum CardSide {
+  FRONT
+  BACK
+}
+
+enum EscalationSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum HandoffStatus {
+  QUEUED
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+}
+
+enum QueueType {
+  CALLBACK
+  LIVE
+  UNRESOLVED
+  AFTER_HOURS
+  MANAGER_REVIEW
+}
+
+enum CallbackStatus {
+  PENDING
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  NO_ANSWER
+}
+
+enum DuplicateMatchType {
+  PHONE
+  NAME
+  DOB
+  EMAIL
+}
+
+enum DuplicateResolution {
+  PENDING
+  MERGED
+  KEPT_SEPARATE
+  DISMISSED
+}
+
+enum FeedbackType {
+  WRONG_TONE
+  INCORRECT_INFO
+  MISSED_INTENT
+  POLICY_VIOLATION
+  GOOD_RESPONSE
+  SUGGESTED_IMPROVEMENT
+  ESCALATION_NEEDED
+  PHRASING_ISSUE
+}
+
+enum FeedbackScope {
+  ONE_TIME_FIX
+  PLAYBOOK_IMPROVEMENT
+  PHRASE_LIBRARY
+  POLICY_ISSUE
+}
+
+enum FeedbackStatus {
+  PENDING
+  REVIEWED
+  APPLIED
+  DISMISSED
+}
+
+enum SliderScope {
+  GLOBAL
+  CHANNEL
+  PLAYBOOK
+}
+
+enum UserRole {
+  ADMIN
+  OPERATOR
+  MANAGER
+  REVIEWER
+  READONLY
+}
+
+enum ABTestStatus {
+  DRAFT
+  RUNNING
+  PAUSED
+  COMPLETED
+}
+
+enum CrmSyncStatus {
+  PENDING
+  SYNCED
+  FAILED
+  RETRYING
+}
+
+enum ContactMethod {
+  PHONE
+  SMS
+  EMAIL
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODELS
+// ═══════════════════════════════════════════════════════════════
+
+// 1. Lead
+model Lead {
+  id                     String              @id @default(uuid())
+  full_name              String
+  date_of_birth          DateTime?
+  phone_number           String
+  email                  String?
+  address                String?
+  insurance_provider     String?
+  insurance_member_id    String?
+  requested_location     String?
+  callback_preference    String?
+  preferred_contact_method ContactMethod?
+  lead_status            LeadStatus          @default(NEW)
+  booking_status         BookingStatus       @default(NOT_STARTED)
+  created_at             DateTime            @default(now())
+  updated_at             DateTime            @updatedAt
+
+  conversations          Conversation[]
+  insurance_intakes      InsuranceIntake[]
+  scheduling_requests    SchedulingRequest[]
+  callback_requests      CallbackRequest[]
+  duplicate_matches      DuplicateMatch[]    @relation("LeadDuplicates")
+  matched_duplicates     DuplicateMatch[]    @relation("MatchedLeadDuplicates")
+  patient                Patient?
+  crm_sync_payloads      CrmSyncPayload[]
+
+  @@index([phone_number])
+  @@index([email])
+  @@index([lead_status])
+  @@index([created_at])
+  @@map("leads")
+}
+
+// 2. Patient
+model Patient {
+  id             String    @id @default(uuid())
+  lead_id        String?   @unique
+  full_name      String
+  date_of_birth  DateTime?
+  phone_number   String
+  email          String?
+  address        String?
+  created_at     DateTime  @default(now())
+
+  lead           Lead?     @relation(fields: [lead_id], references: [id])
+
+  @@index([phone_number])
+  @@index([email])
+  @@map("patients")
+}
+
+// 3. Conversation
+model Conversation {
+  id                String               @id @default(uuid())
+  lead_id           String
+  channel           Channel
+  status            ConversationStatus   @default(ACTIVE)
+  started_at        DateTime             @default(now())
+  ended_at          DateTime?
+  metadata          Json?
+
+  lead              Lead                 @relation(fields: [lead_id], references: [id])
+  messages          Message[]
+  extracted_fields  ExtractedField[]
+  escalation_events EscalationEvent[]
+  human_handoffs    HumanHandoff[]
+  callback_requests CallbackRequest[]
+  operator_feedback OperatorFeedback[]
+  crm_sync_payloads CrmSyncPayload[]
+  test_sessions     TestSession[]
+  ab_test_results   ABTestResult[]
+
+  @@index([lead_id])
+  @@index([channel])
+  @@index([started_at])
+  @@index([status])
+  @@map("conversations")
+}
+
+// 4. Message
+model Message {
+  id              String           @id @default(uuid())
+  conversation_id String
+  role            MessageRole
+  content         String
+  timestamp       DateTime         @default(now())
+  metadata        Json?
+
+  conversation    Conversation     @relation(fields: [conversation_id], references: [id])
+  response_traces ResponseTrace[]
+  operator_feedback OperatorFeedback[]
+
+  @@index([conversation_id])
+  @@index([timestamp])
+  @@map("messages")
+}
+
+// 5. ExtractedField
+model ExtractedField {
+  id                  String              @id @default(uuid())
+  conversation_id     String
+  field_name          String
+  raw_value           String
+  normalized_value    String?
+  verified_value      String?
+  confidence          Float
+  source_text         String?
+  source_message_id   String?
+  verification_status VerificationStatus  @default(UNVERIFIED)
+  timestamp           DateTime            @default(now())
+
+  conversation        Conversation        @relation(fields: [conversation_id], references: [id])
+  corrections         FieldCorrection[]
+
+  @@index([conversation_id])
+  @@index([field_name])
+  @@map("extracted_fields")
+}
+
+// 6. FieldCorrection
+model FieldCorrection {
+  id                 String          @id @default(uuid())
+  extracted_field_id String
+  corrected_by       String
+  previous_value     String
+  new_value          String
+  reason             String?
+  timestamp          DateTime        @default(now())
+
+  extracted_field    ExtractedField  @relation(fields: [extracted_field_id], references: [id])
+
+  @@index([extracted_field_id])
+  @@map("field_corrections")
+}
+
+// 7. Playbook
+model Playbook {
+  id              String           @id @default(uuid())
+  name            String           @unique
+  display_name    String
+  description     String?
+  status          PlaybookStatus   @default(DRAFT)
+  current_version Int              @default(1)
+  config          Json?
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+
+  revisions       PlaybookRevision[]
+
+  @@map("playbooks")
+}
+
+// 8. PlaybookRevision
+model PlaybookRevision {
+  id              String         @id @default(uuid())
+  playbook_id     String
+  version         Int
+  changed_by      String
+  changed_at      DateTime       @default(now())
+  previous_value  Json?
+  new_value       Json
+  change_reason   String?
+  approval_state  ApprovalState  @default(PENDING)
+  publish_state   PublishState   @default(UNPUBLISHED)
+
+  playbook        Playbook       @relation(fields: [playbook_id], references: [id])
+
+  @@index([playbook_id])
+  @@map("playbook_revisions")
+}
+
+// 9. WorkflowRule
+model WorkflowRule {
+  id                String   @id @default(uuid())
+  name              String
+  trigger_condition Json
+  action            Json
+  priority          Int      @default(0)
+  active            Boolean  @default(true)
+
+  @@index([active])
+  @@map("workflow_rules")
+}
+
+// 10. PolicyRule
+model PolicyRule {
+  id          String          @id @default(uuid())
+  category    String
+  rule_text   String
+  severity    PolicySeverity
+  locked      Boolean         @default(false)
+  editable_by String[]
+  active      Boolean         @default(true)
+
+  @@index([category])
+  @@index([active])
+  @@map("policy_rules")
+}
+
+// 11. Location
+model Location {
+  id                          String              @id @default(uuid())
+  display_name                String
+  address                     String
+  state                       String
+  zip                         String
+  phone                       String?
+  services_offered            String[]
+  hours                       Json?
+  holiday_closures            Json?
+  scheduling_integration_type String?
+  fallback_nearby_locations   String[]
+  state_insurance_notes       String?
+  active                      Boolean             @default(true)
+
+  scheduling_requests         SchedulingRequest[]
+
+  @@index([state])
+  @@index([zip])
+  @@index([active])
+  @@map("locations")
+}
+
+// 12. SchedulingRequest
+model SchedulingRequest {
+  id              String            @id @default(uuid())
+  lead_id         String
+  location_id     String
+  requested_date  DateTime?
+  requested_time  String?
+  status          SchedulingStatus  @default(REQUESTED)
+  created_at      DateTime          @default(now())
+
+  lead            Lead              @relation(fields: [lead_id], references: [id])
+  location        Location          @relation(fields: [location_id], references: [id])
+
+  @@index([lead_id])
+  @@index([location_id])
+  @@index([status])
+  @@index([created_at])
+  @@map("scheduling_requests")
+}
+
+// 13. InsuranceIntake
+model InsuranceIntake {
+  id                  String                       @id @default(uuid())
+  lead_id             String
+  provider            String
+  member_id           String?
+  group_number        String?
+  card_front_url      String?
+  card_back_url       String?
+  verification_status InsuranceVerificationStatus  @default(PENDING)
+  created_at          DateTime                     @default(now())
+
+  lead                Lead                         @relation(fields: [lead_id], references: [id])
+  card_uploads        InsuranceCardUpload[]
+
+  @@index([lead_id])
+  @@map("insurance_intakes")
+}
+
+// 14. InsuranceCardUpload
+model InsuranceCardUpload {
+  id                  String          @id @default(uuid())
+  insurance_intake_id String
+  side                CardSide
+  file_url            String
+  uploaded_at         DateTime        @default(now())
+  ocr_result          Json?
+
+  insurance_intake    InsuranceIntake @relation(fields: [insurance_intake_id], references: [id])
+
+  @@index([insurance_intake_id])
+  @@map("insurance_card_uploads")
+}
+
+// 15. EscalationEvent
+model EscalationEvent {
+  id              String              @id @default(uuid())
+  conversation_id String
+  reason          String
+  severity        EscalationSeverity
+  details         String?
+  resolved        Boolean             @default(false)
+  resolved_by     String?
+  resolved_at     DateTime?
+  created_at      DateTime            @default(now())
+
+  conversation    Conversation        @relation(fields: [conversation_id], references: [id])
+
+  @@index([conversation_id])
+  @@index([severity])
+  @@index([created_at])
+  @@map("escalation_events")
+}
+
+// 16. HumanHandoff
+model HumanHandoff {
+  id              String         @id @default(uuid())
+  conversation_id String
+  reason          String
+  status          HandoffStatus  @default(QUEUED)
+  assigned_to     String?
+  queue_type      QueueType
+  created_at      DateTime       @default(now())
+  resolved_at     DateTime?
+
+  conversation    Conversation   @relation(fields: [conversation_id], references: [id])
+
+  @@index([conversation_id])
+  @@index([status])
+  @@index([queue_type])
+  @@index([created_at])
+  @@map("human_handoffs")
+}
+
+// 17. CallbackRequest
+model CallbackRequest {
+  id              String          @id @default(uuid())
+  conversation_id String
+  lead_id         String
+  preferred_time  DateTime?
+  status          CallbackStatus  @default(PENDING)
+  created_at      DateTime        @default(now())
+  completed_at    DateTime?
+  completed_by    String?
+
+  conversation    Conversation    @relation(fields: [conversation_id], references: [id])
+  lead            Lead            @relation(fields: [lead_id], references: [id])
+
+  @@index([conversation_id])
+  @@index([lead_id])
+  @@index([status])
+  @@index([created_at])
+  @@map("callback_requests")
+}
+
+// 18. DuplicateMatch
+model DuplicateMatch {
+  id              String              @id @default(uuid())
+  lead_id         String
+  matched_lead_id String
+  match_type      DuplicateMatchType
+  confidence      Float
+  resolution      DuplicateResolution @default(PENDING)
+  resolved_by     String?
+  resolved_at     DateTime?
+
+  lead            Lead                @relation("LeadDuplicates", fields: [lead_id], references: [id])
+  matched_lead    Lead                @relation("MatchedLeadDuplicates", fields: [matched_lead_id], references: [id])
+
+  @@index([lead_id])
+  @@index([matched_lead_id])
+  @@index([resolution])
+  @@map("duplicate_matches")
+}
+
+// 19. OperatorFeedback
+model OperatorFeedback {
+  id                String          @id @default(uuid())
+  conversation_id   String
+  message_id        String?
+  feedback_type     FeedbackType
+  comment           String?
+  suggested_rewrite String?
+  scope             FeedbackScope?
+  status            FeedbackStatus  @default(PENDING)
+  submitted_by      String
+  created_at        DateTime        @default(now())
+
+  conversation      Conversation    @relation(fields: [conversation_id], references: [id])
+  message           Message?        @relation(fields: [message_id], references: [id])
+
+  @@index([conversation_id])
+  @@index([message_id])
+  @@index([status])
+  @@index([created_at])
+  @@map("operator_feedback")
+}
+
+// 20. ApprovedPhrase
+model ApprovedPhrase {
+  id         String   @id @default(uuid())
+  category   String
+  text       String
+  context    String?
+  added_by   String
+  active     Boolean  @default(true)
+  created_at DateTime @default(now())
+
+  @@index([category])
+  @@index([active])
+  @@map("approved_phrases")
+}
+
+// 21. ProhibitedPhrase
+model ProhibitedPhrase {
+  id         String          @id @default(uuid())
+  category   String
+  text       String
+  reason     String?
+  severity   PolicySeverity
+  added_by   String
+  active     Boolean         @default(true)
+  created_at DateTime        @default(now())
+
+  @@index([category])
+  @@index([active])
+  @@map("prohibited_phrases")
+}
+
+// 22. AuditLogEntry
+model AuditLogEntry {
+  id             String   @id @default(uuid())
+  user_id        String
+  action         String
+  entity_type    String
+  entity_id      String
+  previous_value Json?
+  new_value      Json?
+  reason         String?
+  timestamp      DateTime @default(now())
+
+  @@index([user_id])
+  @@index([entity_type, entity_id])
+  @@index([timestamp])
+  @@map("audit_log_entries")
+}
+
+// 23. CrmSyncPayload
+model CrmSyncPayload {
+  id              String        @id @default(uuid())
+  conversation_id String?
+  lead_id         String?
+  payload         Json
+  sync_status     CrmSyncStatus @default(PENDING)
+  synced_at       DateTime?
+  error_message   String?
+
+  conversation    Conversation? @relation(fields: [conversation_id], references: [id])
+  lead            Lead?         @relation(fields: [lead_id], references: [id])
+
+  @@index([conversation_id])
+  @@index([lead_id])
+  @@index([sync_status])
+  @@map("crm_sync_payloads")
+}
+
+// 24. TestSession
+model TestSession {
+  id              String        @id @default(uuid())
+  created_by      String
+  channel         Channel
+  started_at      DateTime      @default(now())
+  ended_at        DateTime?
+  conversation_id String?
+  notes           String?
+
+  conversation    Conversation? @relation(fields: [conversation_id], references: [id])
+
+  @@index([created_by])
+  @@index([started_at])
+  @@map("test_sessions")
+}
+
+// 25. ResponseTrace
+model ResponseTrace {
+  id                   String   @id @default(uuid())
+  message_id           String
+  detected_intent      String?
+  complexity           String?
+  risk_level           String?
+  workflow_stage       String?
+  active_playbooks     String[]
+  confidence_score     Float?
+  fallback_used        Boolean  @default(false)
+  escalation_triggered Boolean  @default(false)
+  duplicate_detected   Boolean  @default(false)
+  booking_offered      Boolean  @default(false)
+  slider_values        Json?
+  timestamp            DateTime @default(now())
+
+  message              Message  @relation(fields: [message_id], references: [id])
+
+  @@index([message_id])
+  @@index([detected_intent])
+  @@index([timestamp])
+  @@map("response_traces")
+}
+
+// 26. SliderSetting
+model SliderSetting {
+  id          String         @id @default(uuid())
+  slider_name String
+  value       Float
+  scope       SliderScope    @default(GLOBAL)
+  scope_id    String?
+  updated_by  String
+  updated_at  DateTime       @updatedAt
+
+  overrides   SliderOverride[]
+
+  @@index([slider_name])
+  @@index([scope, scope_id])
+  @@map("slider_settings")
+}
+
+// 27. SliderOverride
+model SliderOverride {
+  id                String        @id @default(uuid())
+  slider_setting_id String
+  scope             SliderScope
+  scope_id          String?
+  value             Float
+  updated_by        String
+  updated_at        DateTime      @updatedAt
+
+  slider_setting    SliderSetting @relation(fields: [slider_setting_id], references: [id])
+
+  @@index([slider_setting_id])
+  @@index([scope, scope_id])
+  @@map("slider_overrides")
+}
+
+// 28. User
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  name       String
+  role       UserRole
+  active     Boolean  @default(true)
+  created_at DateTime @default(now())
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+// 29. ABTest
+model ABTest {
+  id          String       @id @default(uuid())
+  name        String
+  entity_type String
+  variants    Json
+  status      ABTestStatus @default(DRAFT)
+  started_at  DateTime?
+  ended_at    DateTime?
+
+  results     ABTestResult[]
+
+  @@index([status])
+  @@map("ab_tests")
+}
+
+// 30. ABTestResult
+model ABTestResult {
+  id              String       @id @default(uuid())
+  ab_test_id      String
+  variant_id      String
+  conversation_id String
+  outcome         String?
+  created_at      DateTime     @default(now())
+
+  ab_test         ABTest       @relation(fields: [ab_test_id], references: [id])
+  conversation    Conversation @relation(fields: [conversation_id], references: [id])
+
+  @@index([ab_test_id])
+  @@index([conversation_id])
+  @@index([created_at])
+  @@map("ab_test_results")
+}

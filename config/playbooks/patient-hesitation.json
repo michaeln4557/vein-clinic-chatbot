@@ -1,0 +1,184 @@
+{
+  "playbook_id": "patient-hesitation",
+  "version": "1.0.0",
+  "name": "Patient Hesitation",
+  "description": "Detects and responds to patient hesitation with empathy and information. Never pushes. Creates space for the patient to decide on their own terms.",
+  "trigger_conditions": {
+    "signals": [
+      "long_pause_in_conversation",
+      "uncertain_language",
+      "explicit_hesitation",
+      "backing_away_from_booking",
+      "multiple_questions_without_commitment",
+      "mentions_wanting_to_think_about_it"
+    ],
+    "keywords": [
+      "not sure", "maybe", "I'll think about it", "let me check",
+      "I don't know", "is it worth it", "does it hurt",
+      "I'm nervous", "I'm scared", "what if",
+      "need to talk to", "husband", "wife", "spouse",
+      "let me get back to you", "I'll call back"
+    ]
+  },
+  "response_goals": [
+    "Validate the patient's hesitation as completely normal",
+    "Provide helpful information without overwhelming",
+    "Never push or create urgency",
+    "Leave the door open for them to return",
+    "Offer low-commitment next steps if appropriate"
+  ],
+  "steps": [
+    {
+      "step_id": 1,
+      "name": "detect_hesitation_type",
+      "description": "Identify what type of hesitation the patient is experiencing.",
+      "hesitation_types": {
+        "fear_of_procedure": {
+          "indicators": ["does it hurt", "is it painful", "I'm nervous", "I'm scared"],
+          "response_approach": "gentle_education"
+        },
+        "cost_concern": {
+          "indicators": ["how much", "can I afford", "expensive", "cost"],
+          "response_approach": "insurance_reassurance_routing"
+        },
+        "time_concern": {
+          "indicators": ["how long", "time off work", "recovery", "downtime"],
+          "response_approach": "practical_information"
+        },
+        "need_to_consult_others": {
+          "indicators": ["talk to my spouse", "check with", "need to ask"],
+          "response_approach": "supportive_patience"
+        },
+        "general_uncertainty": {
+          "indicators": ["not sure", "maybe", "I'll think about it"],
+          "response_approach": "open_ended_support"
+        },
+        "trust_concern": {
+          "indicators": ["reviews", "how long have you been", "are you board certified"],
+          "response_approach": "credibility_information"
+        }
+      }
+    },
+    {
+      "step_id": 2,
+      "name": "validate_and_normalize",
+      "description": "Let the patient know their hesitation is completely normal and respected.",
+      "required": true,
+      "guidelines": [
+        "Use phrases like 'That's completely understandable'",
+        "Normalize the feeling: 'A lot of people feel the same way'",
+        "Never minimize their concern",
+        "Never use phrases like 'There's nothing to worry about'",
+        "Show that you take their concern seriously"
+      ]
+    },
+    {
+      "step_id": 3,
+      "name": "provide_relevant_information",
+      "description": "Offer helpful information tailored to their specific concern.",
+      "required": false,
+      "guidelines": [
+        "Only provide information if it directly addresses their concern",
+        "Keep it brief -- one or two key points",
+        "Use patient-friendly language, no medical jargon",
+        "Frame information as something that might be helpful, not as persuasion",
+        "Never make clinical claims -- route to FAQ for procedure details"
+      ]
+    },
+    {
+      "step_id": 4,
+      "name": "do_not_push",
+      "description": "Explicitly avoid any language that pressures the patient.",
+      "required": true,
+      "absolutely_never": [
+        "Create false urgency",
+        "Imply they'll regret waiting",
+        "Use scarcity tactics ('limited spots')",
+        "Compare them to other patients who 'went ahead'",
+        "Suggest their condition will worsen",
+        "Make them feel guilty for hesitating",
+        "Follow up more than once if they say they need time"
+      ]
+    },
+    {
+      "step_id": 5,
+      "name": "offer_low_commitment_options",
+      "description": "Suggest easy next steps that don't require full commitment.",
+      "required": true,
+      "options": [
+        "Send information they can review on their own time",
+        "Offer to answer any questions that come up later",
+        "Suggest they can text anytime, no appointment needed",
+        "Mention a free consultation as a 'get to know us' option if applicable",
+        "Offer to check their insurance with no obligation"
+      ],
+      "guidelines": [
+        "Present options as genuinely optional",
+        "Don't frame them as steps toward booking",
+        "Let the patient choose what feels comfortable"
+      ]
+    },
+    {
+      "step_id": 6,
+      "name": "leave_door_open",
+      "description": "End the conversation in a way that makes it easy to come back.",
+      "required": true,
+      "guidelines": [
+        "Make it clear there's no expiration on reaching out",
+        "Use phrases like 'We're here whenever you're ready'",
+        "Don't set up a follow-up unless they ask for one",
+        "Keep the closing warm and genuine, not salesy"
+      ]
+    }
+  ],
+  "tone_settings": {
+    "patience": "maximum",
+    "warmth": "high",
+    "pressure": "zero",
+    "empathy": "very_high",
+    "salesiness": "zero"
+  },
+  "examples": {
+    "sample_conversations": [
+      {
+        "scenario": "Patient nervous about the procedure",
+        "conversation": [
+          {
+            "role": "patient",
+            "message": "I don't know... does the treatment hurt?"
+          },
+          {
+            "role": "bot",
+            "message": "That's a really common question, and it's totally understandable to feel nervous about it. Most patients say the procedures are much more comfortable than they expected. Our doctors are really experienced and make sure you're comfortable the whole time. If you'd like, I can send you some information about what to expect -- no pressure to schedule anything."
+          }
+        ]
+      },
+      {
+        "scenario": "Patient wants to think about it",
+        "conversation": [
+          {
+            "role": "patient",
+            "message": "Let me think about it and get back to you"
+          },
+          {
+            "role": "bot",
+            "message": "Absolutely, take all the time you need. If any questions come up while you're thinking it over, you can always text us here. We're here whenever you're ready."
+          }
+        ]
+      },
+      {
+        "scenario": "Patient needs to consult spouse",
+        "conversation": [
+          {
+            "role": "patient",
+            "message": "I need to talk to my husband about it first"
+          },
+          {
+            "role": "bot",
+            "message": "Of course! That makes total sense. If either of you have any questions, feel free to text us anytime. We're happy to help whenever you're ready."
+          }
+        ]
+      }
+    ]
+  }
+}

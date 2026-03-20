@@ -1,0 +1,161 @@
+{
+  "playbook_id": "callback-request",
+  "version": "1.0.0",
+  "name": "Callback Request",
+  "description": "Collects callback preferences and queues the request for a live agent to follow up.",
+  "trigger_conditions": {
+    "intent_detected": [
+      "wants_phone_call",
+      "prefers_speaking_to_person",
+      "callback_request"
+    ],
+    "routed_from": [
+      "missed-call-recovery",
+      "scheduling-unavailable",
+      "human-handoff",
+      "insurance-reassurance"
+    ]
+  },
+  "response_goals": [
+    "Collect the patient's preferred callback time",
+    "Confirm the phone number to call",
+    "Set clear expectations about when they'll hear back",
+    "Queue the callback for a live agent",
+    "End the conversation warmly"
+  ],
+  "steps": [
+    {
+      "step_id": 1,
+      "name": "acknowledge_preference",
+      "description": "Acknowledge that the patient would like a call back.",
+      "required": true,
+      "guidelines": [
+        "Validate their preference for a phone call",
+        "Don't try to redirect them back to text",
+        "Be warm and accommodating"
+      ]
+    },
+    {
+      "step_id": 2,
+      "name": "collect_preferred_time",
+      "description": "Ask when they'd like to be called back.",
+      "required": true,
+      "guidelines": [
+        "Ask for a general window first: 'When is the best time to reach you?'",
+        "Accept ranges like 'afternoon' or 'after 3'",
+        "If they say 'anytime', note it but confirm business hours",
+        "If they want an immediate callback, set expectations on turnaround"
+      ],
+      "fallback_if_no_preference": "We'll reach out within the next business day during office hours."
+    },
+    {
+      "step_id": 3,
+      "name": "confirm_phone_number",
+      "description": "Confirm or collect the number to call back.",
+      "required": true,
+      "guidelines": [
+        "If texting, confirm: 'Should we call you at this number?'",
+        "Allow them to provide an alternate number",
+        "Confirm the number read-back if provided verbally"
+      ]
+    },
+    {
+      "step_id": 4,
+      "name": "collect_brief_reason",
+      "description": "Optionally ask what the callback is about so the agent is prepared.",
+      "required": false,
+      "guidelines": [
+        "Keep it casual: 'Is there anything specific you'd like to discuss so they're prepared?'",
+        "Don't require this -- if they don't want to share, that's fine",
+        "Note any context from the current conversation automatically"
+      ]
+    },
+    {
+      "step_id": 5,
+      "name": "confirm_and_queue",
+      "description": "Summarize the callback request and confirm.",
+      "required": true,
+      "guidelines": [
+        "Read back: time window, phone number, brief topic if shared",
+        "Set a clear expectation: 'Someone from our team will call you [timeframe]'",
+        "Don't overpromise on exact timing",
+        "Queue the callback in the agent system with all collected details"
+      ],
+      "queue_data": {
+        "required_fields": ["patient_name", "phone_number", "preferred_time_window"],
+        "optional_fields": ["reason", "conversation_context", "location_preference", "insurance_provider"],
+        "priority_levels": {
+          "frustrated_patient": "high",
+          "medical_concern": "high",
+          "general_inquiry": "normal",
+          "scheduling": "normal"
+        }
+      }
+    },
+    {
+      "step_id": 6,
+      "name": "warm_close",
+      "description": "End the conversation on a positive note.",
+      "required": true,
+      "guidelines": [
+        "Thank them for reaching out",
+        "Remind them they can text anytime if something comes up before the call",
+        "Keep it brief and genuine"
+      ]
+    }
+  ],
+  "timing_expectations": {
+    "same_day_request": "within 2-4 hours during business hours",
+    "next_day_request": "by end of next business day",
+    "specific_time_request": "within the requested window",
+    "asap_request": "within 1-2 hours during business hours",
+    "after_hours_request": "next business day morning"
+  },
+  "tone_settings": {
+    "accommodation": "high",
+    "efficiency": "moderate",
+    "warmth": "high",
+    "pressure": "zero"
+  },
+  "examples": {
+    "sample_conversations": [
+      {
+        "scenario": "Simple callback request",
+        "conversation": [
+          {
+            "role": "patient",
+            "message": "Can someone just call me?"
+          },
+          {
+            "role": "bot",
+            "message": "Of course! When's the best time to reach you?"
+          },
+          {
+            "role": "patient",
+            "message": "Anytime after 2"
+          },
+          {
+            "role": "bot",
+            "message": "Got it. And should we call you at this number?"
+          },
+          {
+            "role": "patient",
+            "message": "Yes"
+          },
+          {
+            "role": "bot",
+            "message": "Perfect. I'll have someone from our team give you a call this afternoon after 2:00. Is there anything specific you'd like to discuss so they're prepared?"
+          },
+          {
+            "role": "patient",
+            "message": "Just want to ask about scheduling"
+          },
+          {
+            "role": "bot",
+            "message": "Sounds good! Someone will call you after 2:00 today to help with scheduling. If anything comes up before then, you can always text us here. Talk soon!"
+          }
+        ]
+      }
+    ]
+  }
+}

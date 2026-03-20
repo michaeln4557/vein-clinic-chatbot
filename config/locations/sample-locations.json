@@ -1,0 +1,366 @@
+{
+  "locations_config_id": "sample-locations",
+  "version": "1.0.0",
+  "name": "Sample Clinic Locations",
+  "description": "Five sample clinic locations across different states with all operational details.",
+  "locations": [
+    {
+      "location_id": "loc-troy-mi",
+      "name": "Troy",
+      "display_name": "Metro Vein Clinic - Troy",
+      "status": "active",
+      "address": {
+        "street": "3290 W Big Beaver Rd",
+        "suite": "Suite 410",
+        "city": "Troy",
+        "state": "MI",
+        "zip": "48084",
+        "county": "Oakland"
+      },
+      "contact": {
+        "phone": "(248) 555-0120",
+        "fax": "(248) 555-0121",
+        "email": "troy@metrovein.example.com"
+      },
+      "coordinates": {
+        "latitude": 42.5584,
+        "longitude": -83.1499
+      },
+      "hours": {
+        "monday": { "open": "08:00", "close": "17:00" },
+        "tuesday": { "open": "08:00", "close": "17:00" },
+        "wednesday": { "open": "08:00", "close": "17:00" },
+        "thursday": { "open": "08:00", "close": "17:00" },
+        "friday": { "open": "08:00", "close": "15:00" },
+        "saturday": { "open": null, "close": null },
+        "sunday": { "open": null, "close": null }
+      },
+      "timezone": "America/Detroit",
+      "services_offered": [
+        "initial_consultation",
+        "ultrasound_evaluation",
+        "endovenous_laser_ablation",
+        "radiofrequency_ablation",
+        "sclerotherapy",
+        "varithena",
+        "ambulatory_phlebectomy"
+      ],
+      "providers": [
+        {
+          "name": "Dr. Sarah Mitchell",
+          "title": "MD, FACS",
+          "specialty": "Vascular Surgery"
+        },
+        {
+          "name": "Dr. James Park",
+          "title": "DO",
+          "specialty": "Interventional Radiology"
+        }
+      ],
+      "serving_zip_codes": ["48084", "48083", "48085", "48098", "48099", "48007", "48301", "48302", "48304"],
+      "parking": "Free parking in building lot. Enter through main lobby, Suite 410 is on the 4th floor.",
+      "accessibility": "ADA accessible. Elevator available.",
+      "languages_spoken": ["English", "Arabic", "Korean"],
+      "scheduling_integration_type": "manual",
+      "fallback_nearby_locations": ["loc-downtown-detroit-mi"],
+      "state_insurance_notes": "Michigan Medicaid (Healthy Michigan Plan) may cover medically necessary vein treatments. Prior authorization typically required. Blue Cross Blue Shield of Michigan is the dominant carrier in this market.",
+      "holiday_closures": [
+        { "name": "New Year's Day", "start_date": "2026-01-01", "end_date": "2026-01-01", "redirect_to_nearby": true },
+        { "name": "Memorial Day", "start_date": "2026-05-25", "end_date": "2026-05-25", "redirect_to_nearby": false },
+        { "name": "Independence Day", "start_date": "2026-07-03", "end_date": "2026-07-03", "redirect_to_nearby": false },
+        { "name": "Labor Day", "start_date": "2026-09-07", "end_date": "2026-09-07", "redirect_to_nearby": false },
+        { "name": "Thanksgiving", "start_date": "2026-11-26", "end_date": "2026-11-27", "redirect_to_nearby": false },
+        { "name": "Christmas", "start_date": "2026-12-24", "end_date": "2026-12-25", "redirect_to_nearby": false }
+      ],
+      "active": true,
+      "accepting_new_patients": true,
+      "virtual_consultations_available": true,
+      "average_wait_days_new_patient": 5
+    },
+    {
+      "location_id": "loc-downtown-detroit-mi",
+      "name": "Downtown Detroit",
+      "display_name": "Metro Vein Clinic - Downtown Detroit",
+      "status": "active",
+      "address": {
+        "street": "1550 Woodward Ave",
+        "suite": "Suite 200",
+        "city": "Detroit",
+        "state": "MI",
+        "zip": "48226",
+        "county": "Wayne"
+      },
+      "contact": {
+        "phone": "(313) 555-0140",
+        "fax": "(313) 555-0141",
+        "email": "detroit@metrovein.example.com"
+      },
+      "coordinates": {
+        "latitude": 42.3361,
+        "longitude": -83.0486
+      },
+      "hours": {
+        "monday": { "open": "09:00", "close": "18:00" },
+        "tuesday": { "open": "09:00", "close": "18:00" },
+        "wednesday": { "open": "09:00", "close": "18:00" },
+        "thursday": { "open": "09:00", "close": "18:00" },
+        "friday": { "open": "09:00", "close": "16:00" },
+        "saturday": { "open": null, "close": null },
+        "sunday": { "open": null, "close": null }
+      },
+      "timezone": "America/Detroit",
+      "services_offered": [
+        "initial_consultation",
+        "ultrasound_evaluation",
+        "endovenous_laser_ablation",
+        "sclerotherapy",
+        "varithena"
+      ],
+      "providers": [
+        {
+          "name": "Dr. Amanda Chen",
+          "title": "MD",
+          "specialty": "Vascular Medicine"
+        }
+      ],
+      "serving_zip_codes": ["48226", "48201", "48202", "48203", "48204", "48206", "48207", "48208", "48209", "48210"],
+      "parking": "Validated parking available in the Woodward Garage. Bring your parking ticket to the front desk.",
+      "accessibility": "ADA accessible. Building has elevator and automatic doors.",
+      "languages_spoken": ["English", "Spanish", "Arabic"],
+      "scheduling_integration_type": "manual",
+      "fallback_nearby_locations": ["loc-troy-mi"],
+      "state_insurance_notes": "Michigan Medicaid (Healthy Michigan Plan) may cover medically necessary vein treatments. Prior authorization typically required. Wayne County has higher Medicaid enrollment; expect more Medicaid verification requests.",
+      "holiday_closures": [
+        { "name": "New Year's Day", "start_date": "2026-01-01", "end_date": "2026-01-01", "redirect_to_nearby": true },
+        { "name": "Memorial Day", "start_date": "2026-05-25", "end_date": "2026-05-25", "redirect_to_nearby": false },
+        { "name": "Independence Day", "start_date": "2026-07-03", "end_date": "2026-07-03", "redirect_to_nearby": false },
+        { "name": "Labor Day", "start_date": "2026-09-07", "end_date": "2026-09-07", "redirect_to_nearby": false },
+        { "name": "Thanksgiving", "start_date": "2026-11-26", "end_date": "2026-11-27", "redirect_to_nearby": false },
+        { "name": "Christmas", "start_date": "2026-12-24", "end_date": "2026-12-25", "redirect_to_nearby": false }
+      ],
+      "active": true,
+      "accepting_new_patients": true,
+      "virtual_consultations_available": true,
+      "average_wait_days_new_patient": 3
+    },
+    {
+      "location_id": "loc-schaumburg-il",
+      "name": "Schaumburg",
+      "display_name": "Metro Vein Clinic - Schaumburg",
+      "status": "active",
+      "address": {
+        "street": "1699 E Golf Rd",
+        "suite": "Suite 310",
+        "city": "Schaumburg",
+        "state": "IL",
+        "zip": "60173",
+        "county": "Cook"
+      },
+      "contact": {
+        "phone": "(847) 555-0160",
+        "fax": "(847) 555-0161",
+        "email": "schaumburg@metrovein.example.com"
+      },
+      "coordinates": {
+        "latitude": 42.0334,
+        "longitude": -88.0834
+      },
+      "hours": {
+        "monday": { "open": "08:00", "close": "17:00" },
+        "tuesday": { "open": "08:00", "close": "17:00" },
+        "wednesday": { "open": "08:00", "close": "17:00" },
+        "thursday": { "open": "08:00", "close": "19:00" },
+        "friday": { "open": "08:00", "close": "15:00" },
+        "saturday": { "open": "09:00", "close": "13:00" },
+        "sunday": { "open": null, "close": null }
+      },
+      "timezone": "America/Chicago",
+      "services_offered": [
+        "initial_consultation",
+        "ultrasound_evaluation",
+        "endovenous_laser_ablation",
+        "radiofrequency_ablation",
+        "sclerotherapy",
+        "varithena",
+        "ambulatory_phlebectomy",
+        "venaseal"
+      ],
+      "providers": [
+        {
+          "name": "Dr. Robert Kim",
+          "title": "MD, RVT",
+          "specialty": "Vascular Surgery"
+        },
+        {
+          "name": "Dr. Lisa Patel",
+          "title": "MD",
+          "specialty": "Vascular Medicine"
+        },
+        {
+          "name": "Dr. Michael Torres",
+          "title": "DO",
+          "specialty": "Interventional Radiology"
+        }
+      ],
+      "serving_zip_codes": ["60173", "60172", "60107", "60067", "60005", "60008", "60010", "60056", "60169", "60195"],
+      "parking": "Free parking in front of building. Handicap spots available near main entrance.",
+      "accessibility": "ADA accessible. Ground floor access available.",
+      "languages_spoken": ["English", "Polish", "Hindi", "Spanish"],
+      "scheduling_integration_type": "manual",
+      "fallback_nearby_locations": [],
+      "state_insurance_notes": "Illinois Medicaid covers medically necessary vein treatments with prior authorization. Cook County has diverse insurance landscape. Many employer-sponsored plans through major carriers.",
+      "holiday_closures": [
+        { "name": "New Year's Day", "start_date": "2026-01-01", "end_date": "2026-01-01", "redirect_to_nearby": false },
+        { "name": "Memorial Day", "start_date": "2026-05-25", "end_date": "2026-05-25", "redirect_to_nearby": false },
+        { "name": "Independence Day", "start_date": "2026-07-03", "end_date": "2026-07-03", "redirect_to_nearby": false },
+        { "name": "Labor Day", "start_date": "2026-09-07", "end_date": "2026-09-07", "redirect_to_nearby": false },
+        { "name": "Thanksgiving", "start_date": "2026-11-26", "end_date": "2026-11-27", "redirect_to_nearby": false },
+        { "name": "Christmas", "start_date": "2026-12-24", "end_date": "2026-12-25", "redirect_to_nearby": false }
+      ],
+      "active": true,
+      "accepting_new_patients": true,
+      "virtual_consultations_available": true,
+      "average_wait_days_new_patient": 7
+    },
+    {
+      "location_id": "loc-houston-tx",
+      "name": "Houston - Galleria",
+      "display_name": "Metro Vein Clinic - Houston Galleria",
+      "status": "active",
+      "address": {
+        "street": "2425 West Loop South",
+        "suite": "Suite 750",
+        "city": "Houston",
+        "state": "TX",
+        "zip": "77027",
+        "county": "Harris"
+      },
+      "contact": {
+        "phone": "(713) 555-0180",
+        "fax": "(713) 555-0181",
+        "email": "houston@metrovein.example.com"
+      },
+      "coordinates": {
+        "latitude": 29.7376,
+        "longitude": -95.4609
+      },
+      "hours": {
+        "monday": { "open": "08:00", "close": "17:00" },
+        "tuesday": { "open": "08:00", "close": "17:00" },
+        "wednesday": { "open": "08:00", "close": "17:00" },
+        "thursday": { "open": "08:00", "close": "17:00" },
+        "friday": { "open": "08:00", "close": "16:00" },
+        "saturday": { "open": null, "close": null },
+        "sunday": { "open": null, "close": null }
+      },
+      "timezone": "America/Chicago",
+      "services_offered": [
+        "initial_consultation",
+        "ultrasound_evaluation",
+        "endovenous_laser_ablation",
+        "radiofrequency_ablation",
+        "sclerotherapy",
+        "varithena",
+        "ambulatory_phlebectomy"
+      ],
+      "providers": [
+        {
+          "name": "Dr. David Nguyen",
+          "title": "MD, FACS",
+          "specialty": "Vascular Surgery"
+        },
+        {
+          "name": "Dr. Rachel Adams",
+          "title": "MD",
+          "specialty": "Vascular Medicine"
+        }
+      ],
+      "serving_zip_codes": ["77027", "77024", "77019", "77005", "77006", "77007", "77008", "77025", "77030", "77056"],
+      "parking": "Free parking in attached garage. Enter from West Loop South service road.",
+      "accessibility": "ADA accessible. Elevator to Suite 750.",
+      "languages_spoken": ["English", "Spanish", "Vietnamese"],
+      "scheduling_integration_type": "manual",
+      "fallback_nearby_locations": [],
+      "state_insurance_notes": "Texas does not have Medicaid expansion. Uninsured and underinsured rates are higher. Many patients have employer-sponsored plans or ACA marketplace coverage. Be prepared for more self-pay inquiries.",
+      "holiday_closures": [
+        { "name": "New Year's Day", "start_date": "2026-01-01", "end_date": "2026-01-01", "redirect_to_nearby": false },
+        { "name": "Memorial Day", "start_date": "2026-05-25", "end_date": "2026-05-25", "redirect_to_nearby": false },
+        { "name": "Independence Day", "start_date": "2026-07-03", "end_date": "2026-07-03", "redirect_to_nearby": false },
+        { "name": "Labor Day", "start_date": "2026-09-07", "end_date": "2026-09-07", "redirect_to_nearby": false },
+        { "name": "Thanksgiving", "start_date": "2026-11-26", "end_date": "2026-11-27", "redirect_to_nearby": false },
+        { "name": "Christmas", "start_date": "2026-12-24", "end_date": "2026-12-25", "redirect_to_nearby": false }
+      ],
+      "active": true,
+      "accepting_new_patients": true,
+      "virtual_consultations_available": true,
+      "average_wait_days_new_patient": 4
+    },
+    {
+      "location_id": "loc-scottsdale-az",
+      "name": "Scottsdale",
+      "display_name": "Metro Vein Clinic - Scottsdale",
+      "status": "active",
+      "address": {
+        "street": "7425 E Shea Blvd",
+        "suite": "Suite 104",
+        "city": "Scottsdale",
+        "state": "AZ",
+        "zip": "85260",
+        "county": "Maricopa"
+      },
+      "contact": {
+        "phone": "(480) 555-0200",
+        "fax": "(480) 555-0201",
+        "email": "scottsdale@metrovein.example.com"
+      },
+      "coordinates": {
+        "latitude": 33.5806,
+        "longitude": -111.9261
+      },
+      "hours": {
+        "monday": { "open": "07:00", "close": "16:00" },
+        "tuesday": { "open": "07:00", "close": "16:00" },
+        "wednesday": { "open": "07:00", "close": "16:00" },
+        "thursday": { "open": "07:00", "close": "16:00" },
+        "friday": { "open": "07:00", "close": "14:00" },
+        "saturday": { "open": null, "close": null },
+        "sunday": { "open": null, "close": null }
+      },
+      "timezone": "America/Phoenix",
+      "services_offered": [
+        "initial_consultation",
+        "ultrasound_evaluation",
+        "endovenous_laser_ablation",
+        "radiofrequency_ablation",
+        "sclerotherapy",
+        "ambulatory_phlebectomy"
+      ],
+      "providers": [
+        {
+          "name": "Dr. Catherine Walsh",
+          "title": "MD",
+          "specialty": "Vascular Surgery"
+        }
+      ],
+      "serving_zip_codes": ["85260", "85254", "85255", "85256", "85257", "85258", "85259", "85261", "85262", "85266"],
+      "parking": "Free parking in building lot. Suite 104 is ground level with direct exterior entrance.",
+      "accessibility": "ADA accessible. Ground floor, no stairs required.",
+      "languages_spoken": ["English", "Spanish"],
+      "scheduling_integration_type": "manual",
+      "fallback_nearby_locations": [],
+      "state_insurance_notes": "Arizona AHCCCS (Medicaid) may cover medically necessary vein treatments with prior authorization. Arizona does not observe daylight saving time. Many retiree Medicare patients in the Scottsdale area.",
+      "holiday_closures": [
+        { "name": "New Year's Day", "start_date": "2026-01-01", "end_date": "2026-01-01", "redirect_to_nearby": false },
+        { "name": "Memorial Day", "start_date": "2026-05-25", "end_date": "2026-05-25", "redirect_to_nearby": false },
+        { "name": "Independence Day", "start_date": "2026-07-03", "end_date": "2026-07-03", "redirect_to_nearby": false },
+        { "name": "Labor Day", "start_date": "2026-09-07", "end_date": "2026-09-07", "redirect_to_nearby": false },
+        { "name": "Thanksgiving", "start_date": "2026-11-26", "end_date": "2026-11-27", "redirect_to_nearby": false },
+        { "name": "Christmas", "start_date": "2026-12-24", "end_date": "2026-12-25", "redirect_to_nearby": false }
+      ],
+      "active": true,
+      "accepting_new_patients": true,
+      "virtual_consultations_available": false,
+      "average_wait_days_new_patient": 6
+    }
+  ]
+}

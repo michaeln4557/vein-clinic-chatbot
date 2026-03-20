@@ -1,0 +1,108 @@
+{
+  "template_id": "missed-call-sms",
+  "version": "1.0.0",
+  "name": "Missed Call SMS Templates",
+  "description": "Array of SMS template variants for missed call recovery. Designed for A/B testing to optimize response rates.",
+  "channel": "sms",
+  "max_character_count": 320,
+  "compliance_notes": [
+    "All variants must include clinic identification",
+    "All variants must avoid prohibited language",
+    "First message in a new SMS thread must include opt-out language",
+    "Do not send outside 8 AM - 9 PM local time"
+  ],
+  "variants": [
+    {
+      "id": "mc-sms-001",
+      "variant_name": "warm_and_brief",
+      "text": "Hi! This is {ClinicName}. Sorry we missed your call -- I can help you right here by text, or we can set up a time to call you back. Whatever's easiest! Reply STOP to opt out.",
+      "active": true,
+      "character_count": 198,
+      "tone": "warm_casual",
+      "performance_metrics": {
+        "response_rate": null,
+        "booking_conversion_rate": null,
+        "opt_out_rate": null,
+        "avg_time_to_response_minutes": null,
+        "sample_size": 0,
+        "last_updated": null
+      }
+    },
+    {
+      "id": "mc-sms-002",
+      "variant_name": "question_led",
+      "text": "Hi, this is {ClinicName}! We missed your call and wanted to make sure we got back to you. Were you looking to schedule an appointment, or did you have a question? Happy to help right here! Reply STOP to opt out.",
+      "active": true,
+      "character_count": 229,
+      "tone": "helpful_direct",
+      "performance_metrics": {
+        "response_rate": null,
+        "booking_conversion_rate": null,
+        "opt_out_rate": null,
+        "avg_time_to_response_minutes": null,
+        "sample_size": 0,
+        "last_updated": null
+      }
+    },
+    {
+      "id": "mc-sms-003",
+      "variant_name": "ultra_short",
+      "text": "Hi! {ClinicName} here -- sorry we missed your call! Need any help? Just reply here anytime. Reply STOP to opt out.",
+      "active": true,
+      "character_count": 130,
+      "tone": "brief_casual",
+      "performance_metrics": {
+        "response_rate": null,
+        "booking_conversion_rate": null,
+        "opt_out_rate": null,
+        "avg_time_to_response_minutes": null,
+        "sample_size": 0,
+        "last_updated": null
+      }
+    },
+    {
+      "id": "mc-sms-004",
+      "variant_name": "callback_emphasis",
+      "text": "Hi! This is {ClinicName}. We saw we missed your call -- sorry about that! Would you like us to call you back at a time that works for you, or I can help right here by text. Reply STOP to opt out.",
+      "active": true,
+      "character_count": 212,
+      "tone": "accommodating",
+      "performance_metrics": {
+        "response_rate": null,
+        "booking_conversion_rate": null,
+        "opt_out_rate": null,
+        "avg_time_to_response_minutes": null,
+        "sample_size": 0,
+        "last_updated": null
+      }
+    },
+    {
+      "id": "mc-sms-005",
+      "variant_name": "empathy_forward",
+      "text": "Hi there! This is {ClinicName}. I know it can be frustrating when you can't get through -- sorry about that. I'm here now and happy to help with anything you need. Just reply here! Reply STOP to opt out.",
+      "active": false,
+      "character_count": 221,
+      "tone": "empathetic",
+      "performance_metrics": {
+        "response_rate": null,
+        "booking_conversion_rate": null,
+        "opt_out_rate": null,
+        "avg_time_to_response_minutes": null,
+        "sample_size": 0,
+        "last_updated": null
+      }
+    }
+  ],
+  "ab_testing_config": {
+    "enabled": true,
+    "method": "weighted_random",
+    "min_sample_size_per_variant": 100,
+    "significance_threshold": 0.95,
+    "primary_metric": "response_rate",
+    "secondary_metrics": ["booking_conversion_rate", "opt_out_rate"],
+    "auto_disable_if": {
+      "opt_out_rate_above": 0.05,
+      "response_rate_below": 0.10
+    }
+  }
+}
