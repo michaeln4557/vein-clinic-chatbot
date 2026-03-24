@@ -91,6 +91,13 @@
     "warmth": "high",
     "clarity": "very_high"
   },
+  "humanization_overrides": {
+    "tentative_confirmation_language": "prohibited",
+    "confirmed_booking_language": "required",
+    "callback_reconfirmation_language": "required",
+    "typing_indicator": "enabled",
+    "confirmation_template": "Great — you're confirmed for your appointment on {DAY_DATE} at {TIME} at our {LOCATION} location.\nYou'll receive a callback within the next business day to reconfirm once your insurance is verified."
+  },
   "examples": {
     "sample_conversations": [
       {

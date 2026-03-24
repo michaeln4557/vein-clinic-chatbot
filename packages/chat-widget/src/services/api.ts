@@ -1,6 +1,7 @@
 export interface CreateSessionRequest {
   locationId?: string;
   channel: string;
+  greeting?: string;
 }
 
 export interface CreateSessionResponse {

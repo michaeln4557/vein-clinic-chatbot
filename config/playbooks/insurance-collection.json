@@ -161,5 +161,15 @@
     "patience": "high",
     "pressure": "zero",
     "efficiency": "moderate"
+  },
+  "humanization_overrides": {
+    "human_warmth": "medium",
+    "response_length": "medium",
+    "typing_indicator": "enabled",
+    "upload_acknowledgment_required": true,
+    "duplicate_request_without_acknowledgment": "prohibited",
+    "card_request_phrase": "Could you send me a photo of the front and back of your insurance card? That way our team can verify your benefits before your appointment.",
+    "card_received_phrase": "Perfect, I received it — thank you. Our team will review it and follow up within the next business day to reconfirm your appointment once insurance is verified.",
+    "card_failed_phrase": "I'm sorry — I'm not seeing the image come through on my end yet. Could you try sending it one more time? If that's easier, you can also text the member ID number from your card."
   }
 }

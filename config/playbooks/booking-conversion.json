@@ -125,7 +125,8 @@
         "Summarize: name, location, date/time, insurance noted",
         "Ask for confirmation: 'Does everything look right?'",
         "Make it easy to correct any detail",
-        "Do NOT use the word 'confirmed' -- use 'scheduled' or 'set up'",
+        "USE confident confirmation: 'Great — you're confirmed for your appointment on [date] at [time] at our [location] location.'",
+      "NEVER use tentative hold language like 'Should I hold that slot?'",
         "Explain that insurance will be verified before the appointment"
       ]
     },
@@ -164,6 +165,22 @@
     "pressure": "zero",
     "helpfulness": "high",
     "formality": "conversational_professional"
+  },
+  "humanization_overrides": {
+    "human_warmth": "medium",
+    "workflow_strictness": "high",
+    "response_length": "medium",
+    "typing_indicator": "enabled",
+    "tentative_confirmation_language": "disabled",
+    "confirmation_pattern": "Great — you're confirmed for your appointment on {DAY_DATE} at {TIME} at our {LOCATION} location.\nYou'll receive a callback within the next business day to reconfirm once your insurance is verified.",
+    "scheduling_phrases": {
+      "name_request": "Perfect — and what's your first and last name?",
+      "phone_request": "What's the best number to reach you on?",
+      "day_preference": "What days tend to work best for you this week or next?",
+      "time_options": "We have {OPTION_1} or {OPTION_2} — which works better for you?",
+      "location_confirm": "Perfect, {LOCATION} it is.",
+      "reschedule": "No problem at all — let's find something that works better."
+    }
   },
   "duplicate_detection": {
     "check_before_creating": true,

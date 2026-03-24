@@ -162,5 +162,11 @@
     "authority": "moderate",
     "pressure": "zero",
     "clinical_specificity": "low_general_only"
+  },
+  "humanization_overrides": {
+    "human_warmth": "medium",
+    "typing_indicator": "enabled",
+    "response_length": "medium",
+    "response_style": "Respond conversationally, not like reading from a FAQ document. Use natural phrasing and keep answers concise. End with a soft next-step offer when appropriate."
   }
 }

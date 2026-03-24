@@ -129,6 +129,19 @@
     "pressure": "zero",
     "specificity_about_coverage": "zero"
   },
+  "humanization_overrides": {
+    "human_warmth": "high",
+    "workflow_strictness": "medium",
+    "reassurance_level": "high",
+    "response_length": "medium",
+    "typing_indicator": "enabled",
+    "prohibited_terms_enforced": true,
+    "hesitation_phrases": {
+      "cost_concern": "Totally understand — that's exactly why we verify ahead of time.",
+      "coverage_worry": "That makes sense, and we want you to have clarity before you come in.",
+      "general_reassurance": "We do that so there aren't any surprises."
+    }
+  },
   "policy_reference": "insurance-communication",
   "escalation_rules": {
     "escalate_if": [

@@ -14,8 +14,95 @@ interface MessageBubbleProps {
   message: Message;
 }
 
+/**
+ * Render simple markdown: **bold** and [text](url) links.
+ * Also handles bare https:// URLs by auto-linking them.
+ * Returns React elements for safe rendering.
+ */
+function renderFormattedText(text: string, isPatient: boolean): React.ReactNode[] {
+  // Split into lines preserving newlines
+  const lines = text.split('\n');
+  const result: React.ReactNode[] = [];
+
+  lines.forEach((line, lineIdx) => {
+    if (lineIdx > 0) result.push(<br key={`br-${lineIdx}`} />);
+
+    // Process inline formatting: **bold**, [text](url), and bare URLs
+    // Pattern: **bold** | [text](url) | bare https://...
+    const pattern = /(\*\*(.+?)\*\*)|(\[([^\]]+)\]\(([^)]+)\))|(https?:\/\/[^\s,)]+)/g;
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    let partIdx = 0;
+
+    while ((match = pattern.exec(line)) !== null) {
+      // Add text before this match
+      if (match.index > lastIndex) {
+        result.push(line.slice(lastIndex, match.index));
+      }
+
+      if (match[1]) {
+        // **bold**
+        result.push(
+          <strong key={`b-${lineIdx}-${partIdx}`} style={{ fontWeight: 600 }}>
+            {match[2]}
+          </strong>
+        );
+      } else if (match[3]) {
+        // [text](url)
+        result.push(
+          <a
+            key={`a-${lineIdx}-${partIdx}`}
+            href={match[5]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="vc-link"
+            style={{
+              color: isPatient ? '#E0D4FF' : '#6D28D9',
+              textDecoration: 'underline',
+              textUnderlineOffset: '2px',
+            }}
+          >
+            {match[4]}
+          </a>
+        );
+      } else if (match[6]) {
+        // Bare URL - auto-link it
+        const url = match[6];
+        const label = url.includes('google.com/maps') ? 'View on Google Maps' : url;
+        result.push(
+          <a
+            key={`u-${lineIdx}-${partIdx}`}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="vc-link"
+            style={{
+              color: isPatient ? '#E0D4FF' : '#6D28D9',
+              textDecoration: 'underline',
+              textUnderlineOffset: '2px',
+            }}
+          >
+            {label}
+          </a>
+        );
+      }
+
+      lastIndex = match.index + match[0].length;
+      partIdx++;
+    }
+
+    // Add remaining text after last match
+    if (lastIndex < line.length) {
+      result.push(line.slice(lastIndex));
+    }
+  });
+
+  return result;
+}
+
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   const isBot = message.role === 'bot';
+  const isPatient = message.role === 'patient';
   const isSystem = message.type === 'system';
   const isFile = message.type === 'file';
 
@@ -61,7 +148,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
               <span className="vc-file-name">{message.fileName || 'Uploaded file'}</span>
             </div>
           ) : (
-            <p className="vc-bubble-text">{message.content}</p>
+            <p className="vc-bubble-text">
+              {isBot ? renderFormattedText(message.content, false) : message.content}
+            </p>
           )}
         </div>
         <time className="vc-message-time" dateTime={message.timestamp.toISOString()}>

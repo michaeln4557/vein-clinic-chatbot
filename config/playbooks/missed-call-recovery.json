@@ -121,6 +121,12 @@
     "empathy": "high",
     "brevity": "concise"
   },
+  "humanization_overrides": {
+    "human_warmth": "medium",
+    "opener_variant": "missed_call_opener",
+    "typing_indicator": "enabled",
+    "missed_call_opener": "Hi — I'm Maya with Vein Treatment Clinic. Sorry we missed your call earlier — I can help you here by text if that's easier.\nWe can take it step by step — what were you hoping to get help with?"
+  },
   "booking_timing": {
     "when_to_introduce": "only_after_patient_expresses_interest",
     "how_to_introduce": "soft_suggestion",

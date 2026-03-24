@@ -1,5 +1,12 @@
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load .env from monorepo root
+dotenv.config({ path: path.resolve(__dirname, '../../../.env'), override: true });
+
 import express, { Request, Response, NextFunction } from 'express';
 import winston from 'winston';
+import chatRoutes from './api/routes/chat.routes';
 
 // ─── Logger Setup ───────────────────────────────────────────────────────────
 
@@ -68,6 +75,9 @@ app.get('/health', (_req: Request, res: Response) => {
 });
 
 // ─── API Routes ─────────────────────────────────────────────────────────────
+
+// Chat widget routes (public, no auth required)
+app.use('/api/v1/chat', chatRoutes);
 
 // TODO: Import and mount route modules once implemented
 // app.use('/api/v1/conversations', conversationRoutes);

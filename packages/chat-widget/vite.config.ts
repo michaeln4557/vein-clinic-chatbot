@@ -28,6 +28,6 @@ export default defineConfig({
     target: 'es2015',
   },
   server: {
-    port: 3100,
+    port: 3102,
   },
 });
