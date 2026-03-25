@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BarChart3, Headset, Lightbulb } from 'lucide-react';
 import DecisionBar from '../components/dashboard/DecisionBar';
 import MetricCard from '../components/dashboard/MetricCard';
-import TopFilterBar from '../components/dashboard/TopFilterBar';
+import TopFilterBar, { type DashboardView } from '../components/dashboard/TopFilterBar';
 import FunnelChart from '../components/dashboard/FunnelChart';
 import SourcePerformanceTable from '../components/dashboard/SourcePerformanceTable';
 import OperationsPanel from '../components/dashboard/OperationsPanel';
@@ -61,6 +61,7 @@ const funnelViews: { key: FunnelView; label: string; data: FunnelStep[] }[] = [
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<DashboardTab>('performance');
+  const [dashboardView, setDashboardView] = useState<DashboardView>('overall');
 
   // Filter state
   const [dateRange, setDateRange] = useState(defaultFilters.dateRange);
@@ -81,7 +82,14 @@ export default function DashboardPage() {
     setPlaybook(defaultFilters.playbook);
   };
 
-  const currentFunnel = funnelViews.find((f) => f.key === activeFunnel) || funnelViews[0];
+  // Auto-suggest funnel view based on dashboard perspective
+  const suggestedFunnel: FunnelView =
+    dashboardView === 'bot' ? 'automation'
+    : dashboardView === 'human' ? 'handoff'
+    : dashboardView === 'recovery' ? 'mcr'
+    : activeFunnel;
+  const effectiveFunnel = dashboardView === 'overall' ? activeFunnel : suggestedFunnel;
+  const currentFunnel = funnelViews.find((f) => f.key === effectiveFunnel) || funnelViews[0];
 
   // Operations risk metric: at-risk conversions = pending callbacks * historical callback conversion rate
   const atRiskConversions = Math.round(
@@ -112,6 +120,8 @@ export default function DashboardPage() {
           playbookValue={playbook}
           onPlaybookChange={setPlaybook}
           onReset={resetFilters}
+          dashboardView={dashboardView}
+          onDashboardViewChange={setDashboardView}
         />
       </div>
 
@@ -146,6 +156,20 @@ export default function DashboardPage() {
          ════════════════════════════════════════ */}
       {activeTab === 'performance' && (
         <>
+          {/* ── View-aware perspective label ───────── */}
+          {dashboardView !== 'overall' && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-teal-50 border border-teal-200 rounded-lg">
+              <span className="text-xs font-medium text-teal-700">
+                Viewing: {dashboardView === 'bot' ? 'Bot-Only Performance' : dashboardView === 'human' ? 'Human Handoff Performance' : 'Missed Call Recovery Performance'}
+              </span>
+              <span className="text-[10px] text-teal-600">
+                {dashboardView === 'bot' && '— Automated conversion metrics emphasized'}
+                {dashboardView === 'human' && '— Escalation and handoff metrics emphasized'}
+                {dashboardView === 'recovery' && '— Recovered demand metrics emphasized'}
+              </span>
+            </div>
+          )}
+
           {/* ── SECTION 1: Overview ──────────────────── */}
           <div>
             <div className="flex items-center gap-2 mb-3">
@@ -165,64 +189,80 @@ export default function DashboardPage() {
           </div>
 
           {/* ── SECTION 2: Conversion Path ────────────
-               HOW conversions happened: bot vs human.
-               These are mutually exclusive paths that
-               sum to Total Conversions above.
+               Show in Overall, Bot, Human views.
+               Emphasis shifts based on view.
                ────────────────────────────────────────── */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <h2 className="text-xs font-bold text-healthcare-muted uppercase tracking-wider">Conversion Path</h2>
-              <span className="text-[10px] text-healthcare-muted">(bot-only + human-handoff = total conversions)</span>
-              <div className="flex-1 h-px bg-healthcare-border" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {kpiConversionPath.map((m) => (
-                <MetricCard key={m.id} {...m} />
-              ))}
-            </div>
+          {(dashboardView === 'overall' || dashboardView === 'bot' || dashboardView === 'human') && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <h2 className="text-xs font-bold text-healthcare-muted uppercase tracking-wider">Conversion Path</h2>
+                <span className="text-[10px] text-healthcare-muted">(bot-only + human-handoff = total conversions)</span>
+                <div className="flex-1 h-px bg-healthcare-border" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {kpiConversionPath.map((m) => (
+                  <MetricCard
+                    key={m.id}
+                    {...m}
+                    emphasis={
+                      (dashboardView === 'bot' && m.id === 'bot-only-conversions') ||
+                      (dashboardView === 'human' && m.id === 'human-handoff-conversions')
+                    }
+                  />
+                ))}
+              </div>
 
-            {/* Automation vs Human conversion split bar — reinforces the path story */}
-            {(() => {
-              const { botOnlyConversions, humanHandoffConversions, automationRate, humanRate, totalConversions } = computedMetrics;
-              if (totalConversions === 0) return null;
-              return (
-                <div className="flex items-center gap-4 px-4 py-2 mt-3 bg-white/80 rounded-lg border border-healthcare-border/50">
-                  <span className="text-[11px] font-medium text-healthcare-muted">Automation vs Human</span>
-                  <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden flex">
-                    <div className="h-full bg-emerald-500 rounded-l-full transition-all" style={{ width: `${automationRate}%` }} />
-                    <div className="h-full bg-teal-400 rounded-r-full transition-all" style={{ width: `${humanRate}%` }} />
+              {/* Automation vs Human conversion split bar */}
+              {(() => {
+                const { botOnlyConversions, humanHandoffConversions, automationRate, humanRate, totalConversions } = computedMetrics;
+                if (totalConversions === 0) return null;
+                return (
+                  <div className="flex items-center gap-4 px-4 py-2 mt-3 bg-white/80 rounded-lg border border-healthcare-border/50">
+                    <span className="text-[11px] font-medium text-healthcare-muted">Automation vs Human</span>
+                    <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden flex">
+                      <div className="h-full bg-emerald-500 rounded-l-full transition-all" style={{ width: `${automationRate}%` }} />
+                      <div className="h-full bg-teal-400 rounded-r-full transition-all" style={{ width: `${humanRate}%` }} />
+                    </div>
+                    <div className="flex items-center gap-3 text-[11px] shrink-0">
+                      <span className={`flex items-center gap-1 ${dashboardView === 'bot' ? 'font-bold' : ''}`}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        Bot {automationRate}% ({botOnlyConversions})
+                      </span>
+                      <span className={`flex items-center gap-1 ${dashboardView === 'human' ? 'font-bold' : ''}`}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
+                        Human {humanRate}% ({humanHandoffConversions})
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3 text-[11px] shrink-0">
-                    <span className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      Bot {automationRate}% ({botOnlyConversions})
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
-                      Human {humanRate}% ({humanHandoffConversions})
-                    </span>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
+                );
+              })()}
+            </div>
+          )}
 
           {/* ── SECTION 3: Escalation & Recovery ──────
-               Handoff requests (operational demand) and
-               missed call recovery (source performance).
-               Neither is a conversion metric by itself.
+               Show in Overall, Human, Recovery views.
+               Emphasis shifts based on view.
                ────────────────────────────────────────── */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <h2 className="text-xs font-bold text-healthcare-muted uppercase tracking-wider">Escalation & Recovery</h2>
-              <div className="flex-1 h-px bg-healthcare-border" />
+          {(dashboardView === 'overall' || dashboardView === 'human' || dashboardView === 'recovery') && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <h2 className="text-xs font-bold text-healthcare-muted uppercase tracking-wider">Escalation & Recovery</h2>
+                <div className="flex-1 h-px bg-healthcare-border" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {kpiEscalationRecovery.map((m) => (
+                  <MetricCard
+                    key={m.id}
+                    {...m}
+                    emphasis={
+                      (dashboardView === 'human' && m.id === 'human-handoff-requests') ||
+                      (dashboardView === 'recovery' && m.id === 'missed-call-recovery')
+                    }
+                  />
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {kpiEscalationRecovery.map((m) => (
-                <MetricCard key={m.id} {...m} />
-              ))}
-            </div>
-          </div>
+          )}
 
           {/* Funnel + Entry Source Performance */}
           <div className="grid grid-cols-12 gap-6">

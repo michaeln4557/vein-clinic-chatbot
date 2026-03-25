@@ -290,8 +290,15 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-width: 0;
   overflow: visible;
+}
+
+/* Bot messages can shrink to respect max-width, but patient messages must not clip */
+.vc-message--bot .vc-message-content {
+  min-width: 0;
+}
+.vc-message--patient .vc-message-content {
+  min-width: auto;
 }
 
 /* ---- Bubbles ---- */
@@ -319,9 +326,10 @@
   background: var(--vc-bubble-sent);
   color: #FFFFFF;
   border-bottom-right-radius: 6px;
-  padding: 9px 14px;
+  padding: 9px 16px;
   font-size: 15px;
   line-height: 1.4;
+  overflow: visible;
 }
 
 .vc-bubble-text {
