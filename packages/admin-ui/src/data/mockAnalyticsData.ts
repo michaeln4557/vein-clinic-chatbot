@@ -120,10 +120,18 @@ export const callbackQueueFull = [
 export const handoffReasons = [
   { reason: 'Insurance Complexity', count: 68 },
   { reason: 'Patient Request', count: 45 },
-  { reason: 'Low Confidence', count: 32 },
-  { reason: 'Negative Sentiment', count: 24 },
+  { reason: 'Bot Identity Question', count: 38 },
+  { reason: 'Callback Request', count: 32 },
+  { reason: 'Low Confidence', count: 24 },
   { reason: 'Clinical Question', count: 17 },
 ];
+
+export const handoffBreakdown = {
+  total: 186,
+  by_channel: { call_now: 52, call_scheduled: 34, sms_now: 61, sms_scheduled: 39 },
+  by_reason: { bot_identity_question: 38, explicit_human_request: 45, callback_request: 62, sms_request: 41 },
+  by_stage: { pre_lead: 72, mid_funnel: 84, post_lead: 30 },
+};
 
 export const responseTimeDistribution = [
   { bucket: '< 5 min', count: 142 },

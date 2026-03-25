@@ -30,7 +30,7 @@ export default function PlaybookHealthPanel({ onPlaybookClick }: PlaybookHealthP
       <div className="card-header flex items-center justify-between">
         <div className="flex items-center gap-2">
           <BookOpen className="w-4 h-4 text-brand-600" />
-          <h3 className="text-sm font-semibold">Playbook Health</h3>
+          <h3 className="text-sm font-semibold">Playbook Insights</h3>
         </div>
         <span className="badge bg-red-100 text-red-700">
           {playbookHealthData.filter((p) => p.impactScore >= 10).length} needs attention

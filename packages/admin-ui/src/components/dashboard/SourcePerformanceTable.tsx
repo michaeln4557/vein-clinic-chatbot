@@ -69,7 +69,7 @@ export default function SourcePerformanceTable({ onRowClick, compact = false }: 
     <div className="card h-full">
       <div className="card-header flex items-center justify-between">
         <h2 className="text-sm font-semibold">
-          {compact ? 'Top Sources' : 'Source Performance'}
+          {compact ? 'Entry Source Performance' : 'Source Performance'}
         </h2>
         {compact && (
           <span className="text-[10px] text-healthcare-muted">by conversion</span>

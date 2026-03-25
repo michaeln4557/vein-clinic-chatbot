@@ -58,7 +58,12 @@
       "That way, you know what to expect ahead of time.",
       "Totally understand — that's exactly why we verify ahead of time.",
       "We do that so there aren't any surprises."
-    ]
+    ],
+    "calendar_invite_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "When enabled, the chatbot will offer to send patients a calendar invite after booking confirmation. Only asks for email if the patient accepts."
+    }
   },
   "operator_permissions": {
     "can_adjust": [
@@ -67,7 +72,8 @@
       "typing_delay_min_ms",
       "typing_delay_max_ms",
       "confirmation_language_style",
-      "acknowledgment_phrase_library"
+      "acknowledgment_phrase_library",
+      "calendar_invite_enabled"
     ],
     "cannot_override": [
       "tentative_confirmation_allowed",

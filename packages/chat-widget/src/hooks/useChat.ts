@@ -37,11 +37,11 @@ function calculateTypingDelay(text: string, speed: TypingSpeed): number {
   let baseDelay: number;
 
   if (len <= 40) {
-    baseDelay = randomBetween(150, 350);
+    baseDelay = randomBetween(100, 250);
   } else if (len <= 160) {
-    baseDelay = randomBetween(300, 600);
+    baseDelay = randomBetween(200, 450);
   } else {
-    baseDelay = randomBetween(500, 900);
+    baseDelay = randomBetween(350, 650);
   }
 
   return Math.round(baseDelay * mult);
@@ -351,6 +351,10 @@ export function useChat(config: VeinClinicChatConfig): UseChatReturn {
           const replyId = response.messageId || generateId();
           // Update lastMessageIdRef IMMEDIATELY so polling doesn't duplicate it
           lastMessageIdRef.current = replyId;
+
+          // Add the FULL original reply to the filter so polling skips it
+          // (polling returns the full message, not the chunked pieces)
+          greetingContentRef.current.add(response.reply);
 
           // Split response into chunks and render with typing indicators
           const chunks = chunkResponse(response.reply);

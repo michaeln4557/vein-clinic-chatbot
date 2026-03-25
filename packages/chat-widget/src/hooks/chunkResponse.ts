@@ -96,63 +96,51 @@ export function chunkResponse(text: string): string[] {
   const trimmed = text.trim();
   if (!trimmed) return [];
 
-  // Short messages: don't chunk
-  if (trimmed.length <= 260) {
-    return [trimmed];
-  }
-
-  // Structured blocks (appointment summary): keep as single chunk
-  if (isStructuredBlock(trimmed)) {
-    // But still split paragraphs if there's a structured block + other content
-    const paragraphs = trimmed.split(/\n\n+/);
-    if (paragraphs.length > 1) {
-      // Check if any paragraph is the structured summary
-      const chunks: string[] = [];
-      let summaryBlock = '';
-
-      for (const para of paragraphs) {
-        if (isStructuredBlock(para)) {
-          if (summaryBlock) summaryBlock += '\n\n' + para;
-          else summaryBlock = para;
-        } else {
-          if (summaryBlock) {
-            chunks.push(summaryBlock);
-            summaryBlock = '';
-          }
-          // Chunk this non-structured paragraph
-          const sentences = splitSentences(para);
-          chunks.push(...groupSentences(sentences));
-        }
-      }
-      if (summaryBlock) chunks.push(summaryBlock);
-      return chunks.filter((c) => c.trim().length > 0);
-    }
-    return [trimmed];
-  }
-
-  // Split by paragraphs first
+  // ALWAYS split on paragraph boundaries first, regardless of length
   const paragraphs = trimmed.split(/\n\n+/);
 
   if (paragraphs.length > 1) {
-    // Each paragraph becomes its own chunk (or gets further split if too long)
     const chunks: string[] = [];
+    let summaryBlock = '';
+
     for (const para of paragraphs) {
       const p = para.trim();
       if (!p) continue;
-      if (p.length <= 260) {
+
+      // Structured blocks (appointment summary) stay together
+      if (isStructuredBlock(p)) {
+        if (summaryBlock) summaryBlock += '\n\n' + p;
+        else summaryBlock = p;
+        continue;
+      }
+
+      // Flush any pending summary block first
+      if (summaryBlock) {
+        chunks.push(summaryBlock);
+        summaryBlock = '';
+      }
+
+      // Each paragraph is its own bubble (split further only if very long)
+      if (p.length <= 300) {
         chunks.push(p);
       } else {
         const sentences = splitSentences(p);
         chunks.push(...groupSentences(sentences));
       }
     }
-    return chunks;
+    if (summaryBlock) chunks.push(summaryBlock);
+    return chunks.filter((c) => c.trim().length > 0);
   }
 
-  // Single paragraph, split by sentences
+  // Single paragraph, short: don't chunk
+  if (trimmed.length <= 260) {
+    return [trimmed];
+  }
+
+  // Single long paragraph: split by sentences
   const sentences = splitSentences(trimmed);
   if (sentences.length <= 1) {
-    return [trimmed]; // Can't split further
+    return [trimmed];
   }
 
   return groupSentences(sentences);
@@ -170,11 +158,11 @@ export function chunkDelay(text: string, multiplier: number = 1.0): number {
   let max: number;
 
   if (len <= 40) {
-    min = 150; max = 350;
+    min = 100; max = 250;
   } else if (len <= 160) {
-    min = 300; max = 600;
+    min = 200; max = 450;
   } else {
-    min = 500; max = 900;
+    min = 350; max = 650;
   }
 
   const base = Math.floor(min + Math.random() * (max - min));
@@ -186,5 +174,5 @@ export function chunkDelay(text: string, multiplier: number = 1.0): number {
  * Must be long enough for typing dots to be visible.
  */
 export function interChunkDelay(): number {
-  return Math.floor(300 + Math.random() * 300); // 300-600ms
+  return Math.floor(200 + Math.random() * 250); // 200-450ms
 }

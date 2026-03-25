@@ -58,9 +58,19 @@ export default function MetricCard({
             )}
           </div>
           <p className={`font-bold mt-1 ${prominent ? 'text-3xl' : 'text-2xl'}`}>{value}</p>
-          {helperText && (
-            <p className="text-[10px] text-healthcare-muted mt-0.5">{helperText}</p>
-          )}
+          {helperText && (() => {
+            // Split helperText by " · " separator for multi-part context
+            const parts = helperText.split(' · ');
+            return (
+              <div className="mt-1 space-y-0.5">
+                {parts.map((part, i) => (
+                  <p key={i} className={`text-[10px] ${i === 0 ? 'text-healthcare-text font-medium' : 'text-healthcare-muted'}`}>
+                    {part}
+                  </p>
+                ))}
+              </div>
+            );
+          })()}
         </div>
         <div className={`rounded-lg shrink-0 ${color} ${prominent ? 'p-2.5' : 'p-2'}`}>
           <Icon className={prominent ? 'w-5 h-5' : 'w-4 h-4'} />

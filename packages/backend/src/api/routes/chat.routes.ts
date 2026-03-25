@@ -219,12 +219,22 @@ Once the patient agrees to schedule, collect info in THIS order. Ask one thing a
 
 IMPORTANT: Insurance card collection happens BEFORE the appointment confirmation. The confirmation is always the LAST thing sent.
 
-═══ PHONE NUMBER VALIDATION (STRICT) ═══
-The phone number MUST contain exactly 10 digits (after stripping formatting).
-Accepted formats: (XXX) XXX-XXXX, XXX-XXX-XXXX, XXXXXXXXXX
-IF INVALID: "That looks a little off. Could you double check your phone number for me?"
-IF CORRECTED: "Got it, thanks for fixing that."
-Do NOT accept incomplete numbers. Do NOT silently correct. Do NOT proceed with invalid phone.
+═══ PHONE NUMBER VALIDATION (ADVANCED) ═══
+When the patient gives a phone number, mentally normalize it:
+1. Extract digits only. If 11 digits starting with "1", drop the leading "1".
+2. The result must be exactly 10 digits. If not, it's invalid.
+3. NANP rules: digit 1 (area code) must be 2-9, digit 4 (central office) must be 2-9. If either starts with 0 or 1, invalid.
+4. Reject obvious fakes: all same digit (1111111111, 9999999999), sequential (1234567890), or 5555555555.
+
+Accept any formatting: (XXX) XXX-XXXX, XXX-XXX-XXXX, +1 XXX XXX XXXX, embedded in text like "my number is 212-555-7890".
+
+VALIDATION RESPONSES:
+- VALID: Accept naturally. "Got it, thanks." Do NOT challenge valid numbers.
+- FIRST FAILURE: "That looks a little off. Could you double check your phone number for me?"
+- SECOND FAILURE: "Just to make sure we have the right number to reach you, could you send it again including area code?"
+- THIRD FAILURE: "I'm still having trouble reading that number correctly. If you'd like, I can continue and our team can confirm your best number when they follow up." (Accept and move on.)
+
+Do NOT trap the user in endless correction loops. Be forgiving on format, strict on obvious junk.
 
 ═══ SCHEDULING LANGUAGE ═══
 Use natural phrasing:
@@ -279,13 +289,33 @@ Use: "Your vein specialist will be confirmed by our team when we follow up."
 Do NOT leave provider blank. Do NOT invent a doctor name.
 
 ═══ POST-CONFIRMATION CLOSE FLOW ═══
-Immediately after the confirmation message, ask:
+After the confirmation message, follow this sequence:
+
+STEP 1: Ask if anything else is needed:
 "Is there anything else I can help you with?"
 
-IF PATIENT SAYS NO/THANKS/THAT'S ALL:
-"We look forward to seeing you at our [LOCATION] location on [DAY, DATE]. Thank you, and please don't hesitate to reach out if you have any other questions."
+STEP 2: If patient says no, offer calendar invite (if enabled):
+"Would you like me to send you a calendar invite for your appointment?"
 
-RULES:
+IF YES to calendar invite:
+- Ask for email: "Perfect, what's the best email to send that to?"
+- After email provided: "Got it, I'll send that over shortly."
+- If invalid email: "That looks a little off. Could you double check your email for me?"
+- Then proceed to closing.
+
+IF NO to calendar invite (or if patient declines):
+- Do NOT ask again. Proceed to closing.
+
+STEP 3: Warm closing (use bold markdown for date, time, and location):
+"We look forward to seeing you at our **[LOCATION]** location on **[DAY, DATE]** at **[TIME]**. Thank you, and please don't hesitate to reach out if you have any other questions."
+
+CALENDAR INVITE RULES:
+- Only offer AFTER confirmation is sent. Never during booking.
+- Do NOT ask for email unless patient wants the calendar invite.
+- Keep the offer natural and optional, not pushy.
+- If patient provides email unprompted, accept and confirm gracefully.
+
+CLOSING RULES:
 - Do NOT skip the "anything else" question.
 - Do NOT use overly casual closings like "Sounds good!" or "Have a great day!" alone.
 - The closing should include the location name and appointment date.
@@ -300,22 +330,52 @@ Vein Treatment Clinic specializes in lower extremity venous insufficiency and re
 We treat: leg veins, varicose veins, spider veins of the legs, leg swelling, heaviness, aching, fatigue related to venous insufficiency.
 We do NOT treat: arm veins, hand veins, facial veins, chest veins, or upper extremity veins.
 
-If a patient asks about veins outside the legs:
-1. Acknowledge their concern warmly
-2. Clearly state we specialize in leg vein conditions
-3. Do NOT offer to book them or route them into scheduling
-4. Invite them to share if they also have leg vein concerns
+═══ CLINICAL QUALIFICATION (REQUIRED BEFORE BOOKING) ═══
+When a patient mentions veins, bulging veins, varicose veins, spider veins, or vein discomfort, you MUST confirm the location is in their legs BEFORE moving to booking.
 
-Example: "I'm sorry those have been bothering you. Our clinic specializes in leg vein conditions and lower extremity venous insufficiency, so we don't evaluate or treat arm veins here. If you do have any concerns about veins in your legs, I'd be happy to help."
+STEP 1: If the patient has NOT already clearly stated "legs" or "lower extremity", ask:
+"Are the veins you're noticing mostly in your legs, or somewhere else?"
+Keep it natural. ONE question. Do NOT ask this if they already said "leg veins" or similar.
 
-If they mention BOTH arm veins AND leg veins, acknowledge scope limitation for arm veins, then pivot to helping with their leg concerns.
+STEP 2: Based on their answer:
+- If LEGS/LOWER EXTREMITY: Proceed to booking. Optionally say: "Got it, that's exactly what our vein specialists treat."
+- If OTHER LOCATION (arms, face, elsewhere): Do NOT push booking. Say: "Thanks for clarifying. We mainly treat veins in the legs, but I can connect you with our team to guide you to the right next step." Then offer a callback or handoff.
+- If UNCLEAR: Gently clarify once: "Just to confirm, are these in your legs?"
+
+RULES:
+- Do NOT ask this question more than once per conversation.
+- Skip it entirely if the patient already clearly stated legs.
+- Do NOT interrupt a booking-confirmed flow to re-ask.
+- If they mention BOTH arm veins AND leg veins, acknowledge scope limitation for arms, then pivot to helping with legs.
+
+═══ HUMAN HANDOFF ESCALATION ═══
+If the patient asks if you're real, asks if you're a bot, requests a real person, asks for a call, or asks to text with someone:
+
+STEP 1: Respond honestly and offer options:
+"I'm a virtual assistant, but I can connect you with a real team member. Would you prefer a call or a text message?"
+
+STEP 2: If patient chooses CALL:
+Ask: "Would you like a call now or at a specific time?"
+- If "now": Check if phone number is already known. If yes: "Should we use this number: (XXX) XXX-XXXX?" If no: ask for their number.
+- If "specific time": Ask what time works. Confirm: "Got it, we'll have someone call you at [TIME]."
+
+STEP 3: If patient chooses TEXT/SMS:
+Ask: "Would you like a text now or at a specific time?"
+- Same phone confirmation logic as call.
+- Confirm: "Got it, we'll have someone text you [now / at TIME]."
+
+RULES:
+- Keep it brief and natural. Do not over-explain.
+- If they already gave a phone number earlier, reference it.
+- Use the same phone validation rules (10 digits, NANP, 3-strike system).
+- Do NOT try to prevent handoff. If they want a person, help them get one.
+- After handoff is arranged, ask if there's anything else you can help with in the meantime.
 
 ═══ SAFETY RULES (NON-NEGOTIABLE) ═══
 - Never diagnose or recommend specific treatments
 - NEVER say "free", "complimentary", "guaranteed", or "covered" about insurance
 - Never provide medication advice or guarantee outcomes
 - Emergency: tell them to call 911 immediately
-- If asked if you're a bot, be honest and offer to connect with a human
 - If you don't know something, say so and offer to connect them with someone who does`;
 }
 
@@ -328,6 +388,8 @@ interface ChatMessage {
   type: string;
 }
 
+type VeinLocation = 'lower_extremity' | 'other' | 'unknown';
+
 interface ChatSession {
   id: string;
   token: string;
@@ -336,9 +398,63 @@ interface ChatSession {
   greeting?: string;          // stored separately — only used for Claude context, not polled
   messages: ChatMessage[];
   createdAt: string;
+  vein_location?: VeinLocation;
 }
 
 const sessions = new Map<string, ChatSession>();
+
+// ── Human Handoff Analytics ──────────────────────────────────────────
+type HandoffReason = 'bot_identity_question' | 'explicit_human_request' | 'callback_request' | 'sms_request';
+type HandoffChannel = 'call' | 'sms';
+type HandoffTiming = 'now' | 'scheduled';
+type ConversationStage = 'pre_lead' | 'mid_funnel' | 'post_lead';
+
+interface HandoffEvent {
+  event_type: 'human_handoff_request';
+  session_id: string;
+  timestamp: string;
+  handoff_reason: HandoffReason;
+  handoff_channel: HandoffChannel | null;
+  handoff_timing: HandoffTiming | null;
+  phone_number_present: boolean;
+  scheduled_time_present: boolean;
+  conversation_stage: ConversationStage;
+}
+
+// In-memory analytics store (replace with DB in production)
+const handoffEvents: HandoffEvent[] = [];
+
+function determineConversationStage(session: ChatSession): ConversationStage {
+  const msgCount = session.messages.length;
+  const hasPatientInfo = session.messages.some((m) =>
+    m.role === 'bot' && (m.content.includes('Appointment Confirmation') || m.content.includes('confirmed for your appointment'))
+  );
+  if (hasPatientInfo) return 'post_lead';
+  if (msgCount > 4) return 'mid_funnel';
+  return 'pre_lead';
+}
+
+function logHandoffEvent(
+  sessionId: string,
+  session: ChatSession,
+  reason: HandoffReason,
+  channel: HandoffChannel | null = null,
+  timing: HandoffTiming | null = null,
+): void {
+  const event: HandoffEvent = {
+    event_type: 'human_handoff_request',
+    session_id: sessionId,
+    timestamp: new Date().toISOString(),
+    handoff_reason: reason,
+    handoff_channel: channel,
+    handoff_timing: timing,
+    phone_number_present: session.messages.some((m) => /\d{3}.*\d{3}.*\d{4}/.test(m.content)),
+    scheduled_time_present: timing === 'scheduled',
+    conversation_stage: determineConversationStage(session),
+  };
+  handoffEvents.push(event);
+  console.log('[HandoffEvent]', JSON.stringify(event));
+}
 
 function generateToken(): string {
   return `chat_${Date.now()}_${Math.random().toString(36).slice(2, 15)}`;
@@ -476,6 +592,32 @@ router.post(
         type: 'text',
       });
 
+      // Auto-detect and log handoff events
+      const patientMsg = content.toLowerCase();
+      const botReply = reply.toLowerCase();
+      if (botReply.includes('virtual assistant') || botReply.includes('connect you with a real')) {
+        const reason: HandoffReason =
+          patientMsg.includes('bot') || patientMsg.includes('real') || patientMsg.includes('human')
+            ? 'bot_identity_question'
+            : patientMsg.includes('call')
+            ? 'callback_request'
+            : patientMsg.includes('text') || patientMsg.includes('sms')
+            ? 'sms_request'
+            : 'explicit_human_request';
+        logHandoffEvent(session.id, session, reason);
+      }
+
+      // Auto-detect vein location from patient messages
+      if (!session.vein_location) {
+        const legKeywords = /\b(leg|legs|lower|calf|calves|thigh|ankle|knee|shin|foot|feet)\b/i;
+        const otherKeywords = /\b(arm|arms|hand|hands|face|facial|chest|neck|wrist)\b/i;
+        if (legKeywords.test(patientMsg)) {
+          session.vein_location = 'lower_extremity';
+        } else if (otherKeywords.test(patientMsg)) {
+          session.vein_location = 'other';
+        }
+      }
+
       res.status(200).json({
         messageId: replyId,
         reply,
@@ -549,6 +691,37 @@ router.post(
     } catch (err) {
       next(err);
     }
+  },
+);
+
+// GET /chat/analytics/handoffs — Get handoff analytics
+router.get(
+  '/analytics/handoffs',
+  async (_req: Request, res: Response) => {
+    const summary = {
+      total: handoffEvents.length,
+      by_reason: {
+        bot_identity_question: handoffEvents.filter((e) => e.handoff_reason === 'bot_identity_question').length,
+        explicit_human_request: handoffEvents.filter((e) => e.handoff_reason === 'explicit_human_request').length,
+        callback_request: handoffEvents.filter((e) => e.handoff_reason === 'callback_request').length,
+        sms_request: handoffEvents.filter((e) => e.handoff_reason === 'sms_request').length,
+      },
+      by_channel: {
+        call: handoffEvents.filter((e) => e.handoff_channel === 'call').length,
+        sms: handoffEvents.filter((e) => e.handoff_channel === 'sms').length,
+      },
+      by_timing: {
+        now: handoffEvents.filter((e) => e.handoff_timing === 'now').length,
+        scheduled: handoffEvents.filter((e) => e.handoff_timing === 'scheduled').length,
+      },
+      by_stage: {
+        pre_lead: handoffEvents.filter((e) => e.conversation_stage === 'pre_lead').length,
+        mid_funnel: handoffEvents.filter((e) => e.conversation_stage === 'mid_funnel').length,
+        post_lead: handoffEvents.filter((e) => e.conversation_stage === 'post_lead').length,
+      },
+      events: handoffEvents.slice(-50), // last 50 events
+    };
+    res.json(summary);
   },
 );
 
