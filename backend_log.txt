@@ -1,0 +1,20 @@
+C:\Users\jmgrz\OneDrive\Desktop\Vein Chatbot\vein-clinic\node_modules\ts-node\src\index.ts:859
+    return new TSError(diagnosticText, diagnosticCodes, diagnostics);
+           ^
+TSError: ⨯ Unable to compile TypeScript:
+packages/backend/src/index.ts(9,8): error TS1192: Module '"C:/Users/jmgrz/OneDrive/Desktop/Vein Chatbot/vein-clinic/packages/backend/src/api/routes/chat.routes"' has no default export.
+
+    at createTSError (C:\Users\jmgrz\OneDrive\Desktop\Vein Chatbot\vein-clinic\node_modules\ts-node\src\index.ts:859:12)
+    at reportTSError (C:\Users\jmgrz\OneDrive\Desktop\Vein Chatbot\vein-clinic\node_modules\ts-node\src\index.ts:863:19)
+    at getOutput (C:\Users\jmgrz\OneDrive\Desktop\Vein Chatbot\vein-clinic\node_modules\ts-node\src\index.ts:1077:36)
+    at Object.compile (C:\Users\jmgrz\OneDrive\Desktop\Vein Chatbot\vein-clinic\node_modules\ts-node\src\index.ts:1433:41)
+    at Module.m._compile (C:\Users\jmgrz\OneDrive\Desktop\Vein Chatbot\vein-clinic\node_modules\ts-node\src\index.ts:1617:30)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Object.require.extensions.<computed> [as .ts] (C:\Users\jmgrz\OneDrive\Desktop\Vein Chatbot\vein-clinic\node_modules\ts-node\src\index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:173:12) {
+  diagnosticCodes: [ 1192 ]
+}
+
+C:\Users\jmgrz\OneDrive\Desktop\Vein Chatbot\vein-clinic>

@@ -475,7 +475,7 @@ function PlaybookCard({ pb }: { pb: Playbook }) {
         {pb.routesTo.length > 0 && (
           <p className="text-[10px] text-healthcare-muted">Routes to: {pb.routesTo.join(', ')}</p>
         )}
-        <div className="flex items-center justify-between pt-2 border-t border-healthcare-border">
+        <div className="flex items-center justify-between pt-2 border-t border-healthcare-line">
           <span className="text-[10px] text-healthcare-muted">{pb.version} · Modified {pb.lastModified} by {pb.modifiedBy}</span>
           <button onClick={() => setExpanded(!expanded)} className="text-[10px] text-brand-600 hover:text-brand-800 font-medium flex items-center gap-0.5">
             {expanded ? 'Hide' : 'Details'}
@@ -483,7 +483,7 @@ function PlaybookCard({ pb }: { pb: Playbook }) {
           </button>
         </div>
         {expanded && (
-          <div className="space-y-2 pt-2 border-t border-healthcare-border/50">
+          <div className="space-y-2 pt-2 border-t border-healthcare-line/50">
             <DetailRow label="Triggers">
               {pb.triggerIntents.map((t) => <span key={t} className="badge bg-amber-50 text-amber-700">{t.replace(/_/g, ' ')}</span>)}
             </DetailRow>
@@ -627,7 +627,7 @@ function ManagerCard({ pb, metrics }: { pb: Playbook; metrics: PlaybookFunnelMet
 function JourneyCard({ pb, metrics }: { pb: Playbook; metrics: PlaybookFunnelMetrics | undefined }) {
   if (!metrics) {
     return (
-      <div className="flex items-center gap-4 px-4 py-3 bg-gray-50 rounded-lg border border-healthcare-border/50">
+      <div className="flex items-center gap-4 px-4 py-3 bg-gray-50 rounded-lg border border-healthcare-line/50">
         <div className="flex-1">
           <h4 className="text-sm font-semibold">{pb.name}</h4>
           <p className="text-[10px] text-healthcare-muted mt-0.5">No flow data</p>
@@ -649,7 +649,7 @@ function JourneyCard({ pb, metrics }: { pb: Playbook; metrics: PlaybookFunnelMet
     <div className={`rounded-lg border px-4 py-3 transition-all ${
       hasCritical ? 'bg-red-50/60 border-red-300 ring-1 ring-red-200' :
       hasWarning ? 'bg-amber-50/40 border-amber-200' :
-      'bg-white border-healthcare-border/60'
+      'bg-white border-healthcare-line/60'
     }`}>
       <div className="flex items-center gap-4 flex-wrap">
         {/* Name + failure badges */}
@@ -887,7 +887,7 @@ function FlowView({ playbooks }: { playbooks: Playbook[] }) {
                 <div className="flex items-center gap-1 flex-wrap flex-1">
                   {steps.map((step, j) => (
                     <span key={j} className="flex items-center gap-1">
-                      <span className="text-[10px] font-medium bg-white px-2 py-0.5 rounded border border-healthcare-border">
+                      <span className="text-[10px] font-medium bg-white px-2 py-0.5 rounded border border-healthcare-line">
                         {step}
                       </span>
                       {j < steps.length - 1 && <ArrowRight className="w-3 h-3 text-healthcare-muted shrink-0" />}
@@ -1017,7 +1017,7 @@ export default function PlaybooksPage() {
           <button
             onClick={() => setShowFlowView(!showFlowView)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-              showFlowView ? 'bg-brand-50 text-brand-700 border-brand-200' : 'bg-white text-healthcare-muted border-healthcare-border hover:text-healthcare-text'
+              showFlowView ? 'bg-brand-50 text-brand-700 border-brand-200' : 'bg-white text-healthcare-muted border-healthcare-line hover:text-healthcare-text'
             }`}
           >
             <ArrowRight className="w-3.5 h-3.5" />
@@ -1096,7 +1096,7 @@ export default function PlaybooksPage() {
                     </div>
                     <p className="text-[10px] text-healthcare-muted">{group.subtitle}</p>
                   </div>
-                  <div className="flex-1 h-px bg-healthcare-border" />
+                  <div className="flex-1 h-px bg-healthcare-line" />
                   {isCollapsed ? <ChevronRight className="w-4 h-4 text-healthcare-muted" /> : <ChevronDown className="w-4 h-4 text-healthcare-muted" />}
                 </button>
                 {!isCollapsed && (

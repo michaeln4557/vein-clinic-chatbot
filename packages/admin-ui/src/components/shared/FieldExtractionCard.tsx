@@ -29,7 +29,7 @@ export default function FieldExtractionCard({
     confidence >= 0.8 ? 'bg-emerald-500' : confidence >= 0.5 ? 'bg-amber-500' : 'bg-red-500';
 
   return (
-    <div className="border border-healthcare-border rounded-lg p-3 space-y-2">
+    <div className="border border-healthcare-line rounded-lg p-3 space-y-2">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-healthcare-text">{fieldName}</span>
         <StatusBadge

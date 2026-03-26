@@ -196,6 +196,8 @@ export const SLIDER_PRESET_NAMES = [
   'Efficiency',
   'Recovery_Mode',
   'Insurance_Sensitive',
+  'Patient_Coordinator',
+  'Patient_Coordinator_Human_Mode',
 ] as const;
 
 export type SliderPresetNameConst = (typeof SLIDER_PRESET_NAMES)[number];

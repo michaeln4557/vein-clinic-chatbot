@@ -1,46 +1,33 @@
-import { useState } from 'react';
-import { BarChart3, Headset, Lightbulb } from 'lucide-react';
-import DecisionBar from '../components/dashboard/DecisionBar';
 import MetricCard from '../components/dashboard/MetricCard';
 import TopFilterBar, { type DashboardView } from '../components/dashboard/TopFilterBar';
-import FunnelChart from '../components/dashboard/FunnelChart';
-import SourcePerformanceTable from '../components/dashboard/SourcePerformanceTable';
-import OperationsPanel from '../components/dashboard/OperationsPanel';
-import CallbackPanel from '../components/dashboard/CallbackPanel';
-import PlaybookHealthPanel from '../components/dashboard/PlaybookHealthPanel';
-import QualityPanel from '../components/dashboard/QualityPanel';
-import AlertsPanel from '../components/dashboard/AlertsPanel';
-import DrilldownDrawer from '../components/dashboard/DrilldownDrawer';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  decisionBarData,
+  AlertTriangle,
+  TrendingDown,
+  TrendingUp,
+  Lightbulb,
+  ArrowRight,
+  Zap,
+  Bot,
+  Users,
+  Target,
+  CheckCircle2,
+  PhoneOff,
+} from 'lucide-react';
+import {
   kpiOverview,
-  kpiConversionPath,
-  kpiEscalationRecovery,
   computedMetrics,
-  coreFunnelData,
-  automationFunnelData,
-  handoffFunnelData,
-  mcrFunnelData,
-  callbackPanelSummary,
-  type DrawerContext,
-  type FunnelStep,
 } from '../data/mockDashboardData';
 
 /* ══════════════════════════════════════════════
-   DASHBOARD TABS
+   MAYA'S PERFORMANCE — Control Tower
    ══════════════════════════════════════════════
-   Performance  — "Is the chatbot generating business?"
-   Operations   — "What needs action right now?"
-   Optimization — "What should we improve?"
+   Under 5 seconds a manager knows:
+   1. Good or bad?     → Hero conversion
+   2. Biggest problem? → Key Issues
+   3. What to do?      → Suggested Actions
    ══════════════════════════════════════════════ */
-
-type DashboardTab = 'performance' | 'operations' | 'optimization';
-
-const tabs: { key: DashboardTab; label: string; icon: typeof BarChart3; description: string }[] = [
-  { key: 'performance', label: 'Performance', icon: BarChart3, description: 'Business outcomes & conversions' },
-  { key: 'operations', label: 'Operations', icon: Headset, description: 'Live queues & callbacks' },
-  { key: 'optimization', label: 'Optimization', icon: Lightbulb, description: 'AI & playbook improvements' },
-];
 
 const defaultFilters = {
   dateRange: '14d',
@@ -50,29 +37,59 @@ const defaultFilters = {
   playbook: 'all',
 };
 
-type FunnelView = 'core' | 'automation' | 'handoff' | 'mcr';
+function conversionStatus(rate: number) {
+  if (rate >= 80) return { color: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-300', label: 'On track' };
+  if (rate >= 70) return { color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-300', label: 'Near target' };
+  return { color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-300', label: 'Below target — action needed' };
+}
 
-const funnelViews: { key: FunnelView; label: string; data: FunnelStep[] }[] = [
-  { key: 'core', label: 'Core Funnel', data: coreFunnelData },
-  { key: 'automation', label: 'Bot vs Human', data: automationFunnelData },
-  { key: 'handoff', label: 'Handoff', data: handoffFunnelData },
-  { key: 'mcr', label: 'Missed Call Recovery', data: mcrFunnelData },
+const conversionTrend = [32, 35, 34, 38, 36, 40, 42];
+const conversionTrendLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+/* ── Key Issues (merged attention + drop-off) ── */
+const keyIssues: { text: string; severity: 'critical' | 'warning' | 'positive'; link: string; action: string; actionTarget: string }[] = [
+  {
+    text: 'Insurance step drop-off (-38%) — Friction',
+    severity: 'critical',
+    link: '/funnel',
+    action: 'Increase Humanization (3 → 4)',
+    actionTarget: '/sliders',
+  },
+  {
+    text: 'Human handoffs increased (+12% vs last period)',
+    severity: 'warning',
+    link: '/funnel',
+    action: 'Add earlier insurance reassurance',
+    actionTarget: '/playbooks',
+  },
+  {
+    text: 'Engagement improving (+4%) — early-stage changes working',
+    severity: 'positive',
+    link: '/conversations',
+    action: 'Increase Booking Approach to capitalize',
+    actionTarget: '/sliders',
+  },
 ];
 
-export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<DashboardTab>('performance');
-  const [dashboardView, setDashboardView] = useState<DashboardView>('overall');
+/* ── Last change impact ──────────────────────── */
+const lastChangeImpact = {
+  change: 'Humanization increased (2 → 3)',
+  timeAgo: '3 days ago',
+  effects: [
+    { metric: 'Engagement Rate', delta: '+8%', direction: 'up' as const },
+    { metric: 'Bot Conversion', delta: '+3%', direction: 'up' as const },
+    { metric: 'Human Handoffs', delta: '-2', direction: 'down' as const },
+  ],
+};
 
-  // Filter state
+export default function DashboardPage() {
+  const navigate = useNavigate();
+  const [dashboardView, setDashboardView] = useState<DashboardView>('overall');
   const [dateRange, setDateRange] = useState(defaultFilters.dateRange);
   const [location, setLocation] = useState(defaultFilters.location);
   const [channel, setChannel] = useState(defaultFilters.channel);
   const [source, setSource] = useState(defaultFilters.source);
   const [playbook, setPlaybook] = useState(defaultFilters.playbook);
-  const [activeFunnel, setActiveFunnel] = useState<FunnelView>('core');
-
-  // Drawer state
-  const [drawerContext, setDrawerContext] = useState<DrawerContext | null>(null);
 
   const resetFilters = () => {
     setDateRange(defaultFilters.dateRange);
@@ -82,31 +99,17 @@ export default function DashboardPage() {
     setPlaybook(defaultFilters.playbook);
   };
 
-  // Auto-suggest funnel view based on dashboard perspective
-  const suggestedFunnel: FunnelView =
-    dashboardView === 'bot' ? 'automation'
-    : dashboardView === 'human' ? 'handoff'
-    : dashboardView === 'recovery' ? 'mcr'
-    : activeFunnel;
-  const effectiveFunnel = dashboardView === 'overall' ? activeFunnel : suggestedFunnel;
-  const currentFunnel = funnelViews.find((f) => f.key === effectiveFunnel) || funnelViews[0];
-
-  // Operations risk metric: at-risk conversions = pending callbacks * historical callback conversion rate
-  const atRiskConversions = Math.round(
-    callbackPanelSummary.pendingCount * (callbackPanelSummary.callbackConversionRate / 100) * 10
-  ) / 10;
+  const convStatus = conversionStatus(computedMetrics.totalConversionRate);
 
   return (
     <div className="space-y-6">
-      {/* Header + Filters */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1>Command Center</h1>
-            <p className="text-sm text-healthcare-muted mt-1">
-              Real-time overview of chatbot performance, conversions, and operations
-            </p>
-          </div>
+      {/* Header + controls */}
+      <div className="flex flex-col gap-3">
+        <div>
+          <h1>Maya's Performance</h1>
+          <p className="text-sm text-healthcare-muted mt-0.5">
+            What's happening and what should you do?
+          </p>
         </div>
         <TopFilterBar
           dateRange={dateRange}
@@ -125,297 +128,261 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.key;
-          return (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                isActive
-                  ? 'bg-white text-healthcare-text shadow-sm'
-                  : 'text-healthcare-muted hover:text-healthcare-text hover:bg-white/50'
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              <span>{tab.label}</span>
-              <span className={`hidden sm:inline text-[10px] ${isActive ? 'text-healthcare-muted' : 'text-gray-400'}`}>
-                — {tab.description}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* ════════════════════════════════════════
-         PERFORMANCE TAB (Default Home)
-         "Is the chatbot generating business?"
-         ════════════════════════════════════════ */}
-      {activeTab === 'performance' && (
-        <>
-          {/* ── View-aware perspective label ───────── */}
-          {dashboardView !== 'overall' && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-teal-50 border border-teal-200 rounded-lg">
-              <span className="text-xs font-medium text-teal-700">
-                Viewing: {dashboardView === 'bot' ? 'Bot-Only Performance' : dashboardView === 'human' ? 'Human Handoff Performance' : 'Missed Call Recovery Performance'}
-              </span>
-              <span className="text-[10px] text-teal-600">
-                {dashboardView === 'bot' && '— Automated conversion metrics emphasized'}
-                {dashboardView === 'human' && '— Escalation and handoff metrics emphasized'}
-                {dashboardView === 'recovery' && '— Recovered demand metrics emphasized'}
-              </span>
+      {/* ══════════════════════════════════════════
+         HERO ROW — Overall Conversion (dominant) + Engagement + Conversations
+         ══════════════════════════════════════════ */}
+      <div className="grid grid-cols-12 gap-4">
+        {/* PRIMARY: Overall Conversion Rate */}
+        <div
+          className={`col-span-12 md:col-span-5 card card-body border-l-4 ${convStatus.border} ${convStatus.bg} cursor-pointer hover:shadow-md transition-shadow`}
+          onClick={() => navigate('/funnel')}
+        >
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <Target className={`w-5 h-5 ${convStatus.color}`} />
+              <p className="text-sm font-semibold">Overall Conversion Rate</p>
             </div>
-          )}
-
-          {/* ── SECTION 1: Overview ──────────────────── */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <h2 className="text-xs font-bold text-healthcare-muted uppercase tracking-wider">Overview</h2>
-              <div className="flex-1 h-px bg-healthcare-border" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {kpiOverview.map((m) => (
-                <MetricCard
-                  key={m.id}
-                  {...m}
-                  prominent
-                  emphasis={m.id === 'total-conversions'}
-                />
-              ))}
-            </div>
+            <ArrowRight className="w-4 h-4 text-healthcare-muted" />
           </div>
-
-          {/* ── SECTION 2: Conversion Path ────────────
-               Show in Overall, Bot, Human views.
-               Emphasis shifts based on view.
-               ────────────────────────────────────────── */}
-          {(dashboardView === 'overall' || dashboardView === 'bot' || dashboardView === 'human') && (
+          <div className="flex items-end gap-4">
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <h2 className="text-xs font-bold text-healthcare-muted uppercase tracking-wider">Conversion Path</h2>
-                <span className="text-[10px] text-healthcare-muted">(bot-only + human-handoff = total conversions)</span>
-                <div className="flex-1 h-px bg-healthcare-border" />
+              <p className={`text-5xl font-black ${convStatus.color}`}>
+                {computedMetrics.totalConversionRate}%
+              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${convStatus.bg} ${convStatus.color} border ${convStatus.border}`}>
+                  {convStatus.label}
+                </span>
+                <span className="text-[10px] text-healthcare-muted">Target: 70%+</span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {kpiConversionPath.map((m) => (
-                  <MetricCard
-                    key={m.id}
-                    {...m}
-                    emphasis={
-                      (dashboardView === 'bot' && m.id === 'bot-only-conversions') ||
-                      (dashboardView === 'human' && m.id === 'human-handoff-conversions')
-                    }
-                  />
-                ))}
+              <div className="flex items-center gap-1 mt-2 text-xs">
+                <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
+                <span className="text-emerald-600 font-medium">+2.1%</span>
+                <span className="text-healthcare-muted">vs last period</span>
               </div>
-
-              {/* Automation vs Human conversion split bar */}
-              {(() => {
-                const { botOnlyConversions, humanHandoffConversions, automationRate, humanRate, totalConversions } = computedMetrics;
-                if (totalConversions === 0) return null;
+            </div>
+            <div className="flex-1 flex items-end gap-0.5 h-16 ml-4">
+              {conversionTrend.map((val, i) => {
+                const maxVal = Math.max(...conversionTrend);
+                const height = (val / maxVal) * 100;
+                const isLast = i === conversionTrend.length - 1;
                 return (
-                  <div className="flex items-center gap-4 px-4 py-2 mt-3 bg-white/80 rounded-lg border border-healthcare-border/50">
-                    <span className="text-[11px] font-medium text-healthcare-muted">Automation vs Human</span>
-                    <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden flex">
-                      <div className="h-full bg-emerald-500 rounded-l-full transition-all" style={{ width: `${automationRate}%` }} />
-                      <div className="h-full bg-teal-400 rounded-r-full transition-all" style={{ width: `${humanRate}%` }} />
-                    </div>
-                    <div className="flex items-center gap-3 text-[11px] shrink-0">
-                      <span className={`flex items-center gap-1 ${dashboardView === 'bot' ? 'font-bold' : ''}`}>
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        Bot {automationRate}% ({botOnlyConversions})
-                      </span>
-                      <span className={`flex items-center gap-1 ${dashboardView === 'human' ? 'font-bold' : ''}`}>
-                        <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
-                        Human {humanRate}% ({humanHandoffConversions})
-                      </span>
-                    </div>
+                  <div key={i} className="flex-1 flex flex-col items-center">
+                    <div
+                      className={`w-full rounded-t ${isLast ? 'bg-teal-500' : 'bg-teal-200/70'}`}
+                      style={{ height: `${height}%` }}
+                    />
+                    <span className="text-[7px] text-healthcare-muted mt-0.5">{conversionTrendLabels[i]}</span>
                   </div>
                 );
-              })()}
-            </div>
-          )}
-
-          {/* ── SECTION 3: Escalation & Recovery ──────
-               Show in Overall, Human, Recovery views.
-               Emphasis shifts based on view.
-               ────────────────────────────────────────── */}
-          {(dashboardView === 'overall' || dashboardView === 'human' || dashboardView === 'recovery') && (
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <h2 className="text-xs font-bold text-healthcare-muted uppercase tracking-wider">Escalation & Recovery</h2>
-                <div className="flex-1 h-px bg-healthcare-border" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {kpiEscalationRecovery.map((m) => (
-                  <MetricCard
-                    key={m.id}
-                    {...m}
-                    emphasis={
-                      (dashboardView === 'human' && m.id === 'human-handoff-requests') ||
-                      (dashboardView === 'recovery' && m.id === 'missed-call-recovery')
-                    }
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Funnel + Entry Source Performance */}
-          <div className="grid grid-cols-12 gap-6">
-            <div className="col-span-12 xl:col-span-8">
-              <div className="card">
-                <div className="card-header">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <h2 className="text-sm font-semibold">Conversion Funnels</h2>
-                    <div className="flex gap-1 bg-gray-100 rounded-lg p-0.5">
-                      {funnelViews.map((fv) => (
-                        <button
-                          key={fv.key}
-                          className={`px-2.5 py-1 text-[11px] font-medium rounded-md transition-colors ${
-                            activeFunnel === fv.key
-                              ? 'bg-white text-healthcare-text shadow-sm'
-                              : 'text-healthcare-muted hover:text-healthcare-text'
-                          }`}
-                          onClick={() => setActiveFunnel(fv.key)}
-                        >
-                          {fv.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  {activeFunnel === 'core' && (() => {
-                    const drops = currentFunnel.data
-                      .filter((s) => s.dropOffFromPrev !== null && s.dropOffFromPrev > 0)
-                      .sort((a, b) => (b.dropOffFromPrev ?? 0) - (a.dropOffFromPrev ?? 0));
-                    const worst = drops[0];
-                    if (!worst) return null;
-                    return (
-                      <span className="flex items-center gap-1.5 text-[11px] font-medium text-red-600 bg-red-50 px-2 py-1 rounded-md mt-2 w-fit">
-                        <span className="font-bold">Biggest drop:</span> {worst.name} (-{worst.dropOffFromPrev}%)
-                      </span>
-                    );
-                  })()}
-                </div>
-                <div className="card-body">
-                  <FunnelChart
-                    data={currentFunnel.data}
-                    compact
-                    onStageClick={(stage) =>
-                      setDrawerContext({ type: 'funnel_stage', id: stage.name, label: stage.name })
-                    }
-                  />
-                  {activeFunnel === 'core' && (
-                    <div className="mt-3 pt-3 border-t border-healthcare-border flex items-center justify-between text-xs">
-                      <span className="text-healthcare-muted">Overall conversion rate</span>
-                      <span className="font-semibold text-teal-600">
-                        {computedMetrics.totalConversionRate}%
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="col-span-12 xl:col-span-4">
-              <SourcePerformanceTable
-                onRowClick={(row) =>
-                  setDrawerContext({ type: 'source', id: row.source, label: row.source })
-                }
-                compact
-              />
+              })}
             </div>
           </div>
-        </>
-      )}
+          <p className="text-[10px] text-healthcare-muted mt-2">
+            {computedMetrics.totalConversions} total conversions from {computedMetrics.conversationsInitiated} conversations
+          </p>
+        </div>
 
-      {/* ════════════════════════════════════════
-         OPERATIONS TAB
-         "What needs action right now?"
-         ════════════════════════════════════════ */}
-      {activeTab === 'operations' && (
-        <>
-          {/* Decision Bar — urgent operational alert */}
-          <DecisionBar data={decisionBarData} />
+        {/* SECONDARY: Engagement + Conversations */}
+        <div className="col-span-12 md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {kpiOverview.filter((m) => m.id !== 'total-conversions').map((m) => (
+            <MetricCard
+              key={m.id}
+              {...m}
+              prominent
+              onClick={() => m.id === 'engagement-rate' ? navigate('/funnel') : navigate('/conversations')}
+            />
+          ))}
+        </div>
+      </div>
 
-          {/* At-Risk Banner */}
-          {callbackPanelSummary.pendingCount > 0 && (
-            <div className="flex items-center justify-between gap-4 px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-                  <Headset className="w-4 h-4 text-amber-700" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-amber-800">
-                    {callbackPanelSummary.pendingCount} callbacks pending · ~{atRiskConversions} at-risk conversions
-                  </p>
-                  <p className="text-[10px] text-amber-600">
-                    Based on {callbackPanelSummary.callbackConversionRate}% historical callback conversion rate
-                  </p>
-                </div>
+      {/* ══════════════════════════════════════════
+         KEY ISSUES & ACTIONS (compact single card)
+         ══════════════════════════════════════════ */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <h2 className="text-xs font-bold text-healthcare-muted uppercase tracking-wider">Key Issues & Actions</h2>
+          <div className="flex-1 h-px bg-healthcare-line" />
+        </div>
+        <div className="card card-body divide-y divide-healthcare-line">
+          {keyIssues.map((issue, i) => {
+            const dot = issue.severity === 'positive' ? 'bg-blue-500' : 'bg-red-500';
+            const rowBg = issue.severity !== 'positive' ? 'bg-red-50/60 -mx-4 px-4 rounded' : '';
+            return (
+              <div
+                key={i}
+                className={`flex items-center gap-3 py-2.5 first:pt-0 last:pb-0 ${rowBg}`}
+              >
+                <span className={`w-2 h-2 rounded-full shrink-0 ${dot}`} />
+                <p className="text-xs text-gray-700 flex-1 min-w-0">{issue.text}</p>
+                <button
+                  onClick={() => navigate(issue.actionTarget)}
+                  className="text-[10px] font-medium text-teal-700 hover:text-teal-900 whitespace-nowrap shrink-0"
+                >
+                  {issue.action} →
+                </button>
               </div>
-              <span className="text-[10px] font-medium text-amber-700 hover:text-amber-900 cursor-pointer whitespace-nowrap">
-                Assign all →
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Visual break ──────────────────────── */}
+      <div className="h-px bg-healthcare-line" />
+
+      {/* ══════════════════════════════════════════
+         AUTOMATION PERFORMANCE (single combined card)
+         Bot %, Human %, Handoff Rate in one view
+         ══════════════════════════════════════════ */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <h2 className="text-xs font-bold text-healthcare-muted uppercase tracking-wider">Automation Performance</h2>
+          <div className="flex-1 h-px bg-healthcare-line" />
+        </div>
+
+        <div className="card card-body">
+          {/* Automation bar */}
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Zap className="w-3.5 h-3.5 text-teal-600" />
+              <span className="text-xs font-semibold">Automation Split</span>
+            </div>
+            <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden flex">
+              <div className="h-full bg-emerald-500 rounded-l-full" style={{ width: `${computedMetrics.automationRate}%` }} />
+              <div className="h-full bg-teal-400 rounded-r-full" style={{ width: `${computedMetrics.humanRate}%` }} />
+            </div>
+            <div className="flex items-center gap-3 text-[11px] shrink-0">
+              <span className="flex items-center gap-1">
+                <Bot className="w-3 h-3 text-emerald-600" />
+                <span className="font-bold">{computedMetrics.automationRate}%</span>
+                <span className="text-healthcare-muted">bot</span>
+              </span>
+              <span className="flex items-center gap-1">
+                <Users className="w-3 h-3 text-teal-500" />
+                <span className="font-bold">{computedMetrics.humanRate}%</span>
+                <span className="text-healthcare-muted">human</span>
               </span>
             </div>
-          )}
-
-          {/* Operations + Callback panels side by side */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <OperationsPanel />
-            <CallbackPanel
-              onItemClick={(item) =>
-                setDrawerContext({ type: 'callback', id: item.id, label: item.source })
-              }
-            />
           </div>
 
-          {/* Operational Alerts */}
-          <AlertsPanel
-            onAlertClick={(alert) =>
-              setDrawerContext({ type: 'alert', id: alert.id, label: alert.title })
-            }
-          />
-        </>
-      )}
-
-      {/* ════════════════════════════════════════
-         OPTIMIZATION TAB
-         "What should we improve?"
-         ════════════════════════════════════════ */}
-      {activeTab === 'optimization' && (
-        <>
-          {/* Playbook Insights + Quality side by side */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-6">
-              <PlaybookHealthPanel
-                onPlaybookClick={(pb) =>
-                  setDrawerContext({ type: 'playbook', id: pb.playbookId, label: pb.name })
-                }
-              />
+          {/* Bot Conversion (boxed) | Human Escalation → Human Conversion (boxed together) */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Bot Conversion — standalone box */}
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50/30 text-center px-4 py-4">
+              <div className="flex items-center justify-center gap-1.5 mb-1">
+                <Bot className="w-3.5 h-3.5 text-emerald-600" />
+                <p className="text-[10px] font-medium text-emerald-700">Bot Conversion</p>
+              </div>
+              <p className="text-3xl font-black text-emerald-700">{computedMetrics.botOnlyConversionRate}%</p>
+              <p className="text-[10px] text-healthcare-muted mt-0.5">{computedMetrics.botOnlyConversions} bookings</p>
             </div>
-            <div className="space-y-6">
-              <QualityPanel />
+
+            {/* Human Escalation → Human Conversion — connected box */}
+            <div className="rounded-lg border border-teal-200 bg-teal-50/30 px-4 py-4">
+              <div className="flex items-center justify-around">
+                {/* Human Escalation */}
+                <div className="text-center">
+                  <p className="text-[10px] font-medium text-amber-700 mb-1">Human Escalation</p>
+                  <p className="text-2xl font-black text-amber-700">{computedMetrics.humanHandoffRate}%</p>
+                  <p className="text-[10px] text-healthcare-muted">{computedMetrics.humanHandoffRequests} requests</p>
+                </div>
+                {/* Arrow */}
+                <div className="flex flex-col items-center px-2">
+                  <ArrowRight className="w-5 h-5 text-teal-400" />
+                </div>
+                {/* Human Conversion */}
+                <div className="text-center">
+                  <p className="text-[10px] font-medium text-teal-700 mb-1">Human Conversion</p>
+                  <p className="text-2xl font-black text-teal-700">{computedMetrics.humanHandoffConversionRate}%</p>
+                  <p className="text-[10px] text-healthcare-muted">{computedMetrics.humanHandoffConversions} bookings</p>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Optimization-related alerts */}
-          <AlertsPanel
-            onAlertClick={(alert) =>
-              setDrawerContext({ type: 'alert', id: alert.id, label: alert.title })
-            }
-          />
-        </>
-      )}
+      {/* ══════════════════════════════════════════
+         MISSED CALL RECOVERY (lower priority, compact)
+         ══════════════════════════════════════════ */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <h2 className="text-xs font-bold text-healthcare-muted uppercase tracking-wider">Missed Call Recovery</h2>
+          <div className="flex-1 h-px bg-healthcare-line" />
+        </div>
+        <div
+          className="card card-body flex items-center justify-between cursor-pointer hover:shadow-md transition-shadow"
+          onClick={() => navigate('/sources')}
+        >
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <PhoneOff className="w-4 h-4 text-purple-600" />
+              <div>
+                <p className="text-xs font-semibold">Recovery Engagement</p>
+                <p className="text-[10px] text-healthcare-muted">{computedMetrics.mcrConversations} conversations</p>
+              </div>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-purple-700">{computedMetrics.mcrEngagementRate}%</p>
+              <p className="text-[9px] text-healthcare-muted">engaged</p>
+            </div>
+            <div className="h-8 w-px bg-healthcare-line" />
+            <div className="flex items-center gap-4">
+              <div className="text-center">
+                <div className="flex items-center gap-1">
+                  <Bot className="w-3 h-3 text-emerald-500" />
+                  <span className="text-sm font-bold">{computedMetrics.mcrBotOnlyConversions}</span>
+                </div>
+                <p className="text-[9px] text-healthcare-muted">bot conv.</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center gap-1">
+                  <Users className="w-3 h-3 text-teal-500" />
+                  <span className="text-sm font-bold">{computedMetrics.mcrHumanHandoffConversions}</span>
+                </div>
+                <p className="text-[9px] text-healthcare-muted">human conv.</p>
+              </div>
+            </div>
+          </div>
+          <ArrowRight className="w-4 h-4 text-healthcare-muted shrink-0" />
+        </div>
+      </div>
 
-      {/* Drilldown Drawer (shared across all tabs) */}
-      <DrilldownDrawer
-        open={!!drawerContext}
-        onClose={() => setDrawerContext(null)}
-        context={drawerContext}
-      />
+      {/* ══════════════════════════════════════════
+         LAST CHANGE IMPACT (compact footer)
+         ══════════════════════════════════════════ */}
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <h2 className="text-xs font-bold text-healthcare-muted uppercase tracking-wider">Last Change</h2>
+          <div className="flex-1 h-px bg-healthcare-line" />
+        </div>
+        <div className="card card-body">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              <div>
+                <p className="text-xs font-semibold">{lastChangeImpact.change}</p>
+                <p className="text-[10px] text-healthcare-muted">{lastChangeImpact.timeAgo}</p>
+              </div>
+              {lastChangeImpact.effects.map((effect) => (
+                <div key={effect.metric} className="flex items-center gap-1.5">
+                  {effect.direction === 'up'
+                    ? <TrendingUp className="w-3 h-3 text-emerald-500" />
+                    : <TrendingDown className="w-3 h-3 text-emerald-500" />
+                  }
+                  <span className="text-[10px] text-healthcare-muted">{effect.metric}</span>
+                  <span className="text-xs font-bold text-emerald-700">{effect.delta}</span>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => navigate('/sliders')}
+              className="text-[10px] font-medium text-brand-600 hover:text-brand-800 shrink-0"
+            >
+              Controls →
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

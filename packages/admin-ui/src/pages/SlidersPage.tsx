@@ -1,186 +1,156 @@
-import { useState } from 'react';
-import { Save, RotateCcw, Eye, Settings2, ChevronDown, ChevronRight, Check } from 'lucide-react';
-import SliderControl from '../components/shared/SliderControl';
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Save, RotateCcw, Settings2, X, Sparkles } from 'lucide-react';
+import {
+  DEFAULT_BEHAVIOR_PROFILE,
+  BEHAVIOR_SLIDERS,
+  CONVERSATION_STAGES,
+  STAGE_FIX_SUGGESTIONS,
+  deriveBehaviorSettings,
+  derivedToToneSettings,
+  getEffectiveSliders,
+  type BehaviorProfile,
+  type ConversationStage,
+  type SpeedSetting,
+} from '../lib/behaviorMapping';
+import SafeguardsBanner from '../components/behavior/SafeguardsBanner';
+import BehaviorSlider from '../components/behavior/BehaviorSlider';
+import LivePreview from '../components/behavior/LivePreview';
 
-/* ── Types ─────────────────────────────────────────── */
+/* ── Speed options for segmented controls ────────── */
 
-interface SliderConfig {
-  id: string;
-  label: string;
-  helper: string;
-  description: string;
-  value: number;
-  min: number;
-  max: number;
-  step: number;
-  minLabel: string;
-  maxLabel: string;
-}
-
-interface ToggleConfig {
-  id: string;
-  label: string;
-  description: string;
-  enabled: boolean;
-}
-
-/* ── Core Sliders (4 visible) ──────────────────────── */
-
-const initialCoreSliders: SliderConfig[] = [
-  { id: 'empathy', label: 'Empathy', helper: 'Controls warmth and reassurance', description: 'How much warmth, emotional acknowledgment, and reassurance the bot uses', value: 6, min: 0, max: 10, step: 1, minLabel: 'Neutral', maxLabel: 'Compassionate' },
-  { id: 'conversion_drive', label: 'Conversion Drive', helper: 'Controls how strongly the bot moves toward booking', description: 'How proactively the bot guides the patient toward scheduling', value: 5, min: 0, max: 10, step: 1, minLabel: 'Informational', maxLabel: 'Proactive' },
-  { id: 'detail', label: 'Detail Level', helper: 'Controls response length and explanation depth', description: 'How much context and explanation the bot provides', value: 5, min: 0, max: 10, step: 1, minLabel: 'Concise', maxLabel: 'Thorough' },
-  { id: 'insurance_sensitivity', label: 'Insurance Sensitivity', helper: 'Controls caution and reassurance when discussing insurance', description: 'Extra caution and reassurance in insurance-related responses', value: 7, min: 0, max: 10, step: 1, minLabel: 'Standard', maxLabel: 'Ultra-Careful' },
+const SPEED_OPTIONS: { value: SpeedSetting; label: string }[] = [
+  { value: 'slow', label: 'Slow' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'fast', label: 'Fast' },
 ];
 
-/* ── Advanced Sliders (hidden by default) ──────────── */
-
-const initialAdvancedSliders: SliderConfig[] = [
-  { id: 'formality', label: 'Formality', helper: 'Language register from casual to professional', description: 'Adjusts language register', value: 6, min: 0, max: 10, step: 1, minLabel: 'Casual', maxLabel: 'Formal' },
-  { id: 'autonomy', label: 'Bot Autonomy', helper: 'How independently the bot acts before escalating', description: 'How independently the bot handles situations', value: 6, min: 0, max: 10, step: 1, minLabel: 'Conservative', maxLabel: 'Autonomous' },
-  { id: 'followup_freq', label: 'Follow-Up Frequency', helper: 'How persistently the bot sends follow-ups', description: 'Follow-up message aggressiveness', value: 5, min: 0, max: 10, step: 1, minLabel: 'Minimal', maxLabel: 'Persistent' },
-];
-
-/* ── Presets (4 total) ─────────────────────────────── */
-
-interface Preset {
-  id: string;
-  label: string;
-  bullets: string[];
-  core: Record<string, number>;
-  advanced: Record<string, number>;
-}
-
-const presets: Preset[] = [
-  {
-    id: 'concierge',
-    label: 'Concierge',
-    bullets: ['High empathy', 'Low pressure', 'More explanation', 'More reassurance'],
-    core: { empathy: 9, conversion_drive: 3, detail: 8, insurance_sensitivity: 8 },
-    advanced: { formality: 8, autonomy: 4, followup_freq: 3 },
-  },
-  {
-    id: 'balanced',
-    label: 'Balanced',
-    bullets: ['Moderate tone', 'Balanced booking guidance', 'Medium detail', 'Standard caution'],
-    core: { empathy: 6, conversion_drive: 5, detail: 5, insurance_sensitivity: 7 },
-    advanced: { formality: 6, autonomy: 6, followup_freq: 5 },
-  },
-  {
-    id: 'efficiency',
-    label: 'Efficiency',
-    bullets: ['Faster booking', 'Shorter responses', 'Direct tone', 'Less explanation'],
-    core: { empathy: 4, conversion_drive: 8, detail: 3, insurance_sensitivity: 6 },
-    advanced: { formality: 5, autonomy: 8, followup_freq: 6 },
-  },
-  {
-    id: 'insurance_sensitive',
-    label: 'Insurance-Sensitive',
-    bullets: ['Extra care with insurance language', 'Strong reassurance', 'Medium-high empathy', 'Maximum caution'],
-    core: { empathy: 7, conversion_drive: 5, detail: 6, insurance_sensitivity: 10 },
-    advanced: { formality: 7, autonomy: 3, followup_freq: 3 },
-  },
-];
-
-/* ── Feature Toggles ───────────────────────────────── */
-
-const initialToggles: ToggleConfig[] = [
-  { id: 'typing_indicator_enabled', label: 'Typing Indicator', description: 'Show typing dots before bot replies to simulate a real person typing', enabled: true },
-  { id: 'calendar_invite_enabled', label: 'Calendar Invite Option', description: 'Offer to send patients a calendar invite after booking confirmation', enabled: true },
-  { id: 'insurance_card_request', label: 'Auto-Request Insurance Card', description: 'Always ask for insurance card photo before confirming appointments', enabled: true },
-];
-
-/* ── Preview Responses ─────────────────────────────── */
-
-interface PreviewPair {
-  scenario: string;
-  low: string;
-  high: string;
-}
-
-const previewPairs: Record<string, PreviewPair> = {
-  empathy: {
-    scenario: 'Patient says they have varicose veins',
-    low: "What's been going on?",
-    high: "I'm sorry that's been bothering you. A lot of people reach out about varicose veins. What's been going on?",
-  },
-  conversion_drive: {
-    scenario: 'Patient is interested in treatment',
-    low: 'Let me know if you\'d like to come in sometime.',
-    high: 'I can help you find a time. What days work best for you this week or next?',
-  },
-  detail: {
-    scenario: 'Patient asks about treatment options',
-    low: 'Our doctors can walk you through options at your consultation.',
-    high: 'There are a few common approaches for varicose veins, including radiofrequency ablation and sclerotherapy. Our doctors will evaluate and recommend the best option for you during your consultation.',
-  },
-  insurance_sensitivity: {
-    scenario: 'Patient asks if their insurance is accepted',
-    low: 'We work with many plans. We can check for you.',
-    high: "We work with many plans, but coverage can vary depending on the specific plan. We'll verify everything ahead of time and follow up with you before the appointment so you know exactly what to expect. That way there are no surprises.",
-  },
+/* ── Scenario map for preview stage alignment ─────── */
+const STAGE_TO_SCENARIO: Record<ConversationStage, string> = {
+  Early: 'symptoms',
+  Symptoms: 'symptoms',
+  Insurance: 'insurance',
+  Scheduling: 'booking',
 };
 
-/* ── Scope Type ─────────────────────────────────────── */
-
-type ScopeType = 'global' | 'channel' | 'playbook';
-
-/* ── Component ─────────────────────────────────────── */
+/* ── Component ───────────────────────────────────── */
 
 export default function SlidersPage() {
-  const [coreSliders, setCoreSliders] = useState(initialCoreSliders);
-  const [advancedSliders, setAdvancedSliders] = useState(initialAdvancedSliders);
-  const [toggles, setToggles] = useState(initialToggles);
-  const [scope, setScope] = useState<ScopeType>('global');
-  const [activePreset, setActivePreset] = useState<string | null>('balanced');
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [searchParams] = useSearchParams();
+  const initialStage = searchParams.get('stage');
+  const [profile, setProfile] = useState<BehaviorProfile>({ ...DEFAULT_BEHAVIOR_PROFILE });
   const [hasChanges, setHasChanges] = useState(false);
-  const [previewSlider, setPreviewSlider] = useState<string>('empathy');
+  const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('');
+  const [selectedStage, setSelectedStage] = useState<ConversationStage>('Early');
+  const [showSuggestionBanner, setShowSuggestionBanner] = useState(false);
+  const deepLinkAppliedRef = useRef(false);
 
-  const updateCoreSlider = (id: string, value: number) => {
-    setCoreSliders((prev) => prev.map((s) => (s.id === id ? { ...s, value } : s)));
-    setActivePreset(null);
+  // Handle deep-link from funnel analytics (?stage=Insurance)
+  useEffect(() => {
+    if (deepLinkAppliedRef.current) return;
+    if (initialStage && CONVERSATION_STAGES.includes(initialStage as ConversationStage)) {
+      deepLinkAppliedRef.current = true;
+      const stage = initialStage as ConversationStage;
+      setSelectedStage(stage);
+
+      setProfile((prev) => {
+        // Only prefill if no override exists for this stage
+        const hasExisting = prev.stageOverrides[stage];
+        const suggestions = hasExisting ? undefined : STAGE_FIX_SUGGESTIONS[stage];
+        return {
+          ...prev,
+          stageMode: true,
+          stageOverrides: suggestions
+            ? { ...prev.stageOverrides, [stage]: suggestions }
+            : prev.stageOverrides,
+        };
+      });
+      setHasChanges(true);
+      setShowSuggestionBanner(true);
+    }
+  }, [initialStage]);
+
+  const update = <K extends keyof BehaviorProfile>(key: K, value: BehaviorProfile[K]) => {
+    setProfile((prev) => ({ ...prev, [key]: value }));
     setHasChanges(true);
   };
 
-  const updateAdvancedSlider = (id: string, value: number) => {
-    setAdvancedSliders((prev) => prev.map((s) => (s.id === id ? { ...s, value } : s)));
-    setActivePreset(null);
+  const updateStageSlider = (key: 'humanizationLevel' | 'bookingApproach', value: number) => {
+    setProfile((prev) => ({
+      ...prev,
+      stageOverrides: {
+        ...prev.stageOverrides,
+        [selectedStage]: {
+          humanizationLevel: prev.stageOverrides[selectedStage]?.humanizationLevel ?? prev.humanizationLevel,
+          bookingApproach: prev.stageOverrides[selectedStage]?.bookingApproach ?? prev.bookingApproach,
+          [key]: value,
+        },
+      },
+    }));
     setHasChanges(true);
   };
 
-  const applyPreset = (preset: Preset) => {
-    setCoreSliders((prev) =>
-      prev.map((s) => ({
-        ...s,
-        value: preset.core[s.id] ?? s.value,
-      })),
-    );
-    setAdvancedSliders((prev) =>
-      prev.map((s) => ({
-        ...s,
-        value: preset.advanced[s.id] ?? s.value,
-      })),
-    );
-    setActivePreset(preset.id);
+  const clearStageOverride = (stage: ConversationStage) => {
+    setProfile((prev) => {
+      const next = { ...prev.stageOverrides };
+      delete next[stage];
+      return { ...prev, stageOverrides: next };
+    });
     setHasChanges(true);
   };
 
-  const updateToggle = (id: string, enabled: boolean) => {
-    setToggles((prev) => prev.map((t) => (t.id === id ? { ...t, enabled } : t)));
-    setHasChanges(true);
-  };
-
-  const resetToDefaults = () => {
-    setCoreSliders(initialCoreSliders);
-    setAdvancedSliders(initialAdvancedSliders);
-    setToggles(initialToggles);
-    setActivePreset('balanced');
+  const resetAll = () => {
+    setProfile({ ...DEFAULT_BEHAVIOR_PROFILE });
     setHasChanges(false);
+    setShowSuggestionBanner(false);
   };
 
-  const currentPreview = previewPairs[previewSlider];
-  const currentSliderValue = coreSliders.find((s) => s.id === previewSlider)?.value ?? 5;
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const derived = deriveBehaviorSettings(profile);
+      const toneSettings = derivedToToneSettings(derived);
+
+      // Build per-stage derived settings if stage mode is on
+      const stageDerived: Record<string, { derived: ReturnType<typeof deriveBehaviorSettings>; toneSettings: ReturnType<typeof derivedToToneSettings> }> = {};
+      if (profile.stageMode) {
+        for (const [stage, override] of Object.entries(profile.stageOverrides)) {
+          const stageProfile = { ...profile, ...override };
+          const d = deriveBehaviorSettings(stageProfile);
+          stageDerived[stage] = { derived: d, toneSettings: derivedToToneSettings(d) };
+        }
+      }
+
+      const resp = await fetch('http://localhost:3001/api/v1/chat/behavior-profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profile, toneSettings, derived, stageDerived }),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        setSaveStatus(`Saved! Persona: ${data.personaLabel}`);
+        setTimeout(() => setSaveStatus(''), 3000);
+      } else {
+        setSaveStatus('Error saving');
+        setTimeout(() => setSaveStatus(''), 3000);
+      }
+      setHasChanges(false);
+    } catch {
+      setSaveStatus('Connection error');
+      setTimeout(() => setSaveStatus(''), 3000);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Current effective slider values (stage-aware)
+  const effectiveSliders = profile.stageMode
+    ? getEffectiveSliders(profile, selectedStage)
+    : { humanizationLevel: profile.humanizationLevel, bookingApproach: profile.bookingApproach };
+
+  const hasStageOverride = profile.stageMode && !!profile.stageOverrides[selectedStage];
+  const overrideCount = Object.keys(profile.stageOverrides).length;
 
   return (
     <div className="space-y-6">
@@ -188,255 +158,351 @@ export default function SlidersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1>Behavior Controls</h1>
-          <p className="text-healthcare-muted mt-1">
-            Fine-tune chatbot personality and response behavior
+          <p className="text-healthcare-muted mt-1 text-sm">
+            Adjust how the coordinator sounds and responds. Clinical workflow and booking rules stay protected.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button onClick={resetToDefaults} className="btn-secondary" disabled={!hasChanges}>
+        <div className="flex items-center gap-3">
+          {saveStatus && (
+            <span className={`text-sm font-medium ${saveStatus.includes('Error') || saveStatus.includes('Connection') ? 'text-red-600' : 'text-green-600'}`}>
+              {saveStatus}
+            </span>
+          )}
+          <button onClick={resetAll} className="btn-secondary" disabled={!hasChanges}>
             <RotateCcw className="w-4 h-4" />
             Reset
           </button>
-          <button className="btn-primary" disabled={!hasChanges}>
+          <button onClick={handleSave} className="btn-primary" disabled={!hasChanges || saving}>
             <Save className="w-4 h-4" />
-            Save Changes
+            {saving ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </div>
 
-      {/* Scope Selector */}
-      <div className="card card-body">
-        <div className="flex items-center gap-4">
-          <Settings2 className="w-4 h-4 text-healthcare-muted" />
-          <span className="text-sm font-medium">Apply to:</span>
-          <div className="flex gap-1.5 bg-gray-100 rounded-lg p-0.5">
-            {([
-              { value: 'global', label: 'Global' },
-              { value: 'channel', label: 'By Channel' },
-              { value: 'playbook', label: 'By Playbook' },
-            ] as const).map((s) => (
+      {/* Safeguards removed — guardrails are always-on and don't need UI prominence */}
+
+      {/* Two-column layout */}
+      <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
+        {/* LEFT: Controls */}
+        <div className="xl:col-span-3 space-y-6">
+          {/* Mode toggle: Global / Stage-Specific */}
+          <div className="flex items-center gap-3">
+            <div className="flex gap-0.5 bg-gray-100 rounded-lg p-0.5">
               <button
-                key={s.value}
-                onClick={() => setScope(s.value)}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                  scope === s.value
+                onClick={() => update('stageMode', false)}
+                className={`px-4 py-2 rounded-md text-xs font-medium transition-colors ${
+                  !profile.stageMode
                     ? 'bg-white text-healthcare-text shadow-sm'
                     : 'text-healthcare-muted hover:text-healthcare-text'
                 }`}
               >
-                {s.label}
+                Global
               </button>
-            ))}
+              <button
+                onClick={() => update('stageMode', true)}
+                className={`px-4 py-2 rounded-md text-xs font-medium transition-colors ${
+                  profile.stageMode
+                    ? 'bg-brand-600 text-white shadow-sm'
+                    : 'text-healthcare-muted hover:text-healthcare-text'
+                }`}
+              >
+                Stage-Specific
+              </button>
+            </div>
+            <p className="text-xs text-healthcare-muted">
+              {profile.stageMode
+                ? `Adjust behavior per conversation stage${overrideCount > 0 ? ` (${overrideCount} override${overrideCount > 1 ? 's' : ''})` : ''}`
+                : 'Same behavior across all stages'}
+            </p>
           </div>
-          {scope === 'channel' && (
-            <select className="select w-40">
-              <option>All Channels</option>
-              <option>SMS</option>
-              <option>Web Chat</option>
-              <option>Voice</option>
-            </select>
-          )}
-          {scope === 'playbook' && (
-            <select className="select w-56">
-              <option>Select playbook...</option>
-              <option>Inbound New Patient</option>
-              <option>Missed Call Recovery</option>
-              <option>Insurance Pre-Auth</option>
-            </select>
-          )}
-        </div>
-      </div>
 
-      {/* Quick Presets */}
-      <div className="card card-body">
-        <h3 className="text-sm font-medium mb-3">Quick Presets</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {presets.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => applyPreset(p)}
-              className={`text-left px-4 py-3 rounded-lg border transition-colors relative ${
-                activePreset === p.id
-                  ? 'border-brand-400 bg-brand-50 ring-1 ring-brand-200'
-                  : 'border-healthcare-border hover:border-brand-300 hover:bg-brand-50'
-              }`}
-            >
-              {activePreset === p.id && (
-                <span className="absolute top-2 right-2">
-                  <Check className="w-4 h-4 text-brand-500" />
-                </span>
-              )}
-              <p className="text-sm font-semibold">{p.label}</p>
-              <ul className="mt-1.5 space-y-0.5">
-                {p.bullets.map((b, i) => (
-                  <li key={i} className="text-xs text-healthcare-muted flex items-start gap-1">
-                    <span className="text-brand-400 mt-0.5">&#x2022;</span>
-                    {b}
-                  </li>
-                ))}
-              </ul>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Feature Toggles */}
-      <div className="card card-body">
-        <h3 className="text-sm font-medium mb-4">Feature Toggles</h3>
-        <div className="space-y-3">
-          {toggles.map((t) => (
-            <div key={t.id} className="flex items-center justify-between py-2 border-b border-healthcare-border last:border-0">
-              <div>
-                <p className="text-sm font-medium">{t.label}</p>
-                <p className="text-xs text-healthcare-muted mt-0.5">{t.description}</p>
+          {/* Suggestion banner from funnel deep-link */}
+          {showSuggestionBanner && profile.stageMode && (
+            <div className="flex items-start gap-3 px-4 py-3 bg-brand-50 border border-brand-200 rounded-xl">
+              <Sparkles className="w-4 h-4 text-brand-600 mt-0.5 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-brand-800">
+                  Suggested adjustments for {selectedStage}
+                </p>
+                <p className="text-xs text-brand-600 mt-0.5">
+                  Based on funnel drop-off data. Review and save to apply.
+                </p>
               </div>
               <button
-                onClick={() => updateToggle(t.id, !t.enabled)}
-                className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${
-                  t.enabled ? 'bg-brand-500' : 'bg-gray-300'
-                }`}
+                onClick={() => setShowSuggestionBanner(false)}
+                className="text-brand-400 hover:text-brand-600 flex-shrink-0"
               >
-                <span
-                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                    t.enabled ? 'translate-x-5' : 'translate-x-0'
-                  }`}
-                />
+                <X className="w-4 h-4" />
               </button>
             </div>
-          ))}
-        </div>
-      </div>
+          )}
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Core Sliders */}
-        <div className="xl:col-span-2 space-y-4">
-          <div className="card card-body space-y-6">
-            <h3 className="text-sm font-medium">Core Controls</h3>
-            {coreSliders.map((s) => (
+          {/* Stage tabs (only when stage mode is on) */}
+          {profile.stageMode && (
+            <div className="flex gap-1 bg-gray-100 rounded-lg p-0.5">
+              {CONVERSATION_STAGES.map((stage) => {
+                const hasOverride = !!profile.stageOverrides[stage];
+                return (
+                  <button
+                    key={stage}
+                    onClick={() => setSelectedStage(stage)}
+                    className={`flex-1 px-3 py-2 text-xs font-medium rounded-md transition-colors relative ${
+                      selectedStage === stage
+                        ? 'bg-white text-healthcare-text shadow-sm'
+                        : 'text-healthcare-muted hover:text-healthcare-text'
+                    }`}
+                  >
+                    {stage}
+                    {hasOverride && (
+                      <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-brand-500 rounded-full" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Core sliders card */}
+          <div className="card card-body space-y-8">
+            {/* Card header when in stage mode */}
+            {profile.stageMode && (
+              <div className="flex items-center justify-between pb-2 border-b border-healthcare-line">
+                <div>
+                  <p className="text-sm font-semibold text-healthcare-text">
+                    {selectedStage} Stage Behavior
+                  </p>
+                  <p className="text-xs text-healthcare-muted mt-0.5">
+                    {hasStageOverride
+                      ? 'Custom override active'
+                      : 'Using global defaults — adjust to create an override'}
+                  </p>
+                </div>
+                {hasStageOverride && (
+                  <button
+                    onClick={() => clearStageOverride(selectedStage)}
+                    className="inline-flex items-center gap-1 text-xs text-healthcare-muted hover:text-red-600 transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                    Clear override
+                  </button>
+                )}
+              </div>
+            )}
+
+            {BEHAVIOR_SLIDERS.map((slider) => (
               <div
-                key={s.id}
-                onClick={() => setPreviewSlider(s.id)}
-                className={`cursor-pointer rounded-lg p-3 -m-3 transition-colors ${
-                  previewSlider === s.id ? 'bg-brand-50/50 ring-1 ring-brand-100' : 'hover:bg-gray-50'
+                key={slider.key}
+                className={`-mx-6 px-6 py-5 ${
+                  slider.key === 'humanizationLevel'
+                    ? 'bg-brand-50/50 rounded-lg border border-brand-100'
+                    : ''
                 }`}
               >
-                <SliderControl
-                  label={s.label}
-                  description={s.helper}
-                  value={s.value}
-                  min={s.min}
-                  max={s.max}
-                  step={s.step}
-                  minLabel={s.minLabel}
-                  maxLabel={s.maxLabel}
-                  onChange={(val) => updateCoreSlider(s.id, val)}
+                <BehaviorSlider
+                  label={slider.label}
+                  helperText={slider.helperText}
+                  value={effectiveSliders[slider.key]}
+                  stops={slider.stops}
+                  onChange={(val) => {
+                    if (profile.stageMode) {
+                      updateStageSlider(slider.key, val);
+                    } else {
+                      update(slider.key, val);
+                    }
+                  }}
+                  onReset={() => {
+                    if (profile.stageMode) {
+                      updateStageSlider(slider.key, profile[slider.key]);
+                    } else {
+                      update(slider.key, 3);
+                    }
+                  }}
                 />
               </div>
             ))}
           </div>
 
-          {/* Advanced Settings (collapsible) */}
+          {/* Conversation Settings */}
           <div className="card">
+            <div className="card-header flex items-center gap-2">
+              <Settings2 className="w-4 h-4 text-healthcare-muted" />
+              <h3 className="text-sm font-medium">Conversation Settings</h3>
+            </div>
+            <div className="card-body space-y-5">
+              <SegmentedControl
+                label="Response Speed"
+                description="Controls how fast replies appear."
+                options={SPEED_OPTIONS}
+                value={profile.responseSpeed}
+                onChange={(v) => update('responseSpeed', v)}
+              />
+              <SegmentedControl
+                label="Typing Indicator Speed"
+                description="Controls how long typing dots are shown before each message."
+                options={SPEED_OPTIONS}
+                value={profile.typingIndicatorSpeed}
+                onChange={(v) => update('typingIndicatorSpeed', v)}
+              />
+              <hr className="border-healthcare-line" />
+              <ToggleRow
+                label="Calendar Invite"
+                description="Offer to send patients a calendar invite after booking confirmation."
+                enabled={profile.calendarInviteEnabled}
+                onChange={(v) => update('calendarInviteEnabled', v)}
+              />
+              <ToggleRow
+                label="Google Maps Link"
+                description="Include a Google Maps link when confirming location."
+                enabled={profile.googleMapsLinkEnabled}
+                onChange={(v) => update('googleMapsLinkEnabled', v)}
+              />
+              <ToggleRow
+                label="Insurance Card Upload"
+                description="Ask for a photo of the insurance card. When off, collects plan name and member ID only."
+                enabled={profile.insuranceCardUploadEnabled}
+                onChange={(v) => update('insuranceCardUploadEnabled', v)}
+              />
+            </div>
+          </div>
+
+          {/* Reset all */}
+          <div className="flex justify-center">
             <button
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="card-body w-full flex items-center justify-between text-left"
+              onClick={resetAll}
+              className="btn-ghost text-healthcare-muted"
+              disabled={!hasChanges}
             >
-              <div className="flex items-center gap-2">
-                {showAdvanced ? (
-                  <ChevronDown className="w-4 h-4 text-healthcare-muted" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-healthcare-muted" />
-                )}
-                <h3 className="text-sm font-medium">Advanced Settings</h3>
-              </div>
-              <span className="text-xs text-healthcare-muted">
-                {showAdvanced ? 'Hide' : 'Show'} additional controls
-              </span>
+              <RotateCcw className="w-3.5 h-3.5" />
+              Reset all to default
             </button>
-            {showAdvanced && (
-              <div className="card-body border-t border-healthcare-border space-y-6 pt-4">
-                {advancedSliders.map((s) => (
-                  <SliderControl
-                    key={s.id}
-                    label={s.label}
-                    description={s.helper}
-                    value={s.value}
-                    min={s.min}
-                    max={s.max}
-                    step={s.step}
-                    minLabel={s.minLabel}
-                    maxLabel={s.maxLabel}
-                    onChange={(val) => updateAdvancedSlider(s.id, val)}
-                  />
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Preview Panel */}
-        <div className="card">
-          <div className="card-header flex items-center gap-2">
-            <Eye className="w-4 h-4 text-healthcare-muted" />
-            <h3 className="text-sm font-medium">Response Preview</h3>
-          </div>
-          <div className="card-body space-y-4">
-            <p className="text-xs text-healthcare-muted">
-              Click a slider to see how it affects responses:
-            </p>
-
-            {/* Scenario */}
-            <div className="text-xs font-medium text-healthcare-muted uppercase tracking-wide">
-              {currentPreview.scenario}
-            </div>
-
-            {/* Low example */}
-            <div>
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-xs font-medium text-orange-600 bg-orange-50 px-2 py-0.5 rounded">Low</span>
-                <span className="text-xs text-healthcare-muted">
-                  {coreSliders.find((s) => s.id === previewSlider)?.minLabel}
-                </span>
-              </div>
-              <div className={`rounded-lg p-3 text-sm border transition-colors ${
-                currentSliderValue <= 3
-                  ? 'bg-orange-50 border-orange-200 text-orange-900'
-                  : 'bg-gray-50 border-gray-100 text-gray-600'
-              }`}>
-                {currentPreview.low}
-              </div>
-            </div>
-
-            {/* High example */}
-            <div>
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-xs font-medium text-brand-600 bg-brand-50 px-2 py-0.5 rounded">High</span>
-                <span className="text-xs text-healthcare-muted">
-                  {coreSliders.find((s) => s.id === previewSlider)?.maxLabel}
-                </span>
-              </div>
-              <div className={`rounded-lg p-3 text-sm border transition-colors ${
-                currentSliderValue >= 7
-                  ? 'bg-brand-50 border-brand-200 text-brand-900'
-                  : 'bg-gray-50 border-gray-100 text-gray-600'
-              }`}>
-                {currentPreview.high}
-              </div>
-            </div>
-
-            {/* Current position indicator */}
-            <div className="text-xs text-center text-healthcare-muted pt-2 border-t border-healthcare-border">
-              <span className="font-medium capitalize">{previewSlider.replace('_', ' ')}</span>
-              {': '}
-              <span className="font-semibold text-brand-600">{currentSliderValue}</span>
-              <span> / 10</span>
-              {currentSliderValue <= 3 && ' (Low range)'}
-              {currentSliderValue >= 4 && currentSliderValue <= 7 && ' (Medium range)'}
-              {currentSliderValue >= 8 && ' (High range)'}
-            </div>
-          </div>
+        {/* RIGHT: Live Preview */}
+        <div className="xl:col-span-2">
+          <LivePreview
+            profile={profile}
+            stage={profile.stageMode ? selectedStage : undefined}
+            initialScenario={profile.stageMode ? STAGE_TO_SCENARIO[selectedStage] : undefined}
+            onStageChange={(s) => setSelectedStage(s)}
+          />
         </div>
       </div>
+
+      {/* Go Live: Embed Code */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 mt-6">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <h2 className="text-lg font-semibold">Go Live</h2>
+        </div>
+        <p className="text-sm text-gray-500 mb-4">
+          Add this code to your website to embed the chatbot. It will use the behavior settings you configure above.
+        </p>
+        <div className="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm font-mono overflow-x-auto">
+          <pre className="whitespace-pre-wrap">{`<!-- Vein Treatment Clinic Chat Widget -->
+<script src="https://your-domain.com/vein-clinic-chat.iife.js"></script>
+<script>
+  VeinClinicChat.init({
+    apiUrl: 'https://api.your-domain.com',
+    channel: 'web'
+  });
+</script>`}</pre>
+        </div>
+        <div className="mt-3 flex items-center gap-3">
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(`<!-- Vein Treatment Clinic Chat Widget -->\n<script src="https://your-domain.com/vein-clinic-chat.iife.js"></script>\n<script>\n  VeinClinicChat.init({\n    apiUrl: 'https://api.your-domain.com',\n    channel: 'web'\n  });\n</script>`);
+            }}
+            className="btn-secondary text-sm"
+          >
+            Copy Code
+          </button>
+          <a
+            href="http://localhost:3200"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary text-sm"
+          >
+            Open Live Chatbot
+          </a>
+        </div>
+      </div>
+
+    </div>
+  );
+}
+
+/* ── Segmented Control ───────────────────────────── */
+
+function SegmentedControl<T extends string>({
+  label,
+  description,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  description: string;
+  options: { value: T; label: string }[];
+  value: T;
+  onChange: (value: T) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-healthcare-text">{label}</p>
+        <p className="text-xs text-healthcare-muted mt-0.5">{description}</p>
+      </div>
+      <div className="flex gap-0.5 bg-gray-100 rounded-lg p-0.5 flex-shrink-0 ml-4">
+        {options.map((opt) => (
+          <button
+            key={opt.value}
+            onClick={() => onChange(opt.value)}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              value === opt.value
+                ? 'bg-white text-healthcare-text shadow-sm'
+                : 'text-healthcare-muted hover:text-healthcare-text'
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Toggle Row ──────────────────────────────────── */
+
+function ToggleRow({
+  label,
+  description,
+  enabled,
+  onChange,
+}: {
+  label: string;
+  description: string;
+  enabled: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-healthcare-text">{label}</p>
+        <p className="text-xs text-healthcare-muted mt-0.5">{description}</p>
+      </div>
+      <button
+        onClick={() => onChange(!enabled)}
+        className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ml-4 ${
+          enabled ? 'bg-brand-500' : 'bg-gray-300'
+        }`}
+      >
+        <span
+          className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+            enabled ? 'translate-x-5' : 'translate-x-0'
+          }`}
+        />
+      </button>
     </div>
   );
 }

@@ -44,7 +44,7 @@ export default function CallbackOperationsTab() {
                 <th className="table-header text-right">Wait</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-healthcare-border">
+            <tbody className="divide-y divide-healthcare-line">
               {callbackQueueFull.map((cb) => (
                 <tr key={cb.id}>
                   <td className="table-cell text-xs font-mono">{cb.id}</td>

@@ -16,7 +16,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ config }) => {
   const [inputValue, setInputValue] = useState('');
   const [showFileUpload, setShowFileUpload] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const [showSpeedControl, setShowSpeedControl] = useState(false);
 
@@ -57,9 +57,13 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ config }) => {
     if (!text) return;
     sendMessage(text);
     setInputValue('');
+    // Reset textarea height
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+    }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -105,7 +109,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ config }) => {
               />
             </div>
             <div className="vc-header-text">
-              <h2 className="vc-header-title">Maya</h2>
+              <h2 className="vc-header-title">Maya - Front Desk</h2>
               <div className="vc-status-row">
                 <span
                   className={`vc-status-dot ${connectionDotClass[connectionStatus]}`}
@@ -185,16 +189,22 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ config }) => {
               <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
             </svg>
           </button>
-          <input
+          <textarea
             ref={inputRef}
             className="vc-message-input"
-            type="text"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              // Auto-grow
+              const el = e.target;
+              el.style.height = 'auto';
+              el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+            }}
             onKeyDown={handleKeyDown}
             placeholder="Type your message..."
             aria-label="Type your message"
             autoComplete="off"
+            rows={1}
           />
           <button
             className="vc-send-btn"

@@ -14,7 +14,7 @@ interface TabNavProps {
 
 export default function TabNav({ tabs, activeTab, onChange }: TabNavProps) {
   return (
-    <div className="flex overflow-x-auto border-b border-healthcare-border -mb-px">
+    <div className="flex overflow-x-auto border-b border-healthcare-line -mb-px">
       {tabs.map((tab) => {
         const isActive = tab.id === activeTab;
         return (

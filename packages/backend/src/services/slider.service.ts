@@ -230,6 +230,18 @@ export class SliderService {
         values: { warmth: 55, formality: 70, empathy: 65, urgency: 30, detail: 80 },
         system_defined: true,
       },
+      {
+        id: uuid(), name: SliderPresetName.PatientCoordinator,
+        description: 'Sounds like a real team member texting a patient — natural, conversational, and professional.',
+        values: { warmth: 72, formality: 25, empathy: 55, urgency: 45, detail: 30 },
+        system_defined: true,
+      },
+      {
+        id: uuid(), name: SliderPresetName.PatientCoordinatorHumanMode,
+        description: 'Fragments responses into short, paced, human-like messages with typing delays. Feels like texting a real person.',
+        values: { warmth: 70, formality: 20, empathy: 50, urgency: 40, detail: 20 },
+        system_defined: true,
+      },
     ];
 
     for (const preset of presets) {

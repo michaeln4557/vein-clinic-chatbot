@@ -208,7 +208,7 @@ export default function CrmMappingPage() {
 
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-healthcare-border">
+                <thead className="bg-gray-50 border-b border-healthcare-line">
                   <tr>
                     <th className="table-header">Chatbot Field</th>
                     <th className="table-header w-8"></th>
@@ -220,7 +220,7 @@ export default function CrmMappingPage() {
                     <th className="table-header">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-healthcare-border">
+                <tbody className="divide-y divide-healthcare-line">
                   {filtered.map((mapping) => (
                     <tr key={mapping.id} className="hover:bg-gray-50">
                       <td className="table-cell">
@@ -299,7 +299,7 @@ export default function CrmMappingPage() {
               <Clock className="w-4 h-4 text-healthcare-muted" />
               <h3 className="text-sm font-semibold">Recent Sync Log</h3>
             </div>
-            <div className="divide-y divide-healthcare-border">
+            <div className="divide-y divide-healthcare-line">
               {mockSyncLog.map((entry) => (
                 <div key={entry.id} className="px-6 py-3 flex items-center gap-4">
                   <div className="shrink-0">

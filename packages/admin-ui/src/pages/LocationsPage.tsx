@@ -1130,7 +1130,7 @@ export default function LocationsPage() {
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-4 border-b border-healthcare-border">
+            <div className="flex items-center justify-between p-4 border-b border-healthcare-line">
               <h2 className="text-lg font-semibold">
                 {editingId ? 'Edit Location' : 'Add New Location'}
               </h2>
@@ -1358,7 +1358,7 @@ export default function LocationsPage() {
                 </div>
               </div>
             </div>
-            <div className="flex justify-end gap-3 p-4 border-t border-healthcare-border">
+            <div className="flex justify-end gap-3 p-4 border-t border-healthcare-line">
               <button
                 onClick={() => {
                   setShowForm(false);
@@ -1464,7 +1464,7 @@ export default function LocationsPage() {
                 </div>
               )}
 
-              <div className="flex items-center gap-4 pt-2 border-t border-healthcare-border text-xs text-healthcare-muted">
+              <div className="flex items-center gap-4 pt-2 border-t border-healthcare-line text-xs text-healthcare-muted">
                 <span className={loc.chatEnabled ? 'text-emerald-600' : ''}>
                   Chat: {loc.chatEnabled ? 'On' : 'Off'}
                 </span>

@@ -19,6 +19,10 @@ export enum SliderPresetName {
   RecoveryMode = 'Recovery_Mode',
   /** Extra-careful handling of insurance-related conversations. */
   InsuranceSensitive = 'Insurance_Sensitive',
+  /** Natural, human-sounding coordinator for SMS/chat conversations. */
+  PatientCoordinator = 'Patient_Coordinator',
+  /** Human Mode — fragments responses into short, paced, human-like messages. */
+  PatientCoordinatorHumanMode = 'Patient_Coordinator_Human_Mode',
 }
 
 /** Scope at which a slider override applies. */

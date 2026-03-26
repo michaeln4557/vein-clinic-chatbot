@@ -6,6 +6,9 @@ export default defineConfig({
   plugins: [
     react(),
     cssInjectedByJsPlugin(),
+    // NOTE: Mock API plugin was REMOVED. All API calls now go to the real backend.
+    // The mock was intercepting requests and returning hardcoded responses that
+    // bypassed the workflow state machine, qualification gate, and Claude API.
   ],
   define: {
     'process.env.NODE_ENV': JSON.stringify('production'),
@@ -18,7 +21,6 @@ export default defineConfig({
       fileName: (format) => `vein-clinic-chat.${format}.js`,
     },
     rollupOptions: {
-      // Bundle React into the IIFE output so it's self-contained
       output: {
         globals: {},
       },
@@ -28,6 +30,6 @@ export default defineConfig({
     target: 'es2015',
   },
   server: {
-    port: 3102,
+    port: 3200,
   },
 });

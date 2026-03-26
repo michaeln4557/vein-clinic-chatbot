@@ -14,7 +14,7 @@ export default function CallbackQueueTable() {
         <h3 className="text-sm font-semibold">Callback Queue</h3>
         <span className="badge bg-amber-100 text-amber-700">{callbackQueue.length} pending</span>
       </div>
-      <div className="divide-y divide-healthcare-border">
+      <div className="divide-y divide-healthcare-line">
         {callbackQueue.map((cb) => (
           <div key={cb.id} className="px-4 py-2.5">
             <div className="flex items-center justify-between mb-1">

@@ -198,7 +198,7 @@ export default function PermissionsPage() {
 
           <div className="card overflow-hidden">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-healthcare-border">
+              <thead className="bg-gray-50 border-b border-healthcare-line">
                 <tr>
                   <th className="table-header">Name</th>
                   <th className="table-header">Email</th>
@@ -207,7 +207,7 @@ export default function PermissionsPage() {
                   <th className="table-header">Last Active</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-healthcare-border">
+              <tbody className="divide-y divide-healthcare-line">
                 {filteredUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td className="table-cell">
@@ -257,7 +257,7 @@ export default function PermissionsPage() {
             </p>
           </div>
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-healthcare-border">
+            <thead className="bg-gray-50 border-b border-healthcare-line">
               <tr>
                 <th className="table-header w-40">Section</th>
                 {roles.map((role) => (
@@ -267,7 +267,7 @@ export default function PermissionsPage() {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-healthcare-border">
+            <tbody className="divide-y divide-healthcare-line">
               {Object.entries(permissionMatrix).map(([section, perms]) => (
                 <tr key={section} className="hover:bg-gray-50">
                   <td className="table-cell text-sm font-medium">{section}</td>
@@ -285,7 +285,7 @@ export default function PermissionsPage() {
               ))}
             </tbody>
           </table>
-          <div className="card-body border-t border-healthcare-border">
+          <div className="card-body border-t border-healthcare-line">
             <div className="flex items-center gap-4 text-xs text-healthcare-muted">
               <span className="font-medium">Legend:</span>
               {Object.entries(permissionBadge).filter(([k]) => k !== 'none').map(([key, val]) => (

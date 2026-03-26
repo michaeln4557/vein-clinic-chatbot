@@ -18,6 +18,8 @@ interface MetricCardProps {
   prominent?: boolean;
   /** Extra visual emphasis for the primary business metric */
   emphasis?: boolean;
+  /** Click handler for drill-down navigation */
+  onClick?: () => void;
 }
 
 const statusBorder: Record<string, string> = {
@@ -29,12 +31,15 @@ const statusBorder: Record<string, string> = {
 
 export default function MetricCard({
   label, value, delta, deltaDirection, helpText, helperText, status = 'default',
-  icon: Icon, color, sparkline, prominent = false, emphasis = false,
+  icon: Icon, color, sparkline, prominent = false, emphasis = false, onClick,
 }: MetricCardProps) {
   const [showTooltip, setShowTooltip] = useState(false);
 
   return (
-    <div className={`card card-body border-l-2 ${statusBorder[status]} ${prominent ? 'py-5' : ''} ${emphasis ? 'ring-1 ring-teal-200 shadow-sm' : ''}`}>
+    <div
+      className={`card card-body border-l-2 ${statusBorder[status]} ${prominent ? 'py-5' : ''} ${emphasis ? 'ring-1 ring-teal-200 shadow-sm' : ''} ${onClick ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
+      onClick={onClick}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1">

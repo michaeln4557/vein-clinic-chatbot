@@ -80,7 +80,7 @@ export default function MissedCallRecoveryTab() {
                   <th className="table-header text-right">Booking</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-healthcare-border">
+              <tbody className="divide-y divide-healthcare-line">
                 {smsTemplatePerformance.map((t) => (
                   <tr key={t.template}>
                     <td className="table-cell text-xs font-medium">{t.template}</td>
@@ -112,7 +112,7 @@ export default function MissedCallRecoveryTab() {
                 <th className="table-header text-right">Recovery Rate</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-healthcare-border">
+            <tbody className="divide-y divide-healthcare-line">
               {recoveryByLocation.map((loc) => (
                 <tr key={loc.location}>
                   <td className="table-cell text-xs font-medium">{loc.location}</td>

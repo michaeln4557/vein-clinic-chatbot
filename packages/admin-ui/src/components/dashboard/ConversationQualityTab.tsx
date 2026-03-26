@@ -96,7 +96,7 @@ export default function ConversationQualityTab() {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-healthcare-border">
+            <tbody className="divide-y divide-healthcare-line">
               {qualityHeatmapData.map((row) => (
                 <tr key={row.playbook}>
                   <td className="table-cell text-xs font-medium">{row.playbook}</td>
@@ -133,7 +133,7 @@ export default function ConversationQualityTab() {
                 <th className="table-header text-left">Outcome</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-healthcare-border">
+            <tbody className="divide-y divide-healthcare-line">
               {lowConfidenceSessions.map((s) => (
                 <tr key={s.id}>
                   <td className="table-cell text-xs font-mono">{s.id}</td>

@@ -79,18 +79,18 @@ export default function ConversionFunnelTab() {
         </div>
         <div className="card-body space-y-4">
           {abTestResults.map((test) => (
-            <div key={test.id} className="border border-healthcare-border rounded-lg p-4">
+            <div key={test.id} className="border border-healthcare-line rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-semibold">{test.name}</h4>
                 <StatusBadge variant={test.status === 'completed' ? 'success' : 'active'} label={test.status} />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className={`rounded-lg p-3 border ${(test.winner as string) === 'control' ? 'border-emerald-300 bg-emerald-50' : 'border-healthcare-border bg-gray-50'}`}>
+                <div className={`rounded-lg p-3 border ${(test.winner as string) === 'control' ? 'border-emerald-300 bg-emerald-50' : 'border-healthcare-line bg-gray-50'}`}>
                   <p className="text-xs text-healthcare-muted mb-1">Control: {test.control.name}</p>
                   <p className="text-lg font-bold">{test.control.rate}%</p>
                   <p className="text-xs text-healthcare-muted">{test.control.conversions}/{test.control.conversations} conversions</p>
                 </div>
-                <div className={`rounded-lg p-3 border ${test.winner === 'variant' ? 'border-emerald-300 bg-emerald-50' : 'border-healthcare-border bg-gray-50'}`}>
+                <div className={`rounded-lg p-3 border ${test.winner === 'variant' ? 'border-emerald-300 bg-emerald-50' : 'border-healthcare-line bg-gray-50'}`}>
                   <p className="text-xs text-healthcare-muted mb-1">Variant: {test.variant.name}</p>
                   <p className="text-lg font-bold">{test.variant.rate}%</p>
                   <p className="text-xs text-healthcare-muted">{test.variant.conversions}/{test.variant.conversations} conversions</p>

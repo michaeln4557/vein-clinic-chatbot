@@ -37,7 +37,7 @@ export default function PlaybookHealthPanel({ onPlaybookClick }: PlaybookHealthP
         </span>
       </div>
 
-      <div className="divide-y divide-healthcare-border">
+      <div className="divide-y divide-healthcare-line">
         {playbookHealthData.map((pb, idx) => {
           const impact = impactLabel(pb.impactScore);
           const issue = primaryIssues[pb.playbookId];

@@ -102,6 +102,35 @@ export interface Message {
   redacted?: boolean;
 }
 
+/**
+ * A single fragment within a multi-part response delivery.
+ * Used by Human Mode to send responses as multiple short messages
+ * with realistic typing delays between them.
+ */
+export interface MessageFragment {
+  /** The text content of this fragment. */
+  content: string;
+  /** Milliseconds to wait BEFORE sending this fragment (typing delay). */
+  delay_ms: number;
+  /** Whether to show a typing indicator during the delay. */
+  show_typing: boolean;
+  /** Sequence index (0-based). */
+  index: number;
+}
+
+/**
+ * A response that may be delivered as multiple fragments with delays,
+ * or as a single message (when fragmentation is disabled).
+ */
+export interface FragmentedResponse {
+  /** The ordered list of message fragments to deliver. */
+  fragments: MessageFragment[];
+  /** Total estimated delivery time including all delays (ms). */
+  total_delivery_ms: number;
+  /** Whether fragmentation was applied (false = single message passthrough). */
+  was_fragmented: boolean;
+}
+
 /** A full conversation thread between a patient and the system. */
 export interface Conversation {
   /** Unique conversation identifier. */

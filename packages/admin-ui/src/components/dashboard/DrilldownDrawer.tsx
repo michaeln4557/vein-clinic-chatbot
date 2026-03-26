@@ -36,7 +36,7 @@ export default function DrilldownDrawer({ open, onClose, context }: DrilldownDra
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-healthcare-border">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-healthcare-line">
           <div>
             <p className="text-[10px] text-healthcare-muted uppercase tracking-wider">{context.type.replace('_', ' ')}</p>
             <h2 className="text-base font-semibold mt-0.5">{context.label}</h2>

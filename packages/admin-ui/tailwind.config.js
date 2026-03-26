@@ -33,7 +33,7 @@ export default {
         healthcare: {
           bg: '#f8fafc',
           card: '#ffffff',
-          border: '#e2e8f0',
+          line: '#e2e8f0',
           text: '#1e293b',
           muted: '#64748b',
         },

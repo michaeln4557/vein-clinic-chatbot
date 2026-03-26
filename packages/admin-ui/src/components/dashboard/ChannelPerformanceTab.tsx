@@ -22,7 +22,7 @@ export default function ChannelPerformanceTab() {
                 <th className="table-header text-right">Cost/Booking</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-healthcare-border">
+            <tbody className="divide-y divide-healthcare-line">
               {channelComparison.map((ch) => (
                 <tr key={ch.channel}>
                   <td className="table-cell text-xs font-medium">{ch.channel}</td>
@@ -84,7 +84,7 @@ export default function ChannelPerformanceTab() {
                 <th className="table-header text-right">ROI</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-healthcare-border">
+            <tbody className="divide-y divide-healthcare-line">
               {campaignPerformance.map((c) => (
                 <tr key={c.campaign}>
                   <td className="table-cell text-xs font-medium">{c.campaign}</td>

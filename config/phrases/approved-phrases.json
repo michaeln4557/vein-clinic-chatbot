@@ -120,6 +120,50 @@
         "active": true
       }
     ],
+    "data_collection_transition": [
+      {
+        "id": "dct-001",
+        "category": "data_collection_transition",
+        "text": "Yeah, I can definitely help with that.",
+        "context": "Acknowledge intent before transitioning to data collection. Warm, confident, casual.",
+        "active": true
+      },
+      {
+        "id": "dct-002",
+        "category": "data_collection_transition",
+        "text": "I'll just grab a couple quick details so I can get everything set up for you.",
+        "context": "Set expectation for data collection. Frames it as quick, easy, and helpful — not a requirement.",
+        "active": true
+      },
+      {
+        "id": "dct-003",
+        "category": "data_collection_transition",
+        "text": "I'll just need a couple quick details from you first — is that okay?",
+        "context": "Permission variant. Use when patient shows hesitation or friction signals. Wait for response before proceeding.",
+        "active": true
+      },
+      {
+        "id": "dct-004",
+        "category": "data_collection_transition",
+        "text": "Let me just get a couple things from you real quick so we can get you on the schedule.",
+        "context": "Alternative expectation-setting phrase. Slightly more direct, ties data collection to scheduling benefit.",
+        "active": true
+      },
+      {
+        "id": "dct-005",
+        "category": "data_collection_transition",
+        "text": "Awesome — just a few quick things and we'll have you all set.",
+        "context": "Upbeat, casual transition. Good when patient has shown clear enthusiasm about booking.",
+        "active": true
+      },
+      {
+        "id": "dct-006",
+        "category": "data_collection_transition",
+        "text": "No problem at all. If you have any other questions, I'm right here.",
+        "context": "Graceful exit when patient declines to share information. Zero pressure, leaves door open.",
+        "active": true
+      }
+    ],
     "greeting": [
       {
         "id": "greet-001",

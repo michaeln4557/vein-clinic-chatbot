@@ -108,6 +108,46 @@ export class SmsService {
     return null;
   }
 
+  /**
+   * Sends a sequence of SMS fragments with realistic delays between them.
+   * Used by Patient Coordinator (Human Mode) to deliver responses as
+   * multiple short texts instead of one long message.
+   */
+  async sendFragmentedSms(
+    phoneNumber: string,
+    fragments: Array<{ content: string; delay_ms: number }>,
+    messageType: string,
+    locationId?: string,
+  ): Promise<SmsResult[]> {
+    const results: SmsResult[] = [];
+
+    for (const fragment of fragments) {
+      // Wait for the realistic delay between messages
+      if (fragment.delay_ms > 0) {
+        await this.delay(fragment.delay_ms);
+      }
+
+      const result = await this.sendSms(phoneNumber, fragment.content, messageType, locationId);
+      results.push(result);
+
+      // If a send failed, stop the sequence
+      if (!result.success) {
+        logger.warn('Fragmented SMS delivery stopped due to send failure', {
+          phoneNumber,
+          fragmentIndex: fragments.indexOf(fragment),
+          error: result.error,
+        });
+        break;
+      }
+    }
+
+    return results;
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   // ─── Private ────────────────────────────────────────────────────────────────
 
   private async sendSms(

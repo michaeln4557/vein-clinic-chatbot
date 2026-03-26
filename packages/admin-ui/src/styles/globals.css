@@ -3,8 +3,10 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    @apply border-healthcare-border;
+  *,
+  ::before,
+  ::after {
+    border-color: theme('colors.healthcare.line');
   }
 
   body {
@@ -26,11 +28,11 @@
 
 @layer components {
   .card {
-    @apply bg-healthcare-card rounded-xl border border-healthcare-border shadow-sm;
+    @apply bg-healthcare-card rounded-xl border border-healthcare-line shadow-sm;
   }
 
   .card-header {
-    @apply px-6 py-4 border-b border-healthcare-border;
+    @apply px-6 py-4 border-b border-healthcare-line;
   }
 
   .card-body {
@@ -46,7 +48,7 @@
 
   .btn-secondary {
     @apply inline-flex items-center gap-2 px-4 py-2 bg-white text-healthcare-text
-           border border-healthcare-border rounded-lg font-medium text-sm
+           border border-healthcare-line rounded-lg font-medium text-sm
            hover:bg-gray-50 transition-colors
            focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2;
   }
@@ -62,13 +64,13 @@
   }
 
   .input {
-    @apply w-full px-3 py-2 border border-healthcare-border rounded-lg text-sm
+    @apply w-full px-3 py-2 border border-healthcare-line rounded-lg text-sm
            placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500
            focus:border-brand-500 transition-colors;
   }
 
   .select {
-    @apply w-full px-3 py-2 border border-healthcare-border rounded-lg text-sm
+    @apply w-full px-3 py-2 border border-healthcare-line rounded-lg text-sm
            bg-white focus:outline-none focus:ring-2 focus:ring-brand-500
            focus:border-brand-500 transition-colors;
   }

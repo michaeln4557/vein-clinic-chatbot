@@ -19,7 +19,7 @@ export default function ProblematicPlaybooksTable() {
         <h3 className="text-sm font-semibold">Playbooks Needing Attention</h3>
         <span className="badge bg-amber-100 text-amber-700">{problematicPlaybooks.length}</span>
       </div>
-      <div className="divide-y divide-healthcare-border">
+      <div className="divide-y divide-healthcare-line">
         {problematicPlaybooks.map((pb) => (
           <div key={pb.name} className="px-4 py-3">
             <p className="text-xs font-medium mb-1">{pb.name}</p>

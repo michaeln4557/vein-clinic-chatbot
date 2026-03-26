@@ -140,6 +140,30 @@ class ChatApiClient {
       method: 'POST',
     });
   }
+
+  async getPresets(): Promise<PresetResponse> {
+    return this.request<PresetResponse>('/api/v1/chat/presets', { method: 'GET' });
+  }
+}
+
+export interface PresetTiming {
+  minTypingDelay: number;
+  maxTypingDelay: number;
+  interBubblePauseMin: number;
+  interBubblePauseMax: number;
+}
+
+export interface PresetInfo {
+  id: string;
+  label: string;
+  description: string;
+  timing: PresetTiming;
+  active: boolean;
+}
+
+export interface PresetResponse {
+  presets: PresetInfo[];
+  activePreset: string;
 }
 
 /**

@@ -59,7 +59,7 @@ export default function QaReviewTab() {
                 <th className="table-header text-left">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-healthcare-border">
+            <tbody className="divide-y divide-healthcare-line">
               {flaggedConversationsFull.map((f) => (
                 <tr key={f.id}>
                   <td className="table-cell text-xs font-mono">{f.id}</td>

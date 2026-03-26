@@ -288,7 +288,7 @@ export default function TestQAPage() {
           </div>
 
           {/* Input */}
-          <div className="p-3 border-t border-healthcare-border shrink-0">
+          <div className="p-3 border-t border-healthcare-line shrink-0">
             <div className="flex items-center gap-2">
               <input
                 type="text"
@@ -372,7 +372,7 @@ export default function TestQAPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-4 gap-3 pt-3 border-t border-healthcare-border">
+              <div className="grid grid-cols-4 gap-3 pt-3 border-t border-healthcare-line">
                 <div className="flex items-center gap-1.5">
                   {mockOrchestration.fallbackTriggered ? (
                     <AlertTriangle className="w-4 h-4 text-amber-500" />
@@ -425,7 +425,7 @@ export default function TestQAPage() {
               {/* CRM Fields Table */}
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 border-b border-healthcare-border sticky top-0">
+                  <thead className="bg-gray-50 border-b border-healthcare-line sticky top-0">
                     <tr>
                       <th className="text-left px-4 py-2 font-medium text-healthcare-muted text-xs">Field</th>
                       <th className="text-left px-4 py-2 font-medium text-healthcare-muted text-xs">Value</th>
@@ -435,7 +435,7 @@ export default function TestQAPage() {
                       <th className="text-left px-4 py-2 font-medium text-healthcare-muted text-xs">Time</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-healthcare-border">
+                  <tbody className="divide-y divide-healthcare-line">
                     {mockCrmFields.map((field) => {
                       const badge = extractionBadge[field.status];
                       const confColor = field.confidence >= 0.8 ? 'text-emerald-600' : field.confidence >= 0.5 ? 'text-amber-600' : 'text-red-500';
@@ -478,7 +478,7 @@ export default function TestQAPage() {
                 </table>
               </div>
 
-              <div className="p-4 space-y-3 border-t border-healthcare-border">
+              <div className="p-4 space-y-3 border-t border-healthcare-line">
                 {/* Missing Fields */}
                 {missingFields.length > 0 && (
                   <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">

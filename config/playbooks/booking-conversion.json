@@ -44,11 +44,57 @@
   },
   "steps": [
     {
+      "step_id": 0,
+      "name": "soft_transition_to_data_collection",
+      "description": "Ease into personal information collection with a 2-3 bubble transition that feels natural, low-pressure, and expected. This step fires ONCE, right before the first personal question.",
+      "required": true,
+      "trigger": "before_first_personal_question",
+      "default_flow": {
+        "description": "Use when patient shows clear intent and no hesitation signals.",
+        "bubbles": [
+          "Yeah, I can definitely help with that.",
+          "I'll just grab a couple quick details so I can get everything set up for you.",
+          "What's your name?"
+        ],
+        "notes": "Deliver as 3 separate bubbles with natural typing pauses between them. The third bubble IS the name collection — do NOT add a separate name-ask after this."
+      },
+      "permission_flow": {
+        "description": "Use when the patient shows hesitation, friction signals, or seems unsure about sharing info.",
+        "hesitation_signals": [
+          "patient asks 'why do you need that'",
+          "patient uses hedging language ('I guess', 'maybe', 'I'm not sure')",
+          "patient pauses after being asked for info",
+          "patient asks what happens with their information",
+          "patient has already shown friction earlier in conversation"
+        ],
+        "bubbles_before_permission": [
+          "Yeah, I can definitely help with that.",
+          "I'll just need a couple quick details from you first — is that okay?"
+        ],
+        "after_permission_granted": "What's your name?",
+        "after_permission_denied": "No problem at all. If you have any other questions, I'm right here.",
+        "notes": "Wait for the patient to respond before asking the first personal question. If they say yes/sure/okay, proceed. If they decline, respect it and keep the door open."
+      },
+      "tone_rules": [
+        "NEVER use formal or clinical language like 'collect your PHI', 'gather required information', 'before proceeding', 'personal data', 'required fields'",
+        "NEVER frame data collection as a gate or prerequisite — frame it as a quick, helpful step",
+        "Use casual, confident language — 'grab', 'quick details', 'get you set up'",
+        "Match the patient's energy — if they're brief and direct, keep it brief; if they're chatty, be warm",
+        "The transition should feel like a natural next step, not a barrier"
+      ],
+      "variations": {
+        "returning_patient": "Skip entirely if patient is recognized and data is already on file.",
+        "sms_channel": "If texting, the phone number is already known — skip phone confirmation and go straight to name.",
+        "patient_volunteered_info": "If the patient already gave their name or other info unprompted, acknowledge it and skip to the next needed field."
+      }
+    },
+    {
       "step_id": 1,
       "name": "collect_name",
-      "description": "Get the patient's first and last name.",
+      "description": "Get the patient's first and last name. NOTE: If the soft transition (step 0) already asked 'What's your name?', this step is SKIPPED — do not double-ask.",
       "required": true,
       "guidelines": [
+        "Usually handled by step 0's third bubble — only use this step if step 0 was skipped (e.g., returning patient, info already volunteered)",
         "Ask casually: 'Can I grab your name to get started?'",
         "If they give only a first name, gently ask for last name",
         "Confirm spelling if the name is unusual",
@@ -198,7 +244,15 @@
           },
           {
             "role": "bot",
-            "message": "I'd be happy to help with that! Can I grab your name to get started?"
+            "message": "Yeah, I can definitely help with that."
+          },
+          {
+            "role": "bot",
+            "message": "I'll just grab a couple quick details so I can get everything set up for you."
+          },
+          {
+            "role": "bot",
+            "message": "What's your name?"
           },
           {
             "role": "patient",

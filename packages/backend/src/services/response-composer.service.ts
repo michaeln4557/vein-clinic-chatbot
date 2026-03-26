@@ -153,7 +153,7 @@ export class ResponseComposerService {
       [WorkflowStage.Greeting]:
         "Hello! Thank you for reaching out to our vein care center. I'm here to help you with scheduling, insurance questions, or any concerns about your vein health. How can I assist you today?",
       [WorkflowStage.DataCollection]:
-        "Thank you for sharing that. To help match you with the right specialist, could you provide your full name and a phone number where we can reach you?",
+        "Sure, I can definitely help with that.\nI'll just grab a couple quick details so I can get everything set up for you.\nWhat's your name?",
       [WorkflowStage.InsuranceCollection]:
         "We accept most major insurance plans. Could you share your insurance carrier name so I can look into your coverage options?",
       [WorkflowStage.Scheduling]:

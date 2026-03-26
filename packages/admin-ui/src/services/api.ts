@@ -45,6 +45,11 @@ export const sliders = {
       method: 'POST',
       body: JSON.stringify({ presetId, scope }),
     }),
+  saveBehaviorProfile: (profile: any) =>
+    request<any>('/sliders/behavior-profile', {
+      method: 'PUT',
+      body: JSON.stringify(profile),
+    }),
 };
 
 // ── Locations ──────────────────────────────────────────────────────────
@@ -71,20 +76,31 @@ export const smsTemplates = {
     request<any>(`/sms-templates/${id}`, { method: 'DELETE' }),
 };
 
-// ── Review Queue ───────────────────────────────────────────────────────
-export const reviewQueue = {
-  list: (params?: { status?: string; type?: string }) => {
-    const qs = new URLSearchParams(params as any).toString();
-    return request<any[]>(`/review-queue${qs ? `?${qs}` : ''}`);
+// ── Human Recovery Queue ──────────────────────────────────────────────
+export const recoveryQueue = {
+  list: (params?: { status?: string; priority?: string }) => {
+    const qs = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries(params || {}).filter(([_, v]) => v !== undefined),
+      ) as any,
+    ).toString();
+    return request<any[]>(`/recovery-queue${qs ? `?${qs}` : ''}`);
   },
-  get: (id: string) => request<any>(`/review-queue/${id}`),
-  apply: (id: string) =>
-    request<any>(`/review-queue/${id}/apply`, { method: 'POST' }),
-  dismiss: (id: string, reason?: string) =>
-    request<any>(`/review-queue/${id}/dismiss`, {
+  get: (id: string) => request<any>(`/recovery-queue/${id}`),
+  markCompleted: (id: string) =>
+    request<any>(`/recovery-queue/${id}/complete`, { method: 'POST' }),
+  scheduleCallback: (id: string, time: string) =>
+    request<any>(`/recovery-queue/${id}/schedule`, {
       method: 'POST',
-      body: JSON.stringify({ reason }),
+      body: JSON.stringify({ callbackTime: time }),
     }),
+  sendSms: (id: string, message: string) =>
+    request<any>(`/recovery-queue/${id}/sms`, {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    }),
+  missedOpportunities: () => request<any[]>('/recovery-queue/missed-opportunities'),
+  metrics: () => request<any>('/recovery-queue/metrics'),
 };
 
 // ── Test / QA ──────────────────────────────────────────────────────────

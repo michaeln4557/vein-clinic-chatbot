@@ -77,7 +77,7 @@ export default function CallbackPanel({ onItemClick }: CallbackPanelProps) {
       </div>
 
       {/* Summary Metrics */}
-      <div className="px-4 py-3 border-b border-healthcare-border">
+      <div className="px-4 py-3 border-b border-healthcare-line">
         <div className="grid grid-cols-2 gap-3">
           <div>
             <p className="text-[10px] text-healthcare-muted">Pending</p>
@@ -130,7 +130,7 @@ export default function CallbackPanel({ onItemClick }: CallbackPanelProps) {
       })()}
 
       {/* Queue List */}
-      <div className="divide-y divide-healthcare-border">
+      <div className="divide-y divide-healthcare-line">
         {callbackQueue.map((cb) => (
           <div
             key={cb.id}

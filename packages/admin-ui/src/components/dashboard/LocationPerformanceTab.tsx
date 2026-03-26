@@ -31,7 +31,7 @@ export default function LocationPerformanceTab() {
                 <th className="table-header text-center">Tier</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-healthcare-border">
+            <tbody className="divide-y divide-healthcare-line">
               {locationComparison.map((loc) => {
                 const tier = tierBadge(loc.convRate);
                 return (

@@ -422,6 +422,12 @@
   background: var(--vc-bg);
   line-height: 1.4;
   min-width: 0;
+  resize: none;
+  overflow-y: auto;
+  max-height: 120px;
+  min-height: 40px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .vc-message-input::placeholder { color: var(--vc-text-light); }

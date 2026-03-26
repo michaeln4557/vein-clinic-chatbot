@@ -28,7 +28,7 @@ export default function FilterBar({
 }: FilterBarProps) {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <div className="flex rounded-lg border border-healthcare-border overflow-hidden">
+      <div className="flex rounded-lg border border-healthcare-line overflow-hidden">
         {dateRanges.map((r) => (
           <button
             key={r.value}

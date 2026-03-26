@@ -15,7 +15,7 @@ export default function FlaggedConversationsTable() {
         <h3 className="text-sm font-semibold">Flagged Conversations</h3>
         <span className="badge bg-red-100 text-red-700">{flaggedConversations.length}</span>
       </div>
-      <div className="divide-y divide-healthcare-border">
+      <div className="divide-y divide-healthcare-line">
         {flaggedConversations.map((f) => {
           const config = typeConfig[f.type];
           return (

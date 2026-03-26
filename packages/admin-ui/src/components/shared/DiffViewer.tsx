@@ -45,10 +45,10 @@ export default function DiffViewer({ before, after, title }: DiffViewerProps) {
           <h3 className="text-sm font-medium">{title}</h3>
         </div>
       )}
-      <div className="grid grid-cols-2 divide-x divide-healthcare-border">
+      <div className="grid grid-cols-2 divide-x divide-healthcare-line">
         {/* Before */}
         <div>
-          <div className="px-4 py-2 bg-red-50 text-xs font-medium text-red-700 border-b border-healthcare-border">
+          <div className="px-4 py-2 bg-red-50 text-xs font-medium text-red-700 border-b border-healthcare-line">
             Before
           </div>
           <div className="text-sm font-mono">
@@ -83,7 +83,7 @@ export default function DiffViewer({ before, after, title }: DiffViewerProps) {
 
         {/* After */}
         <div>
-          <div className="px-4 py-2 bg-emerald-50 text-xs font-medium text-emerald-700 border-b border-healthcare-border">
+          <div className="px-4 py-2 bg-emerald-50 text-xs font-medium text-emerald-700 border-b border-healthcare-line">
             After
           </div>
           <div className="text-sm font-mono">

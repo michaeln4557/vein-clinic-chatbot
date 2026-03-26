@@ -207,7 +207,7 @@ export default function SmsTemplatesPage() {
 
               {/* A/B Variants */}
               {template.variants.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-healthcare-border">
+                <div className="mt-4 pt-4 border-t border-healthcare-line">
                   <div className="flex items-center gap-2 mb-3">
                     <Beaker className="w-4 h-4 text-purple-600" />
                     <span className="text-xs font-medium text-purple-700">

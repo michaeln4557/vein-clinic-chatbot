@@ -118,6 +118,7 @@ export const computedMetrics = {
 
   // Section 3: Human Handoff
   humanHandoffRequests: handoffRequested.length,   // 5
+  humanHandoffRate: Math.round((handoffRequested.length / Math.max(all.length, 1)) * 100), // 42%
   handoffViaCallback: handoffCallback.length,      // 3
   handoffViaSms: handoffSms.length,                // 2
 
@@ -267,12 +268,12 @@ export const kpiConversionPath: MetricCardData[] = [
 export const kpiEscalationRecovery: MetricCardData[] = [
   {
     id: 'human-handoff-requests',
-    label: 'Human Handoff Requests',
-    value: String(computedMetrics.humanHandoffRequests),
-    delta: '+1',
+    label: 'Human Handoff Rate',
+    value: `${computedMetrics.humanHandoffRate}%`,
+    delta: '+2%',
     deltaDirection: 'up',
-    helpText: 'Conversations where the patient requested a real person. Includes callback requests, SMS requests, and "is this a real person" queries. This is NOT a conversion metric — it measures escalation demand.',
-    helperText: `${computedMetrics.handoffViaCallback} callback · ${computedMetrics.handoffViaSms} SMS · Requested human follow-up`,
+    helpText: 'Percentage of conversations where the patient requested a real person. Includes callback requests, SMS requests, and "is this a real person" queries. This is NOT a conversion metric — it measures escalation demand.',
+    helperText: `${computedMetrics.humanHandoffRequests} requests · ${computedMetrics.handoffViaCallback} callback · ${computedMetrics.handoffViaSms} SMS`,
     status: 'warning',
     icon: PhoneCall,
     color: 'bg-amber-50 text-amber-600',

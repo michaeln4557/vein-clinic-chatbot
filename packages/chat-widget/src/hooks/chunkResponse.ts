@@ -1,15 +1,15 @@
 /**
  * Response Chunking Utility
  *
- * Splits a long bot response into smaller, human-feeling message chunks.
- * Designed to make the chatbot feel like a real person texting in short bursts.
+ * Splits bot responses into natural texting-style message bubbles.
  *
- * Rules:
- * - Split by sentence boundaries first
- * - Group 1-2 short sentences per chunk
- * - Max ~240 characters per chunk unless it's a structured block (e.g. appointment summary)
- * - Keep context together (don't split mid-thought)
- * - Respect paragraph boundaries (\n\n)
+ * CORE RULES:
+ * 1. Questions ALWAYS get their own bubble
+ * 2. Max 2 sentences per bubble (prefer 1)
+ * 3. Split by function: acknowledgment, reassurance, instruction, question
+ * 4. Trust-sensitive topics get stricter 1-sentence-per-bubble splitting
+ * 5. Max 3 bubbles per turn (merge tail if needed)
+ * 6. Never alter script order or logic
  */
 
 const STRUCTURED_BLOCK_MARKERS = [
@@ -17,20 +17,51 @@ const STRUCTURED_BLOCK_MARKERS = [
   'Patient:',
 ];
 
-/**
- * Check if text looks like a structured block (appointment summary, etc.)
- * that should NOT be split further.
- */
+const TRUST_SENSITIVE_KEYWORDS = [
+  'insurance', 'coverage', 'benefits', 'verify', 'plan',
+  'cost', 'covered', 'confirm', 'reconfirm', 'callback',
+  'follow up', 'surprises', 'expect',
+];
+
 function isStructuredBlock(text: string): boolean {
   return STRUCTURED_BLOCK_MARKERS.some((marker) => text.includes(marker));
 }
 
+function isTrustSensitive(text: string): boolean {
+  const lower = text.toLowerCase();
+  return TRUST_SENSITIVE_KEYWORDS.some((kw) => lower.includes(kw));
+}
+
+function isQuestion(s: string): boolean {
+  return /\?\s*$/.test(s.trim());
+}
+
 /**
- * Split text into sentences. Handles common abbreviations.
+ * Classify a sentence by its conversational function.
+ */
+type SentenceFunction = 'acknowledgment' | 'reassurance' | 'instruction' | 'question';
+
+const ACK_PATTERNS = [
+  /^(got it|perfect|of course|makes sense|that makes sense|totally|absolutely|no problem|no worries)/i,
+  /^(i'm sorry|sorry to hear|i understand|totally get that|totally understand)/i,
+  /^(great|nice|awesome|sounds good|okay|ok)\b/i,
+];
+
+function classifySentence(s: string): SentenceFunction {
+  if (isQuestion(s)) return 'question';
+  if (ACK_PATTERNS.some((p) => p.test(s.trim()))) return 'acknowledgment';
+  const lower = s.toLowerCase();
+  if (lower.includes('we\'ll') || lower.includes('we can') || lower.includes('i can') ||
+      lower.includes('our team') || lower.includes('you\'ll') || lower.includes('i\'ll')) {
+    return 'instruction';
+  }
+  return 'reassurance';
+}
+
+/**
+ * Split text into sentences. Handles abbreviations and addresses.
  */
 function splitSentences(text: string): string[] {
-  // Split on sentence-ending punctuation followed by a space or end-of-string
-  // But avoid splitting on common abbreviations (Dr., Mr., Mrs., etc.)
   const sentences: string[] = [];
   let current = '';
 
@@ -39,12 +70,12 @@ function splitSentences(text: string): string[] {
     current += (current ? ' ' : '') + words[i];
 
     const word = words[i];
-    const endsWithPeriod = /[.!?]$/.test(word);
+    const endsWithPunctuation = /[.!?]$/.test(word);
     const isAbbreviation = /^(Dr|Mr|Mrs|Ms|Jr|Sr|St|Ave|Blvd|Rd|Ste|Tpke|Tpk|Pkwy|Hwy)\.$/.test(word);
     const isInitial = /^[A-Z]\.$/.test(word);
     const isNumber = /^\d+\.$/.test(word);
 
-    if (endsWithPeriod && !isAbbreviation && !isInitial && !isNumber) {
+    if (endsWithPunctuation && !isAbbreviation && !isInitial && !isNumber) {
       sentences.push(current.trim());
       current = '';
     }
@@ -58,45 +89,86 @@ function splitSentences(text: string): string[] {
 }
 
 /**
- * Group sentences into chunks of comfortable reading length.
- * Prefers 1-2 sentences per chunk, max ~240 chars.
+ * Group sentences into bubbles using deterministic rules.
+ *
+ * RULES (in priority order):
+ * 1. Questions ALWAYS get their own bubble
+ * 2. Trust-sensitive: max 1 sentence per bubble (unless ack + short reassurance)
+ * 3. Short acknowledgment (< 25 chars) can pair with next non-question sentence
+ * 4. Max 2 sentences per bubble
+ * 5. Function change (e.g., reassurance -> question) forces new bubble
+ * 6. Cap at 3 bubbles total
  */
-function groupSentences(sentences: string[]): string[] {
-  const chunks: string[] = [];
-  let current = '';
+function groupSentences(sentences: string[], trustSensitive: boolean): string[] {
+  const bubbles: string[] = [];
+  let i = 0;
 
-  for (const sentence of sentences) {
-    const combined = current ? `${current} ${sentence}` : sentence;
+  while (i < sentences.length) {
+    const s = sentences[i];
+    const sFunc = classifySentence(s);
 
-    if (!current) {
-      // First sentence in this chunk
-      current = sentence;
-    } else if (combined.length <= 240) {
-      // Can fit another sentence
-      current = combined;
-    } else {
-      // Current chunk is full, start new one
-      chunks.push(current);
-      current = sentence;
+    // Rule 1: Questions always standalone
+    if (sFunc === 'question') {
+      bubbles.push(s);
+      i++;
+      continue;
     }
+
+    const next = sentences[i + 1];
+    const nextFunc = next ? classifySentence(next) : null;
+
+    // Rule 2: Trust-sensitive topics — strict 1-per-bubble
+    // Exception: short ack (< 25 chars) can pair with next non-question
+    if (trustSensitive) {
+      if (sFunc === 'acknowledgment' && s.length < 25 && next && nextFunc !== 'question') {
+        bubbles.push(`${s} ${next}`);
+        i += 2;
+        continue;
+      }
+      bubbles.push(s);
+      i++;
+      continue;
+    }
+
+    // Rule 3: Short acknowledgment (< 25 chars) pairs with next non-question
+    if (sFunc === 'acknowledgment' && s.length < 25 && next && nextFunc !== 'question') {
+      bubbles.push(`${s} ${next}`);
+      i += 2;
+      continue;
+    }
+
+    // Rule 4: Two tightly-connected non-question sentences can share a bubble
+    // Only if both are short (< 60 chars each) and same function
+    if (next && nextFunc !== 'question' && sFunc === nextFunc &&
+        s.length < 60 && next.length < 60) {
+      bubbles.push(`${s} ${next}`);
+      i += 2;
+      continue;
+    }
+
+    // Default: one sentence per bubble
+    bubbles.push(s);
+    i++;
   }
 
-  if (current) {
-    chunks.push(current);
+  // Rule 6: Cap at 3 bubbles max (trust-sensitive gets 3, normal gets 2-3)
+  if (bubbles.length > 3) {
+    const capped = bubbles.slice(0, 2);
+    capped.push(bubbles.slice(2).join(' '));
+    return capped;
   }
 
-  return chunks;
+  return bubbles;
 }
 
 /**
  * Main chunking function.
- * Takes a bot response string and returns an array of message chunks.
  */
 export function chunkResponse(text: string): string[] {
   const trimmed = text.trim();
   if (!trimmed) return [];
 
-  // ALWAYS split on paragraph boundaries first, regardless of length
+  // Split on paragraph boundaries first
   const paragraphs = trimmed.split(/\n\n+/);
 
   if (paragraphs.length > 1) {
@@ -107,72 +179,58 @@ export function chunkResponse(text: string): string[] {
       const p = para.trim();
       if (!p) continue;
 
-      // Structured blocks (appointment summary) stay together
       if (isStructuredBlock(p)) {
         if (summaryBlock) summaryBlock += '\n\n' + p;
         else summaryBlock = p;
         continue;
       }
 
-      // Flush any pending summary block first
       if (summaryBlock) {
         chunks.push(summaryBlock);
         summaryBlock = '';
       }
 
-      // Each paragraph is its own bubble (split further only if very long)
       if (p.length <= 300) {
-        chunks.push(p);
+        // Still apply sentence splitting within paragraphs
+        const sentences = splitSentences(p);
+        if (sentences.length > 1) {
+          chunks.push(...groupSentences(sentences, isTrustSensitive(p)));
+        } else {
+          chunks.push(p);
+        }
       } else {
         const sentences = splitSentences(p);
-        chunks.push(...groupSentences(sentences));
+        chunks.push(...groupSentences(sentences, isTrustSensitive(p)));
       }
     }
     if (summaryBlock) chunks.push(summaryBlock);
-    return chunks.filter((c) => c.trim().length > 0);
+
+    // Global cap: 3 bubbles max
+    const result = chunks.filter((c) => c.trim().length > 0);
+    if (result.length > 3) {
+      const capped = result.slice(0, 2);
+      capped.push(result.slice(2).join(' '));
+      return capped;
+    }
+    return result;
   }
 
-  // Single paragraph, short: don't chunk
-  if (trimmed.length <= 260) {
-    return [trimmed];
-  }
-
-  // Single long paragraph: split by sentences
+  // Single paragraph
   const sentences = splitSentences(trimmed);
-  if (sentences.length <= 1) {
-    return [trimmed];
-  }
+  if (sentences.length <= 1) return [trimmed];
 
-  return groupSentences(sentences);
+  return groupSentences(sentences, isTrustSensitive(trimmed));
 }
 
-/**
- * Calculate typing delay for a chunk based on its length.
- * Uses the humanization spec timing model.
- */
+// Legacy exports (kept for compatibility but timing now lives in useChat)
 export function chunkDelay(text: string, multiplier: number = 1.0): number {
   if (multiplier === 0) return 0;
-
   const len = text.length;
-  let min: number;
-  let max: number;
-
-  if (len <= 40) {
-    min = 100; max = 250;
-  } else if (len <= 160) {
-    min = 200; max = 450;
-  } else {
-    min = 350; max = 650;
-  }
-
-  const base = Math.floor(min + Math.random() * (max - min));
-  return Math.round(base * multiplier);
+  const min = len <= 40 ? 100 : len <= 160 ? 200 : 350;
+  const max = len <= 40 ? 250 : len <= 160 ? 450 : 650;
+  return Math.round((Math.floor(min + Math.random() * (max - min))) * multiplier);
 }
 
-/**
- * Calculate inter-chunk pause (shorter than initial typing delay).
- * Must be long enough for typing dots to be visible.
- */
 export function interChunkDelay(): number {
-  return Math.floor(200 + Math.random() * 250); // 200-450ms
+  return Math.floor(200 + Math.random() * 250);
 }

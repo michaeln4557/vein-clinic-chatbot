@@ -53,7 +53,7 @@ export default function CrmHealthTab() {
                 <th className="table-header text-right">Conflict Rate</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-healthcare-border">
+            <tbody className="divide-y divide-healthcare-line">
               {fieldCompleteness.map((f) => (
                 <tr key={f.field}>
                   <td className="table-cell text-xs font-medium">{f.field}</td>
@@ -90,7 +90,7 @@ export default function CrmHealthTab() {
           </div>
           <div className="card-body space-y-3">
             {syncErrors.map((err) => (
-              <div key={err.id} className="border border-healthcare-border rounded-lg p-3">
+              <div key={err.id} className="border border-healthcare-line rounded-lg p-3">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-mono text-healthcare-muted">{err.record}</span>
                   <div className="flex items-center gap-2">

@@ -317,7 +317,7 @@ export default function AuditLogPage() {
       {/* Table */}
       <div className="card overflow-hidden">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b border-healthcare-border">
+          <thead className="bg-gray-50 border-b border-healthcare-line">
             <tr>
               <th className="table-header w-44">Timestamp</th>
               <th className="table-header w-32">User</th>
@@ -329,7 +329,7 @@ export default function AuditLogPage() {
               <th className="table-header w-12"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-healthcare-border">
+          <tbody className="divide-y divide-healthcare-line">
             {filtered.map((entry) => (
               <Fragment key={entry.id}>
                 <tr

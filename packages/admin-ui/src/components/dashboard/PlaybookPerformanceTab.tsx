@@ -59,7 +59,7 @@ export default function PlaybookPerformanceTab() {
                 <th className="table-header text-right">Modified</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-healthcare-border">
+            <tbody className="divide-y divide-healthcare-line">
               {playbookPerformance.map((pb) => (
                 <tr key={pb.id}>
                   <td className="table-cell text-xs font-medium">{pb.name}</td>
@@ -112,7 +112,7 @@ export default function PlaybookPerformanceTab() {
           </div>
           <div className="card-body space-y-4">
             {bottomPerformers.map((pb) => (
-              <div key={pb.id} className="border border-healthcare-border rounded-lg p-4">
+              <div key={pb.id} className="border border-healthcare-line rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="text-sm font-semibold">{pb.name}</h4>
                   <span className={`text-lg font-bold ${ncsColor(pb.ncsScore)}`}>{pb.ncsScore}</span>

@@ -87,7 +87,7 @@ export default function SourcePerformanceTable({ onRowClick, compact = false }: 
               {!compact && <th className="table-header text-right">Trend</th>}
             </tr>
           </thead>
-          <tbody className="divide-y divide-healthcare-border">
+          <tbody className="divide-y divide-healthcare-line">
             {displayRows.map((row) => {
               const isBest = row.rate === maxRate && maxRate > 0;
               const isWorst = row.rate === minRate && sorted.length > 1;
@@ -126,7 +126,7 @@ export default function SourcePerformanceTable({ onRowClick, compact = false }: 
           </tbody>
         </table>
         {compact && sorted.length > 3 && (
-          <p className="text-center text-[10px] text-healthcare-muted mt-2 pt-2 border-t border-healthcare-border">
+          <p className="text-center text-[10px] text-healthcare-muted mt-2 pt-2 border-t border-healthcare-line">
             {sorted.length - 3} more sources
           </p>
         )}

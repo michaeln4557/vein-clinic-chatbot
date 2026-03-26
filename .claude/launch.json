@@ -4,13 +4,13 @@
     {
       "name": "chat-widget",
       "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
-      "runtimeArgs": ["node_modules/vite/bin/vite.js", "packages/chat-widget", "--port", "3200"],
-      "port": 3200
+      "runtimeArgs": ["node_modules/vite/bin/vite.js", "packages/chat-widget"],
+      "port": 5173
     },
     {
       "name": "admin-ui",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["node_modules/vite/bin/vite.js", "packages/admin-ui", "--port", "3100"],
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "runtimeArgs": ["scripts/start-admin-ui.js", "--port", "3100"],
       "port": 3100
     }
   ]

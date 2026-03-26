@@ -55,7 +55,7 @@ export default function FunnelChart({ data, compact = false, mode = 'combined', 
     <div className={compact ? 'space-y-2' : 'space-y-3'}>
       {/* Mode Toggle */}
       {onModeChange && (
-        <div className="flex rounded-lg border border-healthcare-border overflow-hidden w-fit mb-2">
+        <div className="flex rounded-lg border border-healthcare-line overflow-hidden w-fit mb-2">
           {modes.map((m) => (
             <button
               key={m.value}

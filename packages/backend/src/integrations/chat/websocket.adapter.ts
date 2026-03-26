@@ -126,6 +126,49 @@ export class WebSocketAdapter extends EventEmitter {
   }
 
   /**
+   * Deliver a sequence of message fragments with realistic delays.
+   * Each fragment is preceded by a typing indicator and a timed pause
+   * to simulate a real person composing and sending messages.
+   *
+   * Used by Patient Coordinator (Human Mode) to make the bot feel
+   * indistinguishable from a human texting.
+   */
+  async sendFragmentedResponse(
+    connectionId: string,
+    fragments: Array<{ content: string; delay_ms: number; show_typing: boolean }>,
+    metadata?: Record<string, unknown>,
+  ): Promise<void> {
+    for (const fragment of fragments) {
+      // Show typing indicator during the delay
+      if (fragment.show_typing && fragment.delay_ms > 0) {
+        this.sendTypingIndicator(connectionId, true);
+      }
+
+      // Wait for the realistic delay
+      if (fragment.delay_ms > 0) {
+        await this.delay(fragment.delay_ms);
+      }
+
+      // Stop typing indicator
+      if (fragment.show_typing) {
+        this.sendTypingIndicator(connectionId, false);
+      }
+
+      // Send the fragment as an individual message
+      this.sendBotMessage(connectionId, fragment.content, {
+        ...metadata,
+        is_fragment: true,
+        fragment_index: fragments.indexOf(fragment),
+        fragment_count: fragments.length,
+      });
+    }
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
    * Handle disconnection
    */
   handleDisconnection(connectionId: string): void {

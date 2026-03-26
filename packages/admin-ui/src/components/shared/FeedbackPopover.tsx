@@ -56,7 +56,7 @@ export default function FeedbackPopover({ messageId, onSubmit, onClose }: Feedba
   };
 
   return (
-    <div className="w-80 bg-white rounded-xl shadow-xl border border-healthcare-border p-4 space-y-3">
+    <div className="w-80 bg-white rounded-xl shadow-xl border border-healthcare-line p-4 space-y-3">
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-semibold text-healthcare-text">Provide Feedback</h4>
         <button onClick={onClose} className="text-healthcare-muted hover:text-healthcare-text">
@@ -73,7 +73,7 @@ export default function FeedbackPopover({ messageId, onSubmit, onClose }: Feedba
             className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg text-xs border transition-colors ${
               selectedType === action.type
                 ? 'border-brand-500 bg-brand-50 text-brand-700'
-                : 'border-healthcare-border text-healthcare-muted hover:bg-gray-50'
+                : 'border-healthcare-line text-healthcare-muted hover:bg-gray-50'
             }`}
           >
             <action.icon className="w-4 h-4" />

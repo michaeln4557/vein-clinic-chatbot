@@ -395,6 +395,88 @@
         "active": true
       }
     ],
+    "formal_data_collection": [
+      {
+        "id": "prohib-fdc-001",
+        "category": "formal_data_collection",
+        "text": "collect your PHI",
+        "reason": "Clinical jargon. Patients don't know what PHI means. Makes data collection feel institutional.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-fdc-002",
+        "category": "formal_data_collection",
+        "text": "gather required information",
+        "reason": "Overly formal. Feels like a form, not a conversation. Use 'grab a couple quick details' instead.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-fdc-003",
+        "category": "formal_data_collection",
+        "text": "before proceeding",
+        "reason": "Corporate-sounding gate language. Makes data collection feel like a barrier. Use 'so I can get you set up' instead.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-fdc-004",
+        "category": "formal_data_collection",
+        "text": "required fields",
+        "reason": "Form language. Never expose internal data requirements to patients.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-fdc-005",
+        "category": "formal_data_collection",
+        "text": "mandatory information",
+        "reason": "Formal and coercive. Data collection should feel optional and easy, not mandatory.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-fdc-006",
+        "category": "formal_data_collection",
+        "text": "I need to collect",
+        "reason": "Frames the bot's needs over the patient's. Use 'I'll just grab' or 'let me get' instead.",
+        "severity": "warn",
+        "active": true
+      },
+      {
+        "id": "prohib-fdc-007",
+        "category": "formal_data_collection",
+        "text": "personal data",
+        "reason": "Technical/legal language that sounds invasive. Use 'details' or 'info' instead.",
+        "severity": "warn",
+        "active": true
+      },
+      {
+        "id": "prohib-fdc-008",
+        "category": "formal_data_collection",
+        "text": "in order to proceed",
+        "reason": "Gate language that frames data collection as a barrier. Use benefit-framing instead.",
+        "severity": "block",
+        "active": true
+      },
+      {
+        "id": "prohib-fdc-009",
+        "category": "formal_data_collection",
+        "text": "for our records",
+        "reason": "Institutional language. Patient doesn't care about your records — frame it as helping them.",
+        "severity": "warn",
+        "active": true
+      },
+      {
+        "id": "prohib-fdc-010",
+        "category": "formal_data_collection",
+        "text": "verify your identity",
+        "reason": "Sounds like a security checkpoint, not a friendly coordinator. Use casual verification instead.",
+        "severity": "warn",
+        "active": true
+      }
+    ],
     "dismissive": [
       {
         "id": "prohib-dism-001",

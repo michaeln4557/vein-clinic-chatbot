@@ -1,6 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/shared/Sidebar';
 import DashboardPage from './pages/DashboardPage';
+import FunnelAnalyticsPage from './pages/FunnelAnalyticsPage';
+import ConversationReviewPage from './pages/ConversationReviewPage';
+import SourcePerformancePage from './pages/SourcePerformancePage';
 import PlaybooksPage from './pages/PlaybooksPage';
 import SlidersPage from './pages/SlidersPage';
 import LocationsPage from './pages/LocationsPage';
@@ -22,6 +25,9 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/funnel" element={<FunnelAnalyticsPage />} />
+            <Route path="/conversations" element={<ConversationReviewPage />} />
+            <Route path="/sources" element={<SourcePerformancePage />} />
             <Route path="/playbooks" element={<PlaybooksPage />} />
             <Route path="/phrases" element={<PhrasesPage />} />
             <Route path="/sliders" element={<SlidersPage />} />

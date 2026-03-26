@@ -22,6 +22,13 @@ import { ResponseComposerService } from './response-composer.service';
 import { ExtractionService } from './extraction.service';
 import { SliderService } from './slider.service';
 import { AuditService } from './audit.service';
+import {
+  MessageFragmentationService,
+  HUMAN_MODE_FRAGMENTATION_CONFIG,
+  NO_FRAGMENTATION_CONFIG,
+} from './message-fragmentation.service';
+import type { FragmentationResult } from './message-fragmentation.service';
+import { SliderPresetName } from '../../shared/src/types/slider';
 import { logger } from '../index';
 
 // ─── Internal types used by the orchestration engine ────────────────────────
@@ -61,6 +68,8 @@ export interface OrchestrationTrace {
  * the response, and produces a full orchestration trace for observability.
  */
 export class OrchestrationService {
+  private readonly fragmentationService: MessageFragmentationService;
+
   constructor(
     private readonly playbookService: PlaybookService,
     private readonly policyService: PolicyService,
@@ -68,7 +77,9 @@ export class OrchestrationService {
     private readonly extractionService: ExtractionService,
     private readonly sliderService: SliderService,
     private readonly auditService: AuditService,
-  ) {}
+  ) {
+    this.fragmentationService = new MessageFragmentationService();
+  }
 
   /**
    * Main entry point: receives a raw user message and orchestrates the
@@ -77,7 +88,7 @@ export class OrchestrationService {
   async processMessage(
     conversationId: string,
     message: { content: string; channel?: Channel },
-  ): Promise<{ response: string; trace: OrchestrationTrace }> {
+  ): Promise<{ response: string; fragments: FragmentationResult; trace: OrchestrationTrace }> {
     const startTime = Date.now();
     const traceId = uuid();
     const channel = message.channel ?? Channel.WebChat;
@@ -155,6 +166,18 @@ export class OrchestrationService {
       // TODO: Trigger handoff service
     }
 
+    // Step 10 - Fragment response for Human Mode delivery
+    const fragmentationConfig = await this.getFragmentationConfig(channel, activePlaybooks[0]?.id);
+    const fragments = this.fragmentationService.fragment(response, fragmentationConfig);
+
+    if (fragments.was_fragmented) {
+      logger.info('Response fragmented for Human Mode delivery', {
+        traceId,
+        fragmentCount: fragments.fragments.length,
+        totalDeliveryMs: fragments.total_delivery_ms,
+      });
+    }
+
     // Build the full trace
     const trace = this.buildOrchestrationTrace({
       traceId,
@@ -177,7 +200,7 @@ export class OrchestrationService {
       details: { traceId, intent: intent.intent, workflowStage },
     });
 
-    return { response, trace };
+    return { response, fragments, trace };
   }
 
   /**
@@ -419,6 +442,23 @@ export class OrchestrationService {
   }
 
   // ─── Private ────────────────────────────────────────────────────────────────
+
+  /**
+   * Determines fragmentation config based on the active preset.
+   * Returns Human Mode config when the Patient Coordinator (Human Mode)
+   * preset is active; otherwise returns no-fragmentation passthrough.
+   */
+  private async getFragmentationConfig(
+    channel: Channel | string,
+    playbookId?: string,
+  ) {
+    // Check if the active preset is Human Mode by inspecting current tone settings.
+    // Human Mode has very low formality (20) and very low detail (20) — a unique signature.
+    const tone = await this.sliderService.getEffectiveToneSettings(channel, playbookId);
+    const isHumanMode = tone.formality <= 25 && tone.detail <= 25;
+
+    return isHumanMode ? HUMAN_MODE_FRAGMENTATION_CONFIG : NO_FRAGMENTATION_CONFIG;
+  }
 
   private async loadConversationState(conversationId: string): Promise<ConversationState> {
     // TODO: Replace with Prisma query
